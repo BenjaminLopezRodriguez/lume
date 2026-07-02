@@ -10,6 +10,9 @@ import {
   Briefcase,
   Storefront,
   Globe,
+  MagnifyingGlass,
+  Package,
+  CalendarCheck,
 } from "@phosphor-icons/react/dist/ssr";
 
 const DARK = "#17120e";
@@ -27,6 +30,7 @@ export default function Home() {
       <FeatureScroll />
       <Offering />
       <HowYouSell />
+      <LumeShop />
       <Testimonials />
       <BottomCTA />
       <Footer />
@@ -41,6 +45,9 @@ function TopBar() {
     <div className="flex items-center justify-center gap-8 border-b border-gray-100 py-2 text-sm" style={{ color: GRAY }}>
       <a href="#" className="font-medium transition-colors hover:text-black" style={{ color: DARK }}>
         For merchants
+      </a>
+      <a href="#" className="transition-colors hover:text-black">
+        For shoppers
       </a>
       <a href="#" className="transition-colors hover:text-black">
         For developers
@@ -63,7 +70,7 @@ function Nav() {
         </div>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary">
-          {["Features", "Merchants", "Pricing", "Docs"].map((item) => (
+          {["Features", "Merchants", "Lume Shop", "Pricing", "Docs"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}
@@ -459,6 +466,191 @@ function HowYouSell() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Lume Shop ────────────────────────────────────────────────────────────────
+
+const SHOPPER_PERKS = [
+  { Icon: CheckCircle, text: "Saved payment info everywhere — pay once, never re-enter again." },
+  { Icon: Star, text: "Verified reviews from real customers at every Lume business." },
+  { Icon: Package, text: "Live order and booking status for everything in one feed." },
+  { Icon: CalendarCheck, text: "Book, order, and buy from any Lume seller in seconds." },
+];
+
+const SHOP_LISTINGS = [
+  { name: "Rosemary Bistro", tag: "Restaurant · 0.3 mi", rating: "4.9", color: "#3d2a1a" },
+  { name: "Luxe Cuts Studio", tag: "Hair salon · Now open", rating: "4.8", color: "#1a2a3d" },
+  { name: "Mesa Home Goods", tag: "Merchant · Ships today", rating: "4.7", color: "#1a3d2a" },
+];
+
+function LumeShop() {
+  return (
+    <section className="overflow-hidden px-6 py-24" style={{ backgroundColor: DARK }}>
+      <div className="mx-auto grid max-w-7xl items-center gap-20 lg:grid-cols-2">
+
+        {/* copy */}
+        <div className="flex flex-col gap-8">
+          <div>
+            <span
+              className="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest"
+              style={{ backgroundColor: PINK, color: "white" }}
+            >
+              Lume Shop
+            </span>
+          </div>
+
+          <h2 className="text-5xl font-black leading-[1.05] tracking-tight text-white lg:text-6xl">
+            One app.<br />Every seller.
+          </h2>
+
+          <p className="max-w-md text-lg leading-relaxed" style={{ color: "#9e9693" }}>
+            Thousands of restaurants, service businesses, and merchants —
+            all on one marketplace. Discover local favorites, book what you need,
+            and check out in seconds with your saved info.
+          </p>
+
+          <ul className="flex flex-col gap-4">
+            {SHOPPER_PERKS.map(({ Icon, text }) => (
+              <li key={text} className="flex items-start gap-3">
+                <Icon size={18} weight="fill" style={{ color: PINK }} className="mt-0.5 shrink-0" aria-hidden />
+                <span className="text-sm leading-relaxed" style={{ color: "#c4bfbe" }}>{text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              className="flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white transition-opacity hover:opacity-85"
+              style={{ backgroundColor: PINK }}
+            >
+              Download the app <ArrowRight size={16} />
+            </button>
+            <button
+              className="text-sm font-semibold underline underline-offset-4 transition-opacity hover:opacity-60"
+              style={{ color: "#9e9693" }}
+            >
+              Browse Lume Shop
+            </button>
+          </div>
+        </div>
+
+        {/* phone mockup */}
+        <div className="relative flex justify-center lg:justify-end">
+          <div
+            className="relative w-64 overflow-hidden rounded-[2.5rem] shadow-2xl"
+            style={{ backgroundColor: "#1c1512", border: "1px solid #2e2520" }}
+          >
+            {/* notch */}
+            <div className="flex justify-center pb-1 pt-3">
+              <div className="h-5 w-24 rounded-full" style={{ backgroundColor: "#2e2520" }} />
+            </div>
+
+            <div className="px-4 pb-8">
+              {/* header */}
+              <div className="mb-4 flex items-center justify-between py-2">
+                <span className="text-base font-black text-white">Lume Shop</span>
+                <div
+                  className="flex size-7 items-center justify-center rounded-full"
+                  style={{ backgroundColor: PINK }}
+                >
+                  <Lightning size={13} weight="fill" className="text-white" aria-hidden />
+                </div>
+              </div>
+
+              {/* search */}
+              <div
+                className="mb-4 flex items-center gap-2 rounded-2xl px-3 py-2.5"
+                style={{ backgroundColor: "#2e2520" }}
+              >
+                <MagnifyingGlass size={12} style={{ color: "#6b5f5a" }} aria-hidden />
+                <span className="text-xs" style={{ color: "#6b5f5a" }}>
+                  Restaurants, services, shops...
+                </span>
+              </div>
+
+              {/* category pills */}
+              <div className="mb-4 flex gap-2">
+                {["All", "Food", "Services", "Shop"].map((cat, i) => (
+                  <span
+                    key={cat}
+                    className="shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold"
+                    style={{
+                      backgroundColor: i === 0 ? PINK : "#2e2520",
+                      color: i === 0 ? "white" : "#9e9693",
+                    }}
+                  >
+                    {cat}
+                  </span>
+                ))}
+              </div>
+
+              {/* listings */}
+              <div className="space-y-2">
+                {SHOP_LISTINGS.map(({ name, tag, rating, color }) => (
+                  <div
+                    key={name}
+                    className="flex items-center gap-3 rounded-2xl p-3"
+                    style={{ backgroundColor: "#2e2520" }}
+                  >
+                    <div
+                      className="size-10 shrink-0 rounded-xl"
+                      style={{ backgroundColor: color }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-xs font-semibold text-white">{name}</div>
+                      <div className="truncate text-xs" style={{ color: "#6b5f5a" }}>{tag}</div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-0.5">
+                      <Star size={10} weight="fill" style={{ color: "#fbbf24" }} aria-hidden />
+                      <span className="text-xs font-semibold" style={{ color: "#9e9693" }}>{rating}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* bottom nav */}
+              <div
+                className="mt-4 flex justify-around border-t pt-3"
+                style={{ borderColor: "#2e2520" }}
+                aria-hidden
+              >
+                {["Home", "Explore", "Orders", "You"].map((tab, i) => (
+                  <div key={tab} className="flex flex-col items-center gap-0.5">
+                    <div
+                      className="size-4 rounded"
+                      style={{ backgroundColor: i === 0 ? PINK : "#3d3028" }}
+                    />
+                    <span className="text-[10px]" style={{ color: i === 0 ? PINK : "#6b5f5a" }}>
+                      {tab}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* floating badges */}
+          <div
+            aria-hidden
+            className="absolute -left-6 top-16 hidden rounded-2xl px-4 py-3 shadow-xl lg:block"
+            style={{ backgroundColor: "#2e2520", border: "1px solid #3d3028" }}
+          >
+            <div className="text-xs font-semibold text-white">Order placed</div>
+            <div className="mt-0.5 text-xs" style={{ color: "#9e9693" }}>Rosemary Bistro · $29.16</div>
+          </div>
+
+          <div
+            aria-hidden
+            className="absolute -right-6 bottom-20 hidden rounded-2xl px-4 py-3 shadow-xl lg:block"
+            style={{ backgroundColor: PINK }}
+          >
+            <div className="text-xs font-bold text-white">Booking confirmed</div>
+            <div className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>Luxe Cuts · 3:00 PM today</div>
+          </div>
         </div>
       </div>
     </section>
