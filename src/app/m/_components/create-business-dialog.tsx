@@ -9,7 +9,6 @@ import {
   Plus,
   Storefront,
 } from "@phosphor-icons/react";
-import { useBusinesses } from "@/app/m/_components/business-provider";
 import type { BusinessType } from "@/app/m/_lib/business-types";
 import { BUSINESS_ROUTES } from "@/app/m/_lib/business-types";
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 const CREATE_OPTIONS = [
   {
@@ -32,43 +32,45 @@ const CREATE_OPTIONS = [
     label: "Store",
     desc: "Link-based checkout for retail",
     Icon: Storefront,
+    comingSoon: true,
   },
   {
     type: "restaurant" as const,
     label: "Restaurant",
     desc: "QR ordering and kitchen sync",
     Icon: ForkKnife,
+    comingSoon: false,
   },
   {
     type: "event" as const,
     label: "Event",
     desc: "Ticket sales and deposits",
     Icon: CalendarStar,
+    comingSoon: true,
   },
 ] as const;
 
 type Step = "pick" | "form";
 
-const EMPTY_STORE = { name: "", description: "" };
 const EMPTY_RESTAURANT = { name: "", cuisine: "", address: "" };
-const EMPTY_EVENT = { name: "", date: "", location: "", capacity: "" };
 
 export function CreateBusinessDialog() {
   const router = useRouter();
-  const { createStore, createRestaurant, createEvent } = useBusinesses();
+  const utils = api.useUtils();
+  const createBusiness = api.business.create.useMutation({
+    onSuccess: async () => {
+      await utils.business.invalidate();
+    },
+  });
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("pick");
   const [selectedType, setSelectedType] = useState<BusinessType | null>(null);
-  const [storeForm, setStoreForm] = useState(EMPTY_STORE);
   const [restaurantForm, setRestaurantForm] = useState(EMPTY_RESTAURANT);
-  const [eventForm, setEventForm] = useState(EMPTY_EVENT);
 
   function resetDialog() {
     setStep("pick");
     setSelectedType(null);
-    setStoreForm(EMPTY_STORE);
     setRestaurantForm(EMPTY_RESTAURANT);
-    setEventForm(EMPTY_EVENT);
   }
 
   function handleOpenChange(nextOpen: boolean) {
@@ -76,56 +78,30 @@ export function CreateBusinessDialog() {
     if (!nextOpen) resetDialog();
   }
 
-  function selectType(type: BusinessType) {
+  function selectType(type: BusinessType, comingSoon: boolean) {
+    if (comingSoon) return;
     setSelectedType(type);
     setStep("form");
   }
 
-  function handleCreate(event: React.FormEvent) {
+  async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
-    if (!selectedType) return;
+    if (selectedType !== "restaurant" || !restaurantForm.name.trim()) return;
 
-    if (selectedType === "store") {
-      if (!storeForm.name.trim()) return;
-      createStore({
-        name: storeForm.name.trim(),
-        description: storeForm.description.trim(),
-      });
-    }
-
-    if (selectedType === "restaurant") {
-      if (!restaurantForm.name.trim()) return;
-      createRestaurant({
-        name: restaurantForm.name.trim(),
-        cuisine: restaurantForm.cuisine.trim(),
-        address: restaurantForm.address.trim(),
-      });
-    }
-
-    if (selectedType === "event") {
-      if (!eventForm.name.trim()) return;
-      createEvent({
-        name: eventForm.name.trim(),
-        date: eventForm.date,
-        location: eventForm.location.trim(),
-        capacity: eventForm.capacity.trim(),
-      });
-    }
+    await createBusiness.mutateAsync({
+      type: "restaurant",
+      name: restaurantForm.name.trim(),
+      cuisine: restaurantForm.cuisine.trim() || undefined,
+      address: restaurantForm.address.trim() || undefined,
+    });
 
     setOpen(false);
     resetDialog();
-    router.push(BUSINESS_ROUTES[selectedType]);
+    router.push(BUSINESS_ROUTES.restaurant);
   }
 
   const selectedOption = CREATE_OPTIONS.find((option) => option.type === selectedType);
-  const canSubmit =
-    selectedType === "store"
-      ? storeForm.name.trim().length > 0
-      : selectedType === "restaurant"
-        ? restaurantForm.name.trim().length > 0
-        : selectedType === "event"
-          ? eventForm.name.trim().length > 0
-          : false;
+  const canSubmit = restaurantForm.name.trim().length > 0 && !createBusiness.isPending;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -150,22 +126,31 @@ export function CreateBusinessDialog() {
               </DialogDescription>
             </DialogHeader>
             <div className="divide-y divide-[#ebebeb]">
-              {CREATE_OPTIONS.map(({ type, label, desc, Icon }) => (
+              {CREATE_OPTIONS.map(({ type, label, desc, Icon, comingSoon }) => (
                 <button
                   key={type}
                   type="button"
+                  disabled={comingSoon}
                   className={cn(
-                    "flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]",
+                    "flex w-full items-center gap-3 px-5 py-4 text-left transition-colors",
+                    comingSoon
+                      ? "cursor-not-allowed opacity-60"
+                      : "hover:bg-[#fafafa]",
                   )}
-                  onClick={() => selectType(type)}
+                  onClick={() => selectType(type, comingSoon)}
                 >
                   <div className="flex size-10 items-center justify-center rounded-lg bg-[#f5f5f5] text-neutral-700">
                     <Icon size={20} weight="regular" aria-hidden />
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-neutral-900">{label}</p>
                     <p className="text-sm text-neutral-500">{desc}</p>
                   </div>
+                  {comingSoon ? (
+                    <span className="shrink-0 rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[0.625rem] font-medium text-neutral-500">
+                      Soon
+                    </span>
+                  ) : null}
                 </button>
               ))}
             </div>
@@ -194,160 +179,52 @@ export function CreateBusinessDialog() {
             </DialogHeader>
 
             <div className="flex flex-col gap-4 px-5 py-5">
-              {selectedType === "store" ? (
-                <>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="store-name">Name</Label>
-                    <Input
-                      id="store-name"
-                      value={storeForm.name}
-                      onChange={(event) =>
-                        setStoreForm((current) => ({
-                          ...current,
-                          name: event.target.value,
-                        }))
-                      }
-                      placeholder="Mesa Home Goods"
-                      className="h-10 rounded-lg"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="store-description">Description</Label>
-                    <Textarea
-                      id="store-description"
-                      value={storeForm.description}
-                      onChange={(event) =>
-                        setStoreForm((current) => ({
-                          ...current,
-                          description: event.target.value,
-                        }))
-                      }
-                      placeholder="What do you sell?"
-                      className="min-h-24 rounded-lg"
-                    />
-                  </div>
-                </>
-              ) : null}
-
-              {selectedType === "restaurant" ? (
-                <>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="restaurant-name">Name</Label>
-                    <Input
-                      id="restaurant-name"
-                      value={restaurantForm.name}
-                      onChange={(event) =>
-                        setRestaurantForm((current) => ({
-                          ...current,
-                          name: event.target.value,
-                        }))
-                      }
-                      placeholder="Rosemary Bistro"
-                      className="h-10 rounded-lg"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="restaurant-cuisine">Cuisine</Label>
-                    <Input
-                      id="restaurant-cuisine"
-                      value={restaurantForm.cuisine}
-                      onChange={(event) =>
-                        setRestaurantForm((current) => ({
-                          ...current,
-                          cuisine: event.target.value,
-                        }))
-                      }
-                      placeholder="Italian, brunch, wine bar"
-                      className="h-10 rounded-lg"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="restaurant-address">Address</Label>
-                    <Input
-                      id="restaurant-address"
-                      value={restaurantForm.address}
-                      onChange={(event) =>
-                        setRestaurantForm((current) => ({
-                          ...current,
-                          address: event.target.value,
-                        }))
-                      }
-                      placeholder="123 Main St, Austin TX"
-                      className="h-10 rounded-lg"
-                    />
-                  </div>
-                </>
-              ) : null}
-
-              {selectedType === "event" ? (
-                <>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="event-name">Name</Label>
-                    <Input
-                      id="event-name"
-                      value={eventForm.name}
-                      onChange={(event) =>
-                        setEventForm((current) => ({
-                          ...current,
-                          name: event.target.value,
-                        }))
-                      }
-                      placeholder="Wine dinner"
-                      className="h-10 rounded-lg"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="event-date">Date</Label>
-                    <Input
-                      id="event-date"
-                      type="date"
-                      value={eventForm.date}
-                      onChange={(event) =>
-                        setEventForm((current) => ({
-                          ...current,
-                          date: event.target.value,
-                        }))
-                      }
-                      className="h-10 rounded-lg"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="event-location">Location</Label>
-                    <Input
-                      id="event-location"
-                      value={eventForm.location}
-                      onChange={(event) =>
-                        setEventForm((current) => ({
-                          ...current,
-                          location: event.target.value,
-                        }))
-                      }
-                      placeholder="Private dining room"
-                      className="h-10 rounded-lg"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="event-capacity">Capacity</Label>
-                    <Input
-                      id="event-capacity"
-                      type="number"
-                      min={1}
-                      value={eventForm.capacity}
-                      onChange={(event) =>
-                        setEventForm((current) => ({
-                          ...current,
-                          capacity: event.target.value,
-                        }))
-                      }
-                      placeholder="24"
-                      className="h-10 rounded-lg"
-                    />
-                  </div>
-                </>
-              ) : null}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="restaurant-name">Name</Label>
+                <Input
+                  id="restaurant-name"
+                  value={restaurantForm.name}
+                  onChange={(event) =>
+                    setRestaurantForm((current) => ({
+                      ...current,
+                      name: event.target.value,
+                    }))
+                  }
+                  placeholder="Rosemary Bistro"
+                  className="h-10 rounded-lg"
+                  autoFocus
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="restaurant-cuisine">Cuisine</Label>
+                <Input
+                  id="restaurant-cuisine"
+                  value={restaurantForm.cuisine}
+                  onChange={(event) =>
+                    setRestaurantForm((current) => ({
+                      ...current,
+                      cuisine: event.target.value,
+                    }))
+                  }
+                  placeholder="Italian, brunch, wine bar"
+                  className="h-10 rounded-lg"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="restaurant-address">Address</Label>
+                <Input
+                  id="restaurant-address"
+                  value={restaurantForm.address}
+                  onChange={(event) =>
+                    setRestaurantForm((current) => ({
+                      ...current,
+                      address: event.target.value,
+                    }))
+                  }
+                  placeholder="123 Main St, Austin TX"
+                  className="h-10 rounded-lg"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 border-t border-[#ebebeb] px-5 py-4">
@@ -360,7 +237,7 @@ export function CreateBusinessDialog() {
                 Cancel
               </Button>
               <Button type="submit" className="rounded-lg" disabled={!canSubmit}>
-                Create
+                {createBusiness.isPending ? "Creating..." : "Create"}
               </Button>
             </div>
           </form>

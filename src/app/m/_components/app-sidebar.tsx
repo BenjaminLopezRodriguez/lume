@@ -10,9 +10,16 @@ import {
   ChartBar,
   ForkKnife,
   Gear,
+  Plugs,
   ShareNetwork,
   Storefront,
 } from "@phosphor-icons/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -30,12 +37,13 @@ import { cn } from "@/lib/utils";
 const PRIMARY_NAV = [
   { href: "/m/dashboard", label: "Dashboard", Icon: ChartBar },
   { href: "/m/share", label: "Share", Icon: ShareNetwork },
+  { href: "/m/connect", label: "Connect", Icon: Plugs },
 ] as const;
 
 const BUSINESS_NAV = [
-  { href: "/m/store", label: "Store", Icon: Storefront },
-  { href: "/m/restaurant", label: "Restaurant", Icon: ForkKnife },
-  { href: "/m/event", label: "Event", Icon: CalendarStar },
+  { href: "/m/store", label: "Store", Icon: Storefront, comingSoon: true },
+  { href: "/m/restaurant", label: "Restaurant", Icon: ForkKnife, comingSoon: false },
+  { href: "/m/event", label: "Event", Icon: CalendarStar, comingSoon: true },
 ] as const;
 
 const SECONDARY_NAV = [
@@ -48,12 +56,14 @@ function NavLink({
   Icon,
   active,
   onNavigate,
+  comingSoon,
 }: {
   href: string;
   label: string;
   Icon: React.ComponentType<{ size?: number; weight?: "regular" | "fill" }>;
   active: boolean;
   onNavigate: () => void;
+  comingSoon?: boolean;
 }) {
   return (
     <SidebarMenuItem>
@@ -68,7 +78,14 @@ function NavLink({
       >
         <Link href={href} onClick={onNavigate}>
           <Icon size={18} weight={active ? "fill" : "regular"} />
-          <span>{label}</span>
+          <span className="flex flex-1 items-center justify-between gap-2">
+            {label}
+            {comingSoon ? (
+              <span className="rounded-full bg-[#f5f5f5] px-1.5 py-0.5 text-[0.625rem] font-medium text-neutral-500">
+                Soon
+              </span>
+            ) : null}
+          </span>
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -78,7 +95,7 @@ function NavLink({
 export function AppSidebar() {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
-  const { activeBusiness } = useBusinesses();
+  const { activeBusiness, businesses, setActiveBusiness } = useBusinesses();
 
   function closeOnNavigate() {
     if (isMobile) setOpenMobile(false);
@@ -99,13 +116,36 @@ export function AppSidebar() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="flex h-10 min-w-0 flex-1 items-center justify-between rounded-lg border border-[#ebebeb] bg-white px-3 text-sm font-medium text-neutral-900"
-          >
-            <span className="truncate">{activeBusiness?.name ?? "Rosemary Bistro"}</span>
-            <CaretDown size={14} className="shrink-0 text-neutral-400" aria-hidden />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex h-10 min-w-0 flex-1 items-center justify-between rounded-lg border border-[#ebebeb] bg-white px-3 text-sm font-medium text-neutral-900"
+              >
+                <span className="truncate">
+                  {activeBusiness?.name ?? "Select business"}
+                </span>
+                <CaretDown size={14} className="shrink-0 text-neutral-400" aria-hidden />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              {businesses.length > 0 ? (
+                businesses.map((business) => (
+                  <DropdownMenuItem
+                    key={business.id}
+                    onClick={() => void setActiveBusiness(business.id)}
+                  >
+                    <span className="truncate">{business.name}</span>
+                    <span className="ml-auto text-xs text-neutral-400 capitalize">
+                      {business.type}
+                    </span>
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem disabled>No businesses yet</DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <CreateBusinessDialog />
         </div>
       </SidebarHeader>
@@ -133,7 +173,7 @@ export function AppSidebar() {
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {BUSINESS_NAV.map(({ href, label, Icon }) => (
+              {BUSINESS_NAV.map(({ href, label, Icon, comingSoon }) => (
                 <NavLink
                   key={href}
                   href={href}
@@ -141,6 +181,7 @@ export function AppSidebar() {
                   Icon={Icon}
                   active={pathname === href || pathname.startsWith(`${href}/`)}
                   onNavigate={closeOnNavigate}
+                  comingSoon={comingSoon}
                 />
               ))}
             </SidebarMenu>

@@ -15,8 +15,8 @@ const DEFAULT_TABLES = [
 ] as const;
 
 export function RestaurantPageView() {
-  const { getLatestByType } = useBusinesses();
-  const restaurant = getLatestByType("restaurant");
+  const { getBusinessByType } = useBusinesses();
+  const restaurant = getBusinessByType("restaurant");
 
   return (
     <PageContent>

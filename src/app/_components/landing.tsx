@@ -185,15 +185,19 @@ function Nav() {
             size="sm"
             className="rounded-full text-sm font-medium [touch-action:manipulation]"
             style={{ color: "var(--landing-fg)" }}
+            asChild
           >
-            Log in
+            <a href="/api/auth/login?post_login_redirect_url=/m/dashboard">Log in</a>
           </Button>
           <Button
             size="sm"
             className="btn-spring rounded-full px-6 py-2 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{ backgroundColor: "var(--landing-fg)" }}
+            asChild
           >
-            Get started
+            <a href="/api/auth/register?post_login_redirect_url=/m/onboarding">
+              Get started
+            </a>
           </Button>
         </div>
       </div>
@@ -223,7 +227,8 @@ function Hero() {
           </p>
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-4">
-              <button
+              <a
+                href="/api/auth/register?post_login_redirect_url=/m/onboarding"
                 className="btn-spring flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{
                   backgroundColor: "var(--landing-accent-deep)",
@@ -231,7 +236,7 @@ function Hero() {
                 }}
               >
                 Get started free <ArrowRight size={16} aria-hidden />
-              </button>
+              </a>
             </div>
             <p className="text-xs" style={{ color: "var(--landing-subtle)" }}>
               Apple Pay · Google Pay · Visa · Mastercard · Amex
@@ -1128,12 +1133,13 @@ function BottomCTA() {
           Just a checkout that works — for every type of business, from day one.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <button
+          <a
+            href="/api/auth/register?post_login_redirect_url=/m/onboarding"
             className="btn-spring flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold [touch-action:manipulation] hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             style={{ backgroundColor: "var(--landing-fg)", color: "white" }}
           >
             Get started free <ArrowRight size={16} aria-hidden />
-          </button>
+          </a>
           <button
             className="btn-spring rounded-full border border-white/30 px-8 py-4 text-base font-bold text-white [touch-action:manipulation] hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >

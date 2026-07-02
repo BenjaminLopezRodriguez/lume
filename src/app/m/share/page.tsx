@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { Check, Copy } from "@phosphor-icons/react";
+import { useBusinesses } from "@/app/m/_components/business-provider";
 import { ListCard, ListCardRow } from "@/app/m/_components/list-card";
 import { PageContent } from "@/app/m/_components/page-content";
 import { PageHeader } from "@/app/m/_components/page-header";
 import { SectionHeader } from "@/app/m/_components/section-header";
 import { Button } from "@/components/ui/button";
-
-const CHECKOUT_URL = "https://lume.co/rosemary-bistro";
 
 const SHARE_OPTIONS = [
   { label: "Table QR", trailing: "Print for dine-in", dot: "#6366f1" },
@@ -17,10 +16,13 @@ const SHARE_OPTIONS = [
 ] as const;
 
 export default function SharePage() {
+  const { activeBusiness } = useBusinesses();
+  const checkoutUrl = activeBusiness?.stripePaymentLinkUrl;
   const [copied, setCopied] = useState(false);
 
   async function copyLink() {
-    await navigator.clipboard.writeText(CHECKOUT_URL);
+    if (!checkoutUrl) return;
+    await navigator.clipboard.writeText(checkoutUrl);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 2000);
   }
@@ -44,13 +46,16 @@ export default function SharePage() {
         <section className="flex flex-col gap-3">
           <SectionHeader title="Checkout link" />
           <div className="flex items-center gap-2 rounded-xl border border-[#ebebeb] bg-white px-4 py-3">
-            <p className="min-w-0 flex-1 truncate text-sm text-neutral-600">{CHECKOUT_URL}</p>
+            <p className="min-w-0 flex-1 truncate text-sm text-neutral-600">
+              {checkoutUrl ?? "Create a business to generate your checkout link"}
+            </p>
             <Button
               type="button"
               variant="outline"
               size="sm"
               className="h-8 shrink-0 rounded-lg border-[#ebebeb] px-3"
               onClick={copyLink}
+              disabled={!checkoutUrl}
             >
               {copied ? (
                 <>

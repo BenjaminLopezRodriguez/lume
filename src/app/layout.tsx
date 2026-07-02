@@ -34,7 +34,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(figtree.variable, bricolage.variable, spaceGrotesk.variable, "font-sans")}>
       <body>
-        <TRPCReactProvider><TooltipProvider>{children}</TooltipProvider></TRPCReactProvider>
+        <TRPCReactProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   );

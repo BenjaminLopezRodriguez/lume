@@ -1,158 +1,50 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import type {
-  Business,
-  BusinessType,
-  CreateEventInput,
-  CreateRestaurantInput,
-  CreateStoreInput,
-} from "@/app/m/_lib/business-types";
-import {
-  ACTIVE_STORAGE_KEY,
-  STORAGE_KEY,
-} from "@/app/m/_lib/business-types";
+import { createContext, useContext, useMemo } from "react";
+import { api, type RouterOutputs } from "@/trpc/react";
+
+type Business = RouterOutputs["business"]["list"][number];
 
 type BusinessContextValue = {
   businesses: Business[];
-  activeBusiness: Business | null;
-  createStore: (input: CreateStoreInput) => Business;
-  createRestaurant: (input: CreateRestaurantInput) => Business;
-  createEvent: (input: CreateEventInput) => Business;
-  setActiveBusiness: (id: string) => void;
-  getLatestByType: <T extends BusinessType>(
-    type: T,
-  ) => Extract<Business, { type: T }> | null;
+  activeBusiness: Business | null | undefined;
+  isLoading: boolean;
+  refetch: () => Promise<void>;
+  setActiveBusiness: (id: string) => Promise<void>;
+  getBusinessByType: (type: Business["type"]) => Business | null;
 };
 
 const BusinessContext = createContext<BusinessContextValue | null>(null);
 
-function loadBusinesses(): Business[] {
-  if (typeof window === "undefined") return [];
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Business[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function loadActiveId(): string | null {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(ACTIVE_STORAGE_KEY);
-}
-
-function persistBusinesses(businesses: Business[]) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(businesses));
-}
-
-function persistActiveId(id: string) {
-  window.localStorage.setItem(ACTIVE_STORAGE_KEY, id);
-}
-
 export function BusinessProvider({ children }: { children: React.ReactNode }) {
-  const [businesses, setBusinesses] = useState<Business[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  useEffect(() => {
-    setBusinesses(loadBusinesses());
-    setActiveId(loadActiveId());
-  }, []);
-
-  const activeBusiness = useMemo(
-    () => businesses.find((business) => business.id === activeId) ?? null,
-    [businesses, activeId],
-  );
-
-  const setActiveBusiness = useCallback((id: string) => {
-    setActiveId(id);
-    persistActiveId(id);
-  }, []);
-
-  const addBusiness = useCallback(
-    (business: Business) => {
-      setBusinesses((current) => {
-        const next = [business, ...current];
-        persistBusinesses(next);
-        return next;
-      });
-      setActiveBusiness(business.id);
-      return business;
+  const utils = api.useUtils();
+  const { data: businesses = [], isLoading } = api.business.list.useQuery();
+  const { data: activeBusiness } = api.business.getActive.useQuery();
+  const setActiveMutation = api.business.setActive.useMutation({
+    onSuccess: async () => {
+      await utils.business.invalidate();
     },
-    [setActiveBusiness],
-  );
+  });
 
-  const createStore = useCallback(
-    (input: CreateStoreInput) =>
-      addBusiness({
-        id: crypto.randomUUID(),
-        type: "store",
-        createdAt: new Date().toISOString(),
-        ...input,
-      }),
-    [addBusiness],
-  );
+  const value = useMemo(() => {
+    function getBusinessByType(type: Business["type"]) {
+      if (activeBusiness?.type === type) return activeBusiness;
+      return businesses.find((business) => business.type === type) ?? null;
+    }
 
-  const createRestaurant = useCallback(
-    (input: CreateRestaurantInput) =>
-      addBusiness({
-        id: crypto.randomUUID(),
-        type: "restaurant",
-        createdAt: new Date().toISOString(),
-        ...input,
-      }),
-    [addBusiness],
-  );
-
-  const createEvent = useCallback(
-    (input: CreateEventInput) =>
-      addBusiness({
-        id: crypto.randomUUID(),
-        type: "event",
-        createdAt: new Date().toISOString(),
-        ...input,
-      }),
-    [addBusiness],
-  );
-
-  const getLatestByType = useCallback(
-    <T extends BusinessType>(type: T) => {
-      const match = businesses.find((business) => business.type === type);
-      return (match ?? null) as Extract<Business, { type: T }> | null;
-    },
-    [businesses],
-  );
-
-  const value = useMemo(
-    () => ({
+    return {
       businesses,
       activeBusiness,
-      createStore,
-      createRestaurant,
-      createEvent,
-      setActiveBusiness,
-      getLatestByType,
-    }),
-    [
-      businesses,
-      activeBusiness,
-      createStore,
-      createRestaurant,
-      createEvent,
-      setActiveBusiness,
-      getLatestByType,
-    ],
-  );
+      isLoading,
+      refetch: async () => {
+        await utils.business.invalidate();
+      },
+      setActiveBusiness: async (id: string) => {
+        await setActiveMutation.mutateAsync({ id });
+      },
+      getBusinessByType,
+    };
+  }, [businesses, activeBusiness, isLoading, utils.business, setActiveMutation]);
 
   return (
     <BusinessContext.Provider value={value}>{children}</BusinessContext.Provider>
