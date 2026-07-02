@@ -1,22 +1,25 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import localFont from "next/font/local";
+import { Bricolage_Grotesque, Figtree, Space_Grotesk } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-const bricolage = localFont({
-  src: "../../public/fonts/BricolageGrotesque.ttf",
-  variable: "--font-heading",
-  display: "swap",
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-sans",
 });
 
-const figtree = localFont({
-  src: "../../public/fonts/Figtree.ttf",
-  variable: "--font-sans",
-  display: "swap",
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +32,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(figtree.variable, bricolage.variable, "font-sans")}>
+    <html lang="en" className={cn(figtree.variable, bricolage.variable, spaceGrotesk.variable, "font-sans")}>
       <body>
         <TRPCReactProvider><TooltipProvider>{children}</TooltipProvider></TRPCReactProvider>
       </body>

@@ -8,6 +8,11 @@
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-heading: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --ease-uber: cubic-bezier(0.2, 0, 0, 1);
+  --ease-uber-exit: cubic-bezier(0.4, 0, 1, 1);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
 }
 
 h1, h2, h3, h4 {
@@ -47,6 +52,16 @@ h1, h2, h3, h4 {
   --sidebar-accent-foreground: oklch(0.212 0.019 322.12);
   --sidebar-border: oklch(0.922 0.005 325.62);
   --sidebar-ring: oklch(0.711 0.019 323.02);
+  /* Landing / app shell */
+  --landing-bg: oklch(1 0 0);
+  --landing-fg: oklch(0.12 0.018 30);
+  --landing-muted: oklch(0.47 0.008 0);
+  --landing-subtle: oklch(0.62 0.008 0);
+  --landing-accent: oklch(0.72 0.22 340);
+  --landing-accent-deep: oklch(0.58 0.25 340);
+  --landing-on-accent: oklch(1 0 0);
+  --landing-border: oklch(0.93 0.003 0);
+  --landing-surface: oklch(1 0 0);
 }
 
 .dark {
@@ -86,6 +101,7 @@ h1, h2, h3, h4 {
 @theme inline {
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
+  --font-display: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -135,5 +151,121 @@ h1, h2, h3, h4 {
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* ─── Spring motion language ─────────────────────────────────────────────────
+   Cubic-bezier(0.34, 1.56, 0.64, 1) — "rubber spring"
+   Overshoots the target by ~3-5%, then snaps back. Fast press-in (80-90ms),
+   springy release (340-420ms). Mirrors Facebook/Uber tactile feedback. */
+
+/* Keyframes */
+@keyframes spring-pop-in {
+  from { opacity: 0; scale: 0.94; }
+  to   { opacity: 1; scale: 1; }
+}
+@keyframes spring-pop-out {
+  from { opacity: 1; scale: 1; }
+  to   { opacity: 0; scale: 0.96; }
+}
+/* Polished surface entrance: fade + lift + gentle scale — no overshoot */
+@keyframes surface-enter {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes surface-exit {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+@keyframes sheet-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes sheet-slide-down {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+@keyframes spring-scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes spring-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.96); }
+}
+@keyframes spring-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes spring-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Overrides layer: declared after @import "tailwindcss" so it beats @layer utilities.
+   This ensures the spring press survives transition-colors/transition-all on buttons. */
+@layer overrides {
+  /* ── btn-spring: rubber press for all buttons ─────────────────────────────
+     Press: compresses to 94% in 90ms (fast, tactile)
+     Release: springs back to 100% in 380ms with 3-5% overshoot */
+  .btn-spring {
+    transition:
+      transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease,
+      box-shadow 200ms ease,
+      opacity 150ms ease;
+  }
+  .btn-spring:not(:disabled):active {
+    transform: scale(0.94);
+    transition-duration: 90ms;
+    transition-timing-function: ease-in;
+  }
+
+  /* ── icon-spring: tighter press for small icon buttons ────────────────── */
+  .icon-spring {
+    transition:
+      transform 340ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      background-color 150ms ease,
+      color 150ms ease,
+      opacity 150ms ease;
+  }
+  .icon-spring:not(:disabled):active {
+    transform: scale(0.86);
+    transition-duration: 80ms;
+    transition-timing-function: ease-in;
+  }
+
+  /* ── pill-spring: channel filters, small toggles ─────────────────────── */
+  .pill-spring {
+    transition:
+      transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease;
+  }
+  .pill-spring:not(:disabled):active {
+    transform: scale(0.96);
+    transition-duration: 70ms;
+    transition-timing-function: ease-in;
+  }
+}
+
+/* ─── Marquee (Magic UI) ────────────────────────────────────────────────────*/
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-100% - var(--gap))); }
+}
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to   { transform: translateY(calc(-100% - var(--gap))); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
