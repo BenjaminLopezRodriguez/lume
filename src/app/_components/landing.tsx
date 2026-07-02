@@ -115,6 +115,12 @@ const FOOTER_LINKS: Record<string, string[]> = {
   Company: ["About", "Careers", "Privacy", "Terms"],
 };
 
+const DELIVERY_PLATFORMS = [
+  { name: "Uber Eats", orders: 12, dot: "#06c167" },
+  { name: "DoorDash", orders: 8, dot: "#ff3008" },
+  { name: "Grubhub", orders: 6, dot: "#f63440" },
+] as const;
+
 // ── Root ──────────────────────────────────────────────────────────────────────
 
 export function Landing() {
@@ -127,6 +133,7 @@ export function Landing() {
       <FeatureScroll />
       <Offering />
       <HowYouSell />
+      <RestaurantSection />
       <LumeShop />
       <Testimonials />
       <BottomCTA />
@@ -198,7 +205,7 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden bg-white px-6 pt-20 pb-0">
+    <section className="relative overflow-hidden px-6 pt-20 pb-0" style={{ backgroundColor: "#faf8f6" }}>
       <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
         {/* copy */}
         <div className="flex flex-col gap-8 pb-20">
@@ -400,7 +407,7 @@ function FeatureCheckoutMockup() {
         </div>
         <button
           className="w-full rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]"
-          style={{ backgroundColor: "var(--landing-fg)" }}
+          style={{ backgroundColor: "var(--landing-accent-deep)" }}
         >
           Pay $30.00
         </button>
@@ -413,6 +420,141 @@ function FeatureCheckoutMockup() {
     </div>
   );
 }
+
+function FeatureMockupPayments() {
+  return (
+    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+      <div className="p-8">
+        <div className="mb-5 text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>How do you want to pay?</div>
+        <div className="mb-5 space-y-2.5">
+          <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-black py-3.5 text-sm font-semibold text-white [touch-action:manipulation]">
+             Apple Pay
+          </button>
+          <button className="flex w-full items-center justify-center gap-2 rounded-2xl border py-3.5 text-sm font-semibold [touch-action:manipulation]" style={{ borderColor: "var(--landing-border)", color: "var(--landing-fg)" }}>
+             Google Pay
+          </button>
+          <div className="flex items-center gap-3 py-1">
+            <div className="flex-1 border-t" style={{ borderColor: "var(--landing-border)" }} />
+            <span className="text-xs" style={{ color: "var(--landing-muted)" }}>or card</span>
+            <div className="flex-1 border-t" style={{ borderColor: "var(--landing-border)" }} />
+          </div>
+          <div className="rounded-2xl border px-4 py-3" style={{ borderColor: "var(--landing-border)" }}>
+            <div className="mb-1 text-xs" style={{ color: "var(--landing-muted)" }}>Card number</div>
+            <div className="font-mono text-sm tracking-widest" style={{ color: "var(--landing-fg)" }}>•••• •••• •••• 4242</div>
+          </div>
+        </div>
+        <button className="w-full rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+          Pay $30.00
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FeatureMockupSpeed() {
+  return (
+    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+      <div className="p-8">
+        <div className="mb-5 flex items-center gap-3 rounded-2xl border p-3" style={{ backgroundColor: "#f0fdf4", borderColor: "#bbf7d0" }}>
+          <div className="flex size-8 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">J</div>
+          <div>
+            <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Welcome back, Jordan</div>
+            <div className="text-xs" style={{ color: "var(--landing-muted)" }}>Visa ···· 4242 · ready to go</div>
+          </div>
+        </div>
+        <div className="mb-5 flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: "var(--landing-border)" }}>
+          <div>
+            <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Grilled Salmon Bowl</div>
+            <div className="text-xs" style={{ color: "var(--landing-muted)" }}>Your usual · Rosemary Bistro</div>
+          </div>
+          <div className="font-semibold tabular-nums" style={{ color: "var(--landing-fg)" }}>$29.16</div>
+        </div>
+        <button className="flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+          <Lightning size={14} weight="fill" aria-hidden /> Tap to pay · 1 tap
+        </button>
+        <p className="mt-3 text-center text-xs" style={{ color: "var(--landing-muted)" }}>1.8s avg. checkout · no re-entry</p>
+      </div>
+    </div>
+  );
+}
+
+function FeatureMockupTransparency() {
+  return (
+    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+      <div className="p-8">
+        <div className="mb-4 text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Full order breakdown</div>
+        <div className="mb-3 space-y-2.5">
+          {[
+            { label: "Grilled Salmon Bowl", amount: "$18.00" },
+            { label: "Oat Milk Latte ×2", amount: "$12.00" },
+          ].map(({ label, amount }) => (
+            <div key={label} className="flex justify-between text-sm">
+              <span style={{ color: "var(--landing-muted)" }}>{label}</span>
+              <span className="tabular-nums" style={{ color: "var(--landing-fg)" }}>{amount}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mb-3 space-y-2 border-t pt-3" style={{ borderColor: "var(--landing-border)" }}>
+          {[
+            { label: "Subtotal", amount: "$30.00" },
+            { label: "Tax (8%)", amount: "$2.40" },
+            { label: "Service fee", amount: "$0.89" },
+          ].map(({ label, amount }) => (
+            <div key={label} className="flex justify-between text-sm">
+              <span style={{ color: "var(--landing-muted)" }}>{label}</span>
+              <span className="tabular-nums" style={{ color: "var(--landing-muted)" }}>{amount}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mb-5 flex justify-between border-t pt-3 font-bold" style={{ borderColor: "var(--landing-border)" }}>
+          <span style={{ color: "var(--landing-fg)" }}>Total</span>
+          <span className="tabular-nums" style={{ color: "var(--landing-fg)" }}>$33.29</span>
+        </div>
+        <button className="w-full rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+          Confirm $33.29
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FeatureMockupSupport() {
+  return (
+    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+      <div className="border-b px-6 py-4" style={{ borderColor: "var(--landing-border)" }}>
+        <div className="flex items-center gap-3">
+          <div className="flex size-9 items-center justify-center rounded-full bg-green-500 text-sm font-bold text-white">S</div>
+          <div>
+            <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Sam · Lume Support</div>
+            <div className="flex items-center gap-1.5">
+              <div className="size-1.5 rounded-full bg-green-500" />
+              <span className="text-xs" style={{ color: "var(--landing-muted)" }}>Online · avg reply 2 min</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="space-y-3 p-6">
+        <div className="max-w-[80%] rounded-2xl rounded-tl-sm p-3" style={{ backgroundColor: "#f5f2ee" }}>
+          <p className="text-sm" style={{ color: "var(--landing-fg)" }}>Hi! I see you're a restaurant on Lume. What can I help with?</p>
+        </div>
+        <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm p-3 text-white" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+          <p className="text-sm">QR code at table 12 isn't working</p>
+        </div>
+        <div className="max-w-[80%] rounded-2xl rounded-tl-sm p-3" style={{ backgroundColor: "#f5f2ee" }}>
+          <p className="text-sm" style={{ color: "var(--landing-fg)" }}>Fixed — table 12 QR refreshed. Should work now!</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const FEATURE_MOCKUPS = [
+  FeatureCheckoutMockup,
+  FeatureMockupPayments,
+  FeatureMockupSpeed,
+  FeatureMockupTransparency,
+  FeatureMockupSupport,
+] as const;
 
 function FeatureScroll() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -452,6 +594,9 @@ function FeatureScroll() {
   return (
     <section className="px-6 py-24">
       <div className="mx-auto max-w-7xl">
+        <p className="mb-4 text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
+          Platform features
+        </p>
         <h2
           className="mb-16 text-4xl font-black lg:text-5xl"
           style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
@@ -464,42 +609,45 @@ function FeatureScroll() {
           ref={containerRef}
           style={{ height: `calc(${FEATURES.length * 75}vh + 6rem)` }}
         >
-          {FEATURES.map(({ title, desc }, i) => (
-            <div
-              key={title}
-              className="sticky"
-              style={{ top: NAV_HEIGHT, zIndex: i + 1 }}
-            >
+          {FEATURES.map(({ title, desc }, i) => {
+            const Mockup = FEATURE_MOCKUPS[i] ?? FeatureCheckoutMockup;
+            return (
               <div
-                data-feature-inner
-                className="grid items-center gap-12 rounded-3xl border bg-white p-8 shadow-[0_-8px_40px_rgba(0,0,0,0.06)] lg:grid-cols-2 lg:gap-16 lg:p-12"
-                style={{
-                  borderColor: "var(--landing-border)",
-                  transformOrigin: "top center",
-                  willChange: "transform, opacity",
-                }}
+                key={title}
+                className="sticky"
+                style={{ top: NAV_HEIGHT, zIndex: i + 1 }}
               >
-                <div className="flex flex-col gap-6">
-                  <span
-                    className="text-sm font-semibold tabular-nums"
-                    style={{ color: "var(--landing-muted)" }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h3
-                    className="text-3xl font-black lg:text-4xl"
-                    style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
-                  >
-                    {title}
-                  </h3>
-                  <p className="max-w-md text-base leading-relaxed" style={{ color: "var(--landing-muted)" }}>
-                    {desc}
-                  </p>
+                <div
+                  data-feature-inner
+                  className="grid items-center gap-12 rounded-3xl border bg-white p-8 shadow-[0_-8px_40px_rgba(0,0,0,0.06)] lg:grid-cols-2 lg:gap-16 lg:p-12"
+                  style={{
+                    borderColor: "var(--landing-border)",
+                    transformOrigin: "top center",
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  <div className="flex flex-col gap-6">
+                    <span
+                      className="text-sm font-semibold tabular-nums"
+                      style={{ color: "var(--landing-muted)" }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h3
+                      className="text-3xl font-black lg:text-4xl"
+                      style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
+                    >
+                      {title}
+                    </h3>
+                    <p className="max-w-md text-base leading-relaxed" style={{ color: "var(--landing-muted)" }}>
+                      {desc}
+                    </p>
+                  </div>
+                  <Mockup />
                 </div>
-                <FeatureCheckoutMockup />
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -567,6 +715,9 @@ function HowYouSell() {
   return (
     <section className="border-t border-gray-100 bg-white px-6 py-24">
       <div className="mx-auto max-w-7xl">
+        <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
+          Every channel
+        </p>
         <h2
           className="mb-4 text-center text-4xl font-black lg:text-5xl"
           style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
@@ -601,6 +752,131 @@ function HowYouSell() {
     </section>
   );
 }
+// ─── Restaurant Section ───────────────────────────────────────────────────────
+
+function RestaurantSection() {
+  return (
+    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
+      <div className="mx-auto max-w-7xl">
+        <p className="mb-4 text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
+          For restaurants
+        </p>
+        <h2
+          className="mb-4 text-4xl font-black lg:text-5xl"
+          style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
+        >
+          The table is yours. Keep it.
+        </h2>
+        <p className="mb-16 max-w-2xl text-lg leading-relaxed" style={{ color: "var(--landing-muted)" }}>
+          Stop losing 30% to delivery apps. Lume pulls every order into one dashboard — and gives your guests a direct line to your kitchen.
+        </p>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Card 1 — Unified delivery inbox */}
+          <div className="flex flex-col gap-6 rounded-3xl border bg-white p-8" style={{ borderColor: "var(--landing-border)" }}>
+            <div>
+              <div className="mb-2 text-lg font-black" style={{ color: "var(--landing-fg)" }}>All orders. One place.</div>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--landing-muted)" }}>
+                Uber Eats, DoorDash, and Grubhub — every order flows into Lume. No more juggling three tablets.
+              </p>
+            </div>
+            {/* Platform rows */}
+            <div className="flex flex-col gap-2">
+              {DELIVERY_PLATFORMS.map(({ name, orders, dot }) => (
+                <div
+                  key={name}
+                  className="flex items-center justify-between rounded-xl px-4 py-3"
+                  style={{ backgroundColor: "var(--landing-border)", opacity: 0.7 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} aria-hidden />
+                    <span className="text-sm font-medium" style={{ color: "var(--landing-fg)" }}>{name}</span>
+                  </div>
+                  <span className="text-xs tabular-nums" style={{ color: "var(--landing-muted)" }}>{orders} orders</span>
+                </div>
+              ))}
+              {/* Lume unified row */}
+              <div
+                className="flex items-center justify-between rounded-xl px-4 py-3"
+                style={{ backgroundColor: "var(--landing-fg)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="size-2 rounded-full flex-shrink-0 bg-white" aria-hidden />
+                  <span className="text-sm font-semibold text-white">Lume dashboard</span>
+                </div>
+                <span className="text-xs font-bold tabular-nums text-white">26 total</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2 — QR codes + savings */}
+          <div
+            className="flex flex-col gap-6 rounded-3xl p-8"
+            style={{ backgroundColor: "var(--landing-fg)" }}
+          >
+            <div>
+              <div className="mb-2 text-lg font-black text-white">Your QR. $0 commission.</div>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
+                Guests scan, order, and pay direct. You keep 100% — no 30% Uber fee eating your margins.
+              </p>
+            </div>
+            {/* QR visual */}
+            <div
+              className="flex items-center justify-center rounded-2xl p-6"
+              style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
+            >
+              <div className="relative flex size-24 items-center justify-center">
+                {/* Corner markers */}
+                <div className="absolute left-0 top-0 size-6 rounded-sm border-4 border-white" style={{ borderRight: "none", borderBottom: "none" }} />
+                <div className="absolute right-0 top-0 size-6 rounded-sm border-4 border-white" style={{ borderLeft: "none", borderBottom: "none" }} />
+                <div className="absolute bottom-0 left-0 size-6 rounded-sm border-4 border-white" style={{ borderRight: "none", borderTop: "none" }} />
+                <Lightning size={28} weight="fill" style={{ color: "var(--landing-accent)" }} aria-hidden />
+              </div>
+            </div>
+            {/* Savings comparison */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
+                <span className="text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>Uber Eats fee</span>
+                <span className="text-sm font-semibold" style={{ color: "#ff6b6b" }}>−30%</span>
+              </div>
+              <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ backgroundColor: "rgba(255,255,255,0.12)" }}>
+                <span className="text-sm text-white font-medium">Lume direct order</span>
+                <span className="text-sm font-bold" style={{ color: "var(--landing-accent)" }}>$0 fee</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3 — Complaint handling */}
+          <div className="flex flex-col gap-6 rounded-3xl border bg-white p-8" style={{ borderColor: "var(--landing-border)" }}>
+            <div>
+              <div className="mb-2 text-lg font-black" style={{ color: "var(--landing-fg)" }}>Handle complaints in one tap.</div>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--landing-muted)" }}>
+                A guest flags a cold dish. Lume notifies you instantly. Resolve, refund, or reply — without leaving the dashboard.
+              </p>
+            </div>
+            {/* Step flow */}
+            <div className="flex flex-col gap-3">
+              {[
+                { dot: "#f59e0b", label: "Issue flagged", sub: "Guest taps \"Something's wrong\"" },
+                { dot: "var(--landing-accent-deep)", label: "You're notified", sub: "Instant alert on your phone" },
+                { dot: "#22c55e", label: "Resolved in 1 tap", sub: "Refund, replacement, or note sent" },
+              ].map(({ dot, label, sub }) => (
+                <div key={label} className="flex items-start gap-3">
+                  <div className="mt-1 size-2.5 flex-shrink-0 rounded-full" style={{ backgroundColor: dot }} aria-hidden />
+                  <div>
+                    <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>{label}</div>
+                    <div className="text-xs" style={{ color: "var(--landing-muted)" }}>{sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Lume Shop ────────────────────────────────────────────────────────────────
 
 function LumeShop() {
@@ -713,7 +989,9 @@ function LumeShop() {
                     className="flex items-center gap-3 rounded-2xl p-3"
                     style={{ backgroundColor: "#2e2520" }}
                   >
-                    <div className="size-10 shrink-0 rounded-xl" style={{ backgroundColor: color }} aria-hidden />
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white" style={{ backgroundColor: color }} aria-hidden>
+                      {name[0]}
+                    </div>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-xs font-semibold text-white">{name}</div>
                       <div className="truncate text-xs" style={{ color: "#6b5f5a" }}>{tag}</div>
@@ -800,7 +1078,7 @@ function Testimonials() {
                 <div
                   className="flex size-10 items-center justify-center rounded-full text-sm font-bold"
                   style={{
-                    backgroundColor: featured ? "var(--landing-accent-deep)" : "var(--landing-surface)",
+                    backgroundColor: featured ? "var(--landing-accent-deep)" : "#ede9e6",
                     color: featured ? "white" : "var(--landing-fg)",
                   }}
                 >
@@ -913,7 +1191,7 @@ function Footer() {
           className="mt-12 flex flex-col justify-between gap-4 border-t border-gray-100 pt-8 sm:flex-row"
         >
           <p className="text-sm" style={{ color: "var(--landing-muted)" }}>© 2026 Lume, Inc. All rights reserved.</p>
-          <p className="text-sm" style={{ color: "var(--landing-muted)" }}>Made with commerce in mind.</p>
+          <p className="text-sm" style={{ color: "var(--landing-muted)" }}>Every seller. One checkout.</p>
         </div>
       </div>
     </footer>

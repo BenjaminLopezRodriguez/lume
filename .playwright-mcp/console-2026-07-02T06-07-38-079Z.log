@@ -1,0 +1,43 @@
+[     152ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[     166ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816
+[     439ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_compiled_react-dom_cf23a88f._.js:14537
+[  273293ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  273590ms] [LOG] [Fast Refresh] done in 369ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816
+[  439712ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  439891ms] [ERROR] ./src/app/_components/landing.tsx:859:77
+Parsing ecmascript source code failed
+  857 |             <div className="flex flex-col gap-3">
+  858 |               {[
+> 859 |                 { dot: "#f59e0b", label: "Issue flagged", sub: "Guest taps "Something's wrong"" },
+      |                                                                             ^^^^^^^^^
+  860 |                 { dot: "var(--landing-accent-deep)", label: "You're notified", sub: "Instant alert on your phone" },
+  861 |                 { dot: "#22c55e", label: "Resolved in 1 tap", sub: "Refund, replacement, or note sent" },
+  862 |               ].map(({ dot, label, sub }) => (
+
+Expected '</', got 'Something'
+
+Import trace:
+  Server Component:
+    ./src/app/_components/landing.tsx
+    ./src/app/page.tsx @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_daa7b628._.js:2405
+[  439899ms] [LOG] {file: Object} @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_compiled_next-devtools_index_0a245f90.js:16058
+[  443484ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  443510ms] [ERROR] ./src/app/_components/landing.tsx:860:77
+Parsing ecmascript source code failed
+  858 |             <div className="flex flex-col gap-3">
+  859 |               {[
+> 860 |                 { dot: "#f59e0b", label: "Issue flagged", sub: "Guest taps "Something's wrong"" },
+      |                                                                             ^^^^^^^^^
+  861 |                 { dot: "var(--landing-accent-deep)", label: "You're notified", sub: "Instant alert on your phone" },
+  862 |                 { dot: "#22c55e", label: "Resolved in 1 tap", sub: "Refund, replacement, or note sent" },
+  863 |               ].map(({ dot, label, sub }) => (
+
+Expected '</', got 'Something'
+
+Import trace:
+  Server Component:
+    ./src/app/_components/landing.tsx
+    ./src/app/page.tsx @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_daa7b628._.js:2405
+[  443511ms] [LOG] {file: Object} @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_compiled_next-devtools_index_0a245f90.js:16058
+[  453063ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  453410ms] [LOG] [Fast Refresh] done in 387ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816

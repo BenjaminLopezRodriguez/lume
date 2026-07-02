@@ -1,0 +1,13 @@
+[     277ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_compiled_react-dom_cf23a88f._.js:14537
+[  242454ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  242550ms] [LOG] [Fast Refresh] done in 168ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816
+[  273140ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  273367ms] [LOG] [Fast Refresh] done in 268ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816
+[  285258ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  285312ms] [LOG] [Fast Refresh] done in 124ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816
+[  292995ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  293033ms] [LOG] [Fast Refresh] done in 116ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816
+[  306102ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  306152ms] [LOG] [Fast Refresh] done in 128ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816
+[  310124ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5956
+[  310174ms] [LOG] [Fast Refresh] done in 127ms @ http://localhost:3000/_next/static/chunks/15cf0_next_dist_client_caadf709._.js:5816

@@ -1,0 +1,469 @@
+- generic [ref=f4e2]:
+  - generic [ref=f4e3]:
+    - link "For merchants" [ref=f4e4] [cursor=pointer]:
+      - /url: "#"
+    - link "For shoppers" [ref=f4e5] [cursor=pointer]:
+      - /url: "#"
+    - link "For developers" [ref=f4e6] [cursor=pointer]:
+      - /url: "#"
+  - banner [ref=f4e7]:
+    - generic [ref=f4e8]:
+      - generic [ref=f4e10]: Lume
+      - navigation "Primary navigation" [ref=f4e11]:
+        - link "Features" [ref=f4e12] [cursor=pointer]:
+          - /url: "#features"
+        - link "Merchants" [ref=f4e13] [cursor=pointer]:
+          - /url: "#merchants"
+        - link "Lume Shop" [ref=f4e14] [cursor=pointer]:
+          - /url: "#lume-shop"
+        - link "Pricing" [ref=f4e15] [cursor=pointer]:
+          - /url: "#pricing"
+        - link "Docs" [ref=f4e16] [cursor=pointer]:
+          - /url: "#docs"
+      - generic [ref=f4e17]:
+        - button "Log in" [ref=f4e18]
+        - button "Get started" [ref=f4e19]
+  - generic [ref=f4e21]:
+    - generic [ref=f4e22]:
+      - heading "Your checkout. Done right." [level=1] [ref=f4e23]:
+        - text: Your checkout.
+        - text: Done right.
+      - paragraph [ref=f4e24]: One checkout for restaurants, services, and retail. Live in minutes, built to convert.
+      - generic [ref=f4e25]:
+        - button "Get started free" [ref=f4e27]:
+          - text: Get started free
+          - img [ref=f4e28]
+        - paragraph [ref=f4e30]: Apple Pay · Google Pay · Visa · Mastercard · Amex
+    - generic [ref=f4e31]:
+      - generic [ref=f4e32]:
+        - generic [ref=f4e38]:
+          - img [ref=f4e39]
+          - text: lume.io/checkout
+        - generic [ref=f4e41]:
+          - generic [ref=f4e42]:
+            - heading "Your Order" [level=3] [ref=f4e43]
+            - img [ref=f4e44]
+          - generic [ref=f4e46]:
+            - generic [ref=f4e47]:
+              - generic [ref=f4e48]: Grilled Salmon Bowl
+              - generic [ref=f4e49]: $18.00
+            - generic [ref=f4e50]:
+              - generic [ref=f4e51]: Oat Milk Latte
+              - generic [ref=f4e52]: $6.00
+            - generic [ref=f4e53]:
+              - generic [ref=f4e54]: Sparkling Water
+              - generic [ref=f4e55]: $3.00
+          - generic [ref=f4e56]:
+            - generic [ref=f4e57]:
+              - generic [ref=f4e58]: Subtotal
+              - generic [ref=f4e59]: $27.00
+            - generic [ref=f4e60]:
+              - generic [ref=f4e61]: Tax
+              - generic [ref=f4e62]: $2.16
+            - generic [ref=f4e63]:
+              - generic [ref=f4e64]: Total
+              - generic [ref=f4e65]: $29.16
+          - button "Checkout securely" [ref=f4e66] [cursor=pointer]:
+            - img [ref=f4e67]
+            - text: Checkout securely
+            - img [ref=f4e69]
+          - paragraph [ref=f4e71]: Powered by Lume · 256-bit encryption
+      - generic [ref=f4e72]: +$29.16 confirmed
+  - generic [ref=f4e75]:
+    - generic [ref=f4e76]:
+      - generic [ref=f4e77]: 10,000+ merchants
+      - generic [ref=f4e79]: ★ 4.8 average rating
+      - generic [ref=f4e81]: $500M+ processed
+      - generic [ref=f4e83]: 1.8s avg. checkout
+      - generic [ref=f4e85]: Apple Pay
+      - generic [ref=f4e87]: Google Pay
+      - generic [ref=f4e89]: Visa · Mastercard · Amex
+      - generic [ref=f4e91]: Rosemary Bistro · $29.16 ✓
+      - generic [ref=f4e93]: Luxe Cuts Studio · $142.00 ✓
+      - generic [ref=f4e95]: Mesa Home Goods · $67.50 ✓
+      - generic [ref=f4e97]: Zero setup fees
+      - generic [ref=f4e99]: Live in minutes
+    - generic [ref=f4e101]:
+      - generic [ref=f4e102]: 10,000+ merchants
+      - generic [ref=f4e104]: ★ 4.8 average rating
+      - generic [ref=f4e106]: $500M+ processed
+      - generic [ref=f4e108]: 1.8s avg. checkout
+      - generic [ref=f4e110]: Apple Pay
+      - generic [ref=f4e112]: Google Pay
+      - generic [ref=f4e114]: Visa · Mastercard · Amex
+      - generic [ref=f4e116]: Rosemary Bistro · $29.16 ✓
+      - generic [ref=f4e118]: Luxe Cuts Studio · $142.00 ✓
+      - generic [ref=f4e120]: Mesa Home Goods · $67.50 ✓
+      - generic [ref=f4e122]: Zero setup fees
+      - generic [ref=f4e124]: Live in minutes
+    - generic [ref=f4e126]:
+      - generic [ref=f4e127]: 10,000+ merchants
+      - generic [ref=f4e129]: ★ 4.8 average rating
+      - generic [ref=f4e131]: $500M+ processed
+      - generic [ref=f4e133]: 1.8s avg. checkout
+      - generic [ref=f4e135]: Apple Pay
+      - generic [ref=f4e137]: Google Pay
+      - generic [ref=f4e139]: Visa · Mastercard · Amex
+      - generic [ref=f4e141]: Rosemary Bistro · $29.16 ✓
+      - generic [ref=f4e143]: Luxe Cuts Studio · $142.00 ✓
+      - generic [ref=f4e145]: Mesa Home Goods · $67.50 ✓
+      - generic [ref=f4e147]: Zero setup fees
+      - generic [ref=f4e149]: Live in minutes
+    - generic [ref=f4e151]:
+      - generic [ref=f4e152]: 10,000+ merchants
+      - generic [ref=f4e154]: ★ 4.8 average rating
+      - generic [ref=f4e156]: $500M+ processed
+      - generic [ref=f4e158]: 1.8s avg. checkout
+      - generic [ref=f4e160]: Apple Pay
+      - generic [ref=f4e162]: Google Pay
+      - generic [ref=f4e164]: Visa · Mastercard · Amex
+      - generic [ref=f4e166]: Rosemary Bistro · $29.16 ✓
+      - generic [ref=f4e168]: Luxe Cuts Studio · $142.00 ✓
+      - generic [ref=f4e170]: Mesa Home Goods · $67.50 ✓
+      - generic [ref=f4e172]: Zero setup fees
+      - generic [ref=f4e174]: Live in minutes
+  - generic [ref=f4e177]:
+    - paragraph [ref=f4e178]: Platform features
+    - heading "Your everyday checkout platform" [level=2] [ref=f4e179]
+    - generic [ref=f4e180]:
+      - generic [ref=f4e182]:
+        - generic [ref=f4e183]:
+          - generic [ref=f4e184]: "01"
+          - heading "Built around how you actually sell" [level=3] [ref=f4e185]
+          - paragraph [ref=f4e186]: Every checkout flow matches your category — table ordering for restaurants, booking deposits for services, link-based checkout for merchants. No generic forms, no configuring around limitations.
+        - generic [ref=f4e188]:
+          - generic [ref=f4e189]:
+            - img [ref=f4e191]
+            - generic [ref=f4e193]:
+              - generic [ref=f4e194]: Lume Checkout
+              - generic [ref=f4e195]: Rosemary Bistro
+          - generic [ref=f4e196]:
+            - generic [ref=f4e197]:
+              - generic [ref=f4e198]:
+                - generic [ref=f4e199]: Salmon Bowl
+                - generic [ref=f4e200]: ×1
+              - generic [ref=f4e201]: $18
+            - generic [ref=f4e202]:
+              - generic [ref=f4e203]:
+                - generic [ref=f4e204]: Oat Latte
+                - generic [ref=f4e205]: ×2
+              - generic [ref=f4e206]: $12
+          - button "Pay $30.00" [ref=f4e207]
+          - generic [ref=f4e208]:
+            - generic [ref=f4e209]: Apple Pay
+            - generic [ref=f4e210]: Google Pay
+            - generic [ref=f4e211]: Card
+      - generic [ref=f4e213]:
+        - generic [ref=f4e214]:
+          - generic [ref=f4e215]: "02"
+          - heading "Every payment method, one integration" [level=3] [ref=f4e216]
+          - paragraph [ref=f4e217]: Apple Pay, Google Pay, card, and link — one integration covers every payment method that matters. Your customers pay how they want. No extra setup. No extra fees.
+        - generic [ref=f4e219]:
+          - generic [ref=f4e220]: How do you want to pay?
+          - generic [ref=f4e221]:
+            - button "Apple Pay" [ref=f4e222]
+            - button "Google Pay" [ref=f4e223]
+            - generic [ref=f4e226]: or card
+            - generic [ref=f4e228]:
+              - generic [ref=f4e229]: Card number
+              - generic [ref=f4e230]: •••• •••• •••• 4242
+          - button "Pay $30.00" [ref=f4e231]
+      - generic [ref=f4e233]:
+        - generic [ref=f4e234]:
+          - generic [ref=f4e235]: "03"
+          - heading "Fewer taps, more revenue" [level=3] [ref=f4e236]
+          - paragraph [ref=f4e237]: Smart autofill, one-tap repeat checkout, and sub-2-second load times cut abandonment before it starts. Your checkout doesn't lose sales your business earned.
+        - generic [ref=f4e239]:
+          - generic [ref=f4e240]:
+            - generic [ref=f4e241]: J
+            - generic [ref=f4e242]:
+              - generic [ref=f4e243]: Welcome back, Jordan
+              - generic [ref=f4e244]: Visa ···· 4242 · ready to go
+          - generic [ref=f4e245]:
+            - generic [ref=f4e246]:
+              - generic [ref=f4e247]: Grilled Salmon Bowl
+              - generic [ref=f4e248]: Your usual · Rosemary Bistro
+            - generic [ref=f4e249]: $29.16
+          - button "Tap to pay · 1 tap" [ref=f4e250]:
+            - img [ref=f4e251]
+            - text: Tap to pay · 1 tap
+          - paragraph [ref=f4e253]: 1.8s avg. checkout · no re-entry
+      - generic [ref=f4e255]:
+        - generic [ref=f4e256]:
+          - generic [ref=f4e257]: "04"
+          - heading "No surprise totals. Ever." [level=3] [ref=f4e258]
+          - paragraph [ref=f4e259]: Subtotals, taxes, and fees in full view before the pay button. No surprise total at confirmation. Customers who trust the process come back more often.
+        - generic [ref=f4e261]:
+          - generic [ref=f4e262]: Full order breakdown
+          - generic [ref=f4e263]:
+            - generic [ref=f4e264]:
+              - generic [ref=f4e265]: Grilled Salmon Bowl
+              - generic [ref=f4e266]: $18.00
+            - generic [ref=f4e267]:
+              - generic [ref=f4e268]: Oat Milk Latte ×2
+              - generic [ref=f4e269]: $12.00
+          - generic [ref=f4e270]:
+            - generic [ref=f4e271]:
+              - generic [ref=f4e272]: Subtotal
+              - generic [ref=f4e273]: $30.00
+            - generic [ref=f4e274]:
+              - generic [ref=f4e275]: Tax (8%)
+              - generic [ref=f4e276]: $2.40
+            - generic [ref=f4e277]:
+              - generic [ref=f4e278]: Service fee
+              - generic [ref=f4e279]: $0.89
+          - generic [ref=f4e280]:
+            - generic [ref=f4e281]: Total
+            - generic [ref=f4e282]: $33.29
+          - button "Confirm $33.29" [ref=f4e283]
+      - generic [ref=f4e285]:
+        - generic [ref=f4e286]:
+          - generic [ref=f4e287]: "05"
+          - heading "Real support, not just help docs" [level=3] [ref=f4e288]
+          - paragraph [ref=f4e289]: Live chat, onboarding help, and a team that knows your business type. When something goes wrong — and it will — you're not alone with a ticket queue.
+        - generic [ref=f4e290]:
+          - generic [ref=f4e292]:
+            - generic [ref=f4e293]: S
+            - generic [ref=f4e294]:
+              - generic [ref=f4e295]: Sam · Lume Support
+              - generic [ref=f4e298]: Online · avg reply 2 min
+          - generic [ref=f4e299]:
+            - paragraph [ref=f4e301]: Hi! I see you're a restaurant on Lume. What can I help with?
+            - paragraph [ref=f4e303]: QR code at table 12 isn't working
+            - paragraph [ref=f4e305]: Fixed — table 12 QR refreshed. Should work now!
+  - generic [ref=f4e307]:
+    - paragraph [ref=f4e308]: Built for your category
+    - generic [ref=f4e309]:
+      - button "Restaurants" [ref=f4e311] [cursor=pointer]:
+        - heading "Restaurants" [level=3] [ref=f4e312]
+      - generic [ref=f4e313]:
+        - button "Services" [pressed] [ref=f4e314] [cursor=pointer]:
+          - heading "Services" [level=3] [ref=f4e315]
+        - generic [ref=f4e316]:
+          - paragraph [ref=f4e317]: From haircuts to home repairs — clients book, confirm, and pay without the back-and-forth.
+          - button "Learn more" [ref=f4e318]
+      - button "Merchants" [ref=f4e320] [cursor=pointer]:
+        - heading "Merchants" [level=3] [ref=f4e321]
+      - button "Developers" [ref=f4e323] [cursor=pointer]:
+        - heading "Developers" [level=3] [ref=f4e324]
+  - generic [ref=f4e326]:
+    - paragraph [ref=f4e327]: Every channel
+    - heading "Pick how you sell" [level=2] [ref=f4e328]
+    - paragraph [ref=f4e329]: One checkout button. Every commerce type.
+    - generic [ref=f4e330]:
+      - generic [ref=f4e331]:
+        - img [ref=f4e333]
+        - generic [ref=f4e335]:
+          - generic [ref=f4e336]: At the table
+          - generic [ref=f4e337]: QR codes, table ordering, kitchen sync
+      - generic [ref=f4e338]:
+        - img [ref=f4e340]
+        - generic [ref=f4e342]:
+          - generic [ref=f4e343]: Book a service
+          - generic [ref=f4e344]: Scheduling, deposits, recurring billing
+      - generic [ref=f4e345]:
+        - img [ref=f4e347]
+        - generic [ref=f4e349]:
+          - generic [ref=f4e350]: In-store
+          - generic [ref=f4e351]: POS replacement, tap to pay, inventory
+      - generic [ref=f4e352]:
+        - img [ref=f4e354]
+        - generic [ref=f4e356]:
+          - generic [ref=f4e357]: Online
+          - generic [ref=f4e358]: Embed checkout anywhere, any device
+  - generic [ref=f4e360]:
+    - generic [ref=f4e361]:
+      - generic [ref=f4e362]: Lume Shop
+      - heading "One app. Every seller." [level=2] [ref=f4e363]:
+        - text: One app.
+        - text: Every seller.
+      - paragraph [ref=f4e364]: Thousands of restaurants, service businesses, and merchants — all on one marketplace. Discover local favorites, book what you need, and check out in seconds with your saved info.
+      - list [ref=f4e365]:
+        - listitem [ref=f4e366]:
+          - img [ref=f4e367]
+          - generic [ref=f4e369]: Saved payment info everywhere — pay once, never re-enter again.
+        - listitem [ref=f4e370]:
+          - img [ref=f4e371]
+          - generic [ref=f4e373]: Verified reviews from real customers at every Lume business.
+        - listitem [ref=f4e374]:
+          - img [ref=f4e375]
+          - generic [ref=f4e377]: Live order and booking status for everything in one feed.
+        - listitem [ref=f4e378]:
+          - img [ref=f4e379]
+          - generic [ref=f4e381]: Book, order, and buy from any Lume seller in seconds.
+      - generic [ref=f4e382]:
+        - button "Download the app" [ref=f4e383]:
+          - text: Download the app
+          - img [ref=f4e384]
+        - button "Browse Lume Shop" [ref=f4e386]
+    - generic [ref=f4e387]:
+      - generic [ref=f4e391]:
+        - generic [ref=f4e392]:
+          - generic [ref=f4e393]: Lume Shop
+          - img [ref=f4e395]
+        - generic [ref=f4e397]:
+          - img [ref=f4e398]
+          - generic [ref=f4e400]: Restaurants, services, shops…
+        - generic [ref=f4e401]:
+          - generic [ref=f4e402]: All
+          - generic [ref=f4e403]: Food
+          - generic [ref=f4e404]: Services
+          - generic [ref=f4e405]: Shop
+        - generic [ref=f4e406]:
+          - generic [ref=f4e407]:
+            - generic [ref=f4e408]: R
+            - generic [ref=f4e409]:
+              - generic [ref=f4e410]: Rosemary Bistro
+              - generic [ref=f4e411]: Restaurant · 0.3 mi
+            - generic [ref=f4e412]:
+              - img [ref=f4e413]
+              - generic [ref=f4e415]: "4.9"
+          - generic [ref=f4e416]:
+            - generic [ref=f4e417]: L
+            - generic [ref=f4e418]:
+              - generic [ref=f4e419]: Luxe Cuts Studio
+              - generic [ref=f4e420]: Hair salon · Now open
+            - generic [ref=f4e421]:
+              - img [ref=f4e422]
+              - generic [ref=f4e424]: "4.8"
+          - generic [ref=f4e425]:
+            - generic [ref=f4e426]: M
+            - generic [ref=f4e427]:
+              - generic [ref=f4e428]: Mesa Home Goods
+              - generic [ref=f4e429]: Merchant · Ships today
+            - generic [ref=f4e430]:
+              - img [ref=f4e431]
+              - generic [ref=f4e433]: "4.7"
+        - generic [ref=f4e434]:
+          - generic [ref=f4e437]: Home
+          - generic [ref=f4e440]: Explore
+          - generic [ref=f4e443]: Orders
+          - generic [ref=f4e446]: You
+      - generic [ref=f4e447]:
+        - generic [ref=f4e448]: Order placed
+        - generic [ref=f4e449]: Rosemary Bistro · $29.16
+      - generic [ref=f4e450]:
+        - generic [ref=f4e451]: Booking confirmed
+        - generic [ref=f4e452]: Luxe Cuts · 3:00 PM today
+  - generic [ref=f4e454]:
+    - paragraph [ref=f4e455]: Reviews
+    - heading "4.8 stars from real merchants" [level=2] [ref=f4e456]
+    - generic [ref=f4e457]:
+      - figure "2 weeks ago" [ref=f4e458]:
+        - generic [ref=f4e459]:
+          - generic [ref=f4e460]: MR
+          - generic [ref=f4e461]:
+            - generic [ref=f4e462]: Maria R.
+            - generic "5 out of 5 stars" [ref=f4e463]:
+              - img [ref=f4e464]
+              - img [ref=f4e466]
+              - img [ref=f4e468]
+              - img [ref=f4e470]
+              - img [ref=f4e472]
+        - blockquote [ref=f4e474]: “Lume cut our checkout abandonment in half. Our regulars tap once and they're done. That's the product you want.”
+        - generic [ref=f4e475]: 2 weeks ago
+      - figure "1 month ago" [ref=f4e476]:
+        - generic [ref=f4e477]:
+          - generic [ref=f4e478]: JK
+          - generic [ref=f4e479]:
+            - generic [ref=f4e480]: James K.
+            - generic "5 out of 5 stars" [ref=f4e481]:
+              - img [ref=f4e482]
+              - img [ref=f4e484]
+              - img [ref=f4e486]
+              - img [ref=f4e488]
+              - img [ref=f4e490]
+        - blockquote [ref=f4e492]: “We went from a clunky POS to Lume in an afternoon. Revenue was up 22% the next week. I wish I'd done it sooner.”
+        - generic [ref=f4e493]: 1 month ago
+      - figure "3 weeks ago" [ref=f4e494]:
+        - generic [ref=f4e495]:
+          - generic [ref=f4e496]: PS
+          - generic [ref=f4e497]:
+            - generic [ref=f4e498]: Priya S.
+            - generic "5 out of 5 stars" [ref=f4e499]:
+              - img [ref=f4e500]
+              - img [ref=f4e502]
+              - img [ref=f4e504]
+              - img [ref=f4e506]
+              - img [ref=f4e508]
+        - blockquote [ref=f4e510]: “Three locations, one dashboard. Lume is the backbone of how we operate. Can't imagine going back.”
+        - generic [ref=f4e511]: 3 weeks ago
+  - generic [ref=f4e513]:
+    - heading "No setup fees. No contracts." [level=2] [ref=f4e514]
+    - paragraph [ref=f4e515]: Just a checkout that works — for every type of business, from day one.
+    - generic [ref=f4e516]:
+      - button "Get started free" [ref=f4e517]:
+        - text: Get started free
+        - img [ref=f4e518]
+      - button "Talk to sales" [ref=f4e520]
+  - contentinfo [ref=f4e521]:
+    - generic [ref=f4e522]:
+      - generic [ref=f4e523]:
+        - generic [ref=f4e524]:
+          - generic [ref=f4e525]:
+            - img [ref=f4e527]
+            - generic [ref=f4e529]: Lume
+          - paragraph [ref=f4e530]: The checkout button for every business.
+        - generic [ref=f4e531]:
+          - heading "Product" [level=4] [ref=f4e532]
+          - list [ref=f4e533]:
+            - listitem [ref=f4e534]:
+              - link "Features" [ref=f4e535] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e536]:
+              - link "Pricing" [ref=f4e537] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e538]:
+              - link "Changelog" [ref=f4e539] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e540]:
+              - link "Roadmap" [ref=f4e541] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=f4e542]:
+          - heading "Merchants" [level=4] [ref=f4e543]
+          - list [ref=f4e544]:
+            - listitem [ref=f4e545]:
+              - link "Restaurants" [ref=f4e546] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e547]:
+              - link "Services" [ref=f4e548] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e549]:
+              - link "Retail" [ref=f4e550] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e551]:
+              - link "Case studies" [ref=f4e552] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=f4e553]:
+          - heading "Resources" [level=4] [ref=f4e554]
+          - list [ref=f4e555]:
+            - listitem [ref=f4e556]:
+              - link "Docs" [ref=f4e557] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e558]:
+              - link "API Reference" [ref=f4e559] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e560]:
+              - link "Status" [ref=f4e561] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e562]:
+              - link "Blog" [ref=f4e563] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=f4e564]:
+          - heading "Company" [level=4] [ref=f4e565]
+          - list [ref=f4e566]:
+            - listitem [ref=f4e567]:
+              - link "About" [ref=f4e568] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e569]:
+              - link "Careers" [ref=f4e570] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e571]:
+              - link "Privacy" [ref=f4e572] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f4e573]:
+              - link "Terms" [ref=f4e574] [cursor=pointer]:
+                - /url: "#"
+      - generic [ref=f4e575]:
+        - paragraph [ref=f4e576]: © 2026 Lume, Inc. All rights reserved.
+        - paragraph [ref=f4e577]: Every seller. One checkout.
