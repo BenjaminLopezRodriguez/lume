@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CreateBusinessDialog } from "@/app/m/_components/create-business-dialog";
+import { useBusinesses } from "@/app/m/_components/business-provider";
 import {
   CalendarStar,
   CaretDown,
@@ -77,6 +78,7 @@ function NavLink({
 export function AppSidebar() {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
+  const { activeBusiness } = useBusinesses();
 
   function closeOnNavigate() {
     if (isMobile) setOpenMobile(false);
@@ -101,7 +103,7 @@ export function AppSidebar() {
             type="button"
             className="flex h-10 min-w-0 flex-1 items-center justify-between rounded-lg border border-[#ebebeb] bg-white px-3 text-sm font-medium text-neutral-900"
           >
-            <span className="truncate">Rosemary Bistro</span>
+            <span className="truncate">{activeBusiness?.name ?? "Rosemary Bistro"}</span>
             <CaretDown size={14} className="shrink-0 text-neutral-400" aria-hidden />
           </button>
           <CreateBusinessDialog />

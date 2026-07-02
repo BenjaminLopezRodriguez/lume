@@ -2,6 +2,7 @@ import { ListCard, ListCardRow } from "@/app/m/_components/list-card";
 import { PageContent } from "@/app/m/_components/page-content";
 import { PageHeader } from "@/app/m/_components/page-header";
 import { SectionHeader } from "@/app/m/_components/section-header";
+import { SalesBarGraph } from "@/app/m/_components/sales-bar-graph";
 
 const ORDERS = [
   { label: "Table 4 · 2 items", trailing: "$38.50", dot: "#f59e0b" },
@@ -35,6 +36,7 @@ export default function DashboardPage() {
 
       <div className="mt-8 flex flex-col gap-8">
         <section className="flex flex-col gap-3">
+          <SalesBarGraph label="Revenue this week" />
           <SectionHeader title="Live orders" />
           <ListCard
             footer={{
