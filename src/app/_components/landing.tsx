@@ -24,24 +24,24 @@ import {
 
 const FEATURES = [
   {
-    title: "Designed for your business",
-    desc: "Every checkout flow is tailored to your category — no generic forms, no guesswork. Restaurants, salons, shops, and services all get the layout that fits how they sell.",
+    title: "Built around how you actually sell",
+    desc: "Every checkout flow matches your category — table ordering for restaurants, booking deposits for services, link-based checkout for merchants. No generic forms, no configuring around limitations.",
   },
   {
-    title: "Accepted everywhere",
-    desc: "Apple Pay, Google Pay, card, and link — one integration covers every payment method that matters. No extra setup. No extra fees.",
+    title: "Every payment method, one integration",
+    desc: "Apple Pay, Google Pay, card, and link — one integration covers every payment method that matters. Your customers pay how they want. No extra setup. No extra fees.",
   },
   {
-    title: "Built to convert",
+    title: "Fewer taps, more revenue",
     desc: "Smart autofill, one-tap repeat checkout, and sub-2-second load times cut abandonment before it starts. Your checkout doesn't lose sales your business earned.",
   },
   {
-    title: "Clear and transparent",
-    desc: "Subtotals, taxes, and fees in full view before the pay button. No surprise total at confirmation. Trust converts — and keeps them coming back.",
+    title: "No surprise totals. Ever.",
+    desc: "Subtotals, taxes, and fees in full view before the pay button. No surprise total at confirmation. Customers who trust the process come back more often.",
   },
   {
-    title: "Always supported",
-    desc: "Live chat, onboarding help, and a team that knows your business type. When something goes wrong — and it will — you're not alone with a help doc.",
+    title: "Real support, not just help docs",
+    desc: "Live chat, onboarding help, and a team that knows your business type. When something goes wrong — and it will — you're not alone with a ticket queue.",
   },
 ];
 
@@ -210,16 +210,25 @@ function Hero() {
             <br />
             <span style={{ color: "var(--landing-accent-deep)" }}>Done right.</span>
           </h1>
-          <div className="flex items-center gap-4">
-            <button
-              className="btn-spring flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
-              style={{
-                backgroundColor: "var(--landing-accent-deep)",
-                outlineColor: "var(--landing-accent-deep)",
-              }}
-            >
-              Get started free <ArrowRight size={16} aria-hidden />
-            </button>
+          <p className="max-w-md text-lg leading-relaxed" style={{ color: "var(--landing-muted)" }}>
+            One checkout for restaurants, services, and retail.
+            Live in minutes, built to convert.
+          </p>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-4">
+              <button
+                className="btn-spring flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
+                style={{
+                  backgroundColor: "var(--landing-accent-deep)",
+                  outlineColor: "var(--landing-accent-deep)",
+                }}
+              >
+                Get started free <ArrowRight size={16} aria-hidden />
+              </button>
+            </div>
+            <p className="text-xs" style={{ color: "var(--landing-subtle)" }}>
+              Apple Pay · Google Pay · Visa · Mastercard · Amex
+            </p>
           </div>
         </div>
 
@@ -419,7 +428,7 @@ function FeatureScroll() {
 
     const update = () => {
       const scrolled = Math.max(0, -container.getBoundingClientRect().top);
-      const slotH = window.innerHeight;
+      const slotH = window.innerHeight * 0.75;
 
       cards.forEach((el, i) => {
         if (i === n - 1) return; // last card never exits
@@ -453,7 +462,7 @@ function FeatureScroll() {
         {/* Each card owns one viewport-height of scroll runway */}
         <div
           ref={containerRef}
-          style={{ height: `calc(${FEATURES.length * 100}vh + 6rem)` }}
+          style={{ height: `calc(${FEATURES.length * 75}vh + 6rem)` }}
         >
           {FEATURES.map(({ title, desc }, i) => (
             <div
@@ -503,10 +512,10 @@ function Offering() {
   const current = OFFERINGS[active]!;
 
   return (
-    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "var(--landing-surface)" }}>
+    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
       <div className="mx-auto max-w-5xl">
         <p className="mb-16 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
-          Explore our solutions
+          Built for your category
         </p>
 
         <div className="flex flex-col items-center gap-2">
@@ -572,7 +581,7 @@ function HowYouSell() {
           {SELL_METHODS.map(({ Icon, label, bg, fg, desc }) => (
             <div
               key={label}
-              className="group flex flex-col gap-5 overflow-hidden rounded-3xl p-7 transition-transform hover:-translate-y-1"
+              className="flex flex-col gap-5 overflow-hidden rounded-3xl p-7"
               style={{ backgroundColor: bg }}
             >
               <div
@@ -764,7 +773,7 @@ function LumeShop() {
 
 function Testimonials() {
   return (
-    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "var(--landing-surface)" }}>
+    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
       <div className="mx-auto max-w-7xl">
         <p className="mb-2 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
           Reviews
@@ -835,10 +844,10 @@ function BottomCTA() {
           className="text-4xl font-black text-white lg:text-6xl"
           style={{ textWrap: "balance" } as React.CSSProperties}
         >
-          Start selling smarter today
+          No setup fees. No contracts.
         </h2>
         <p className="text-xl" style={{ color: "rgba(255,255,255,0.75)" }}>
-          No setup fees. No long-term contracts. Just a checkout that works.
+          Just a checkout that works — for every type of business, from day one.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <button
