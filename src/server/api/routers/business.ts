@@ -6,13 +6,18 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createBusinessPaymentLink } from "@/server/stripe";
 import { businesses, businessLocations } from "@/server/db/schema";
 
-const businessTypeSchema = z.enum(["store", "restaurant", "event"]);
+const businessTypeSchema = z.enum(["store", "services", "restaurant", "event"]);
 
 const createBusinessInput = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("store"),
     name: z.string().min(1),
     description: z.string().optional(),
+  }),
+  z.object({
+    type: z.literal("services"),
+    name: z.string().min(1),
+    trade: z.string().optional(),
   }),
   z.object({
     type: z.literal("restaurant"),
@@ -38,10 +43,11 @@ export const businessRouter = createTRPCRouter({
   }),
 
   getActive: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.query.businesses.findFirst({
+    const business = await ctx.db.query.businesses.findFirst({
       where: (business, { eq: equals }) => equals(business.ownerId, ctx.userId),
       orderBy: (business, { desc: orderDesc }) => [orderDesc(business.updatedAt)],
     });
+    return business ?? null;
   }),
 
   getById: protectedProcedure
@@ -70,7 +76,12 @@ export const businessRouter = createTRPCRouter({
           ownerId: ctx.userId,
           type: input.type,
           name: input.name,
-          description: input.type === "store" ? input.description ?? null : null,
+          description:
+            input.type === "store" || input.type === "services"
+              ? input.type === "store"
+                ? input.description ?? null
+                : input.trade ?? null
+              : null,
           cuisine: input.type === "restaurant" ? input.cuisine ?? null : null,
           address: input.type === "restaurant" ? input.address ?? null : null,
           eventDate: input.type === "event" && input.date ? input.date : null,

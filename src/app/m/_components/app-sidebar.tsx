@@ -13,6 +13,7 @@ import {
   Plugs,
   ShareNetwork,
   Storefront,
+  Toolbox,
 } from "@phosphor-icons/react";
 import {
   DropdownMenu,
@@ -33,18 +34,25 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { BUSINESS_ROUTES, VERTICAL_CONFIG, type BusinessType } from "@/verticals/types";
 
 const PRIMARY_NAV = [
   { href: "/m/dashboard", label: "Dashboard", Icon: ChartBar },
   { href: "/m/share", label: "Share", Icon: ShareNetwork },
-  { href: "/m/connect", label: "Connect", Icon: Plugs },
+  { href: "/m/connect", label: "Connect", Icon: Plugs, restaurantOnly: true },
 ] as const;
 
-const BUSINESS_NAV = [
-  { href: "/m/store", label: "Store", Icon: Storefront, comingSoon: true },
-  { href: "/m/restaurant", label: "Restaurant", Icon: ForkKnife, comingSoon: false },
-  { href: "/m/event", label: "Event", Icon: CalendarStar, comingSoon: true },
-] as const;
+const BUSINESS_NAV: {
+  type: BusinessType;
+  href: string;
+  label: string;
+  Icon: typeof Storefront;
+}[] = [
+  { type: "store", href: BUSINESS_ROUTES.store, label: VERTICAL_CONFIG.store.label, Icon: Storefront },
+  { type: "services", href: BUSINESS_ROUTES.services, label: VERTICAL_CONFIG.services.label, Icon: Toolbox },
+  { type: "restaurant", href: BUSINESS_ROUTES.restaurant, label: VERTICAL_CONFIG.restaurant.label, Icon: ForkKnife },
+  { type: "event", href: BUSINESS_ROUTES.event, label: VERTICAL_CONFIG.event.label, Icon: CalendarStar },
+];
 
 const SECONDARY_NAV = [
   { href: "/m/settings", label: "Settings", Icon: Gear },
@@ -154,7 +162,11 @@ export function AppSidebar() {
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {PRIMARY_NAV.map(({ href, label, Icon }) => (
+              {PRIMARY_NAV.filter(
+                (item) =>
+                  !("restaurantOnly" in item && item.restaurantOnly) ||
+                  activeBusiness?.type === "restaurant",
+              ).map(({ href, label, Icon }) => (
                 <NavLink
                   key={href}
                   href={href}
@@ -173,7 +185,7 @@ export function AppSidebar() {
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {BUSINESS_NAV.map(({ href, label, Icon, comingSoon }) => (
+              {BUSINESS_NAV.map(({ type, href, label, Icon }) => (
                 <NavLink
                   key={href}
                   href={href}
@@ -181,7 +193,7 @@ export function AppSidebar() {
                   Icon={Icon}
                   active={pathname === href || pathname.startsWith(`${href}/`)}
                   onNavigate={closeOnNavigate}
-                  comingSoon={comingSoon}
+                  comingSoon={VERTICAL_CONFIG[type].comingSoon}
                 />
               ))}
             </SidebarMenu>

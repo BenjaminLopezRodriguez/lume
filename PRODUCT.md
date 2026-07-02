@@ -1,22 +1,30 @@
 # Product
 
+**North star:** [thesis.md](./thesis.md) — commerce does not end at checkout; ownership begins at payment.
+
+See [VERTICALS.md](./VERTICALS.md) for per-vertical assets, lifecycles, checkout entry points, and design-system primitives. See [docs/THESIS_MAP.md](./docs/THESIS_MAP.md) for thesis ↔ code status.
+
 ## Register
 
-The checkout button for every business.
+Ownership starts at checkout.
+
+Checkout is the wedge — fast, branded, category-aware pay. Ownership is the product — the ongoing relationship between merchant, customer, and asset across the full lifecycle.
 
 ## Users
 
-Small business owners running restaurants, service businesses (salons, home-repair, booking-based trades), or retail shops — online and in-person. They're operators, not developers. They're choosing Lume because their current checkout is either a clunky POS, a generic payment link, or a form that loses them sales. They check their dashboard between rushes, not at a desk. Their primary anxiety is abandoned carts and missed orders.
+Small business owners running restaurants, service businesses (salons, home-repair, booking-based trades), or retail shops — online and in-person. They're operators, not developers. They're choosing Lume because their current checkout is either a clunky POS, a generic payment link, or a form that loses them sales — and because nothing helps them after the sale. They check their dashboard between rushes, not at a desk. Their primary anxiety is abandoned carts, missed orders, and customers who never come back.
 
-Secondary users: shoppers on Lume Shop — consumers who've checked out at one Lume merchant and now have saved payment info and a unified order feed across every Lume seller they visit.
+Secondary users: shoppers on Lume Shop — consumers who discover merchants by **ownership quality** (warranties, maintenance, buyback programs, lifecycle support), save payment info once, and maintain a unified relationship feed across every Lume seller they visit.
 
 ## Product Purpose
 
-Lume is a checkout infrastructure layer for brick-and-mortar and online businesses. It provides embeddable checkout flows (QR, POS, link, widget), Apple Pay / Google Pay / card acceptance, order and booking tracking, merchant analytics, and a consumer-facing marketplace (Lume Shop) where shoppers discover and re-order from any Lume seller. The core promise: one fast, beautiful checkout button that converts. The broader ambition: become the commerce layer that connects every local merchant to every repeat buyer — the way Shopify owns online storefronts, Lume owns the moment of payment and the relationship after it.
+Lume manages ownership throughout the commerce lifecycle. It starts with embeddable checkout (QR, link, widget), Apple Pay / Google Pay / card acceptance, and merchant operations — then continues through receipts, checkpoints, maintenance, recovery paths, and proactive outreach (SMS, AI-assisted recommendations).
+
+The core promise today: one fast checkout that converts. The broader ambition: formalize ownership the way Stripe formalized payments and Shopify formalized storefronts — so the transaction is the beginning of commerce, not the end.
 
 ## Brand Personality
 
-Bold · Frictionless · Merchant-first. Lume earns confidence by making hard things (payments, POS replacement, multi-location ops) feel effortless — and by treating a restaurant owner with the same design seriousness that fintech products reserve for enterprises. The visual language (dark brown near-black, hot pink, heavy type) signals that this is a modern tool, not a legacy platform wearing a new skin.
+Bold · Frictionless · Merchant-first. Lume earns confidence by making hard things (payments, POS replacement, multi-location ops, post-sale lifecycle) feel effortless — and by treating a restaurant owner with the same design seriousness that fintech products reserve for enterprises. The visual language (dark brown near-black, hot pink, heavy type) signals that this is a modern tool, not a legacy platform wearing a new skin.
 
 ## Anti-references
 
@@ -29,6 +37,7 @@ Not like Square, Toast, or Clover — avoid the cluttered POS-grid aesthetic, th
 3. **Merchant context everywhere**: The checkout should feel like it belongs to the business — name, category, brand tone — not like a generic payment processor in disguise. If a shopper can't tell which business they're buying from, it fails.
 4. **Confidence through transparency**: Totals, taxes, and fees must be visible before the pay button. Surprises at confirmation kill trust. If a user sees a different number after tapping pay than they saw before, it fails.
 5. **Consistency earns the saved-payment flywheel**: Shoppers save their info once and expect it everywhere on Lume. If the checkout experience varies meaningfully between two Lume merchants, the network effect breaks.
+6. **Every terminal state is a fork, not an end**: Returns denied, empty tables, cancelled appointments, and unused tickets are recovery opportunities — not dead ends. Lume asks "what is the next best outcome?"
 
 ## Accessibility & Inclusion
 

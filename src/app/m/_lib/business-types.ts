@@ -1,10 +1,33 @@
-export type BusinessType = "store" | "restaurant" | "event";
+export type {
+  BusinessType,
+  PrimaryPrimitive,
+  ShareMode,
+  ShareModeConfig,
+  VerticalConfig,
+} from "@/verticals/types";
 
+export {
+  BUSINESS_ROUTES,
+  SHARE_MODE_CONFIG,
+  VERTICAL_CONFIG,
+  getShareModesForVertical,
+  getVerticalConfig,
+} from "@/verticals/types";
+
+// Legacy client-side business shapes (localStorage era)
 export type StoreBusiness = {
   id: string;
   type: "store";
   name: string;
   description: string;
+  createdAt: string;
+};
+
+export type ServicesBusiness = {
+  id: string;
+  type: "services";
+  name: string;
+  trade: string;
   createdAt: string;
 };
 
@@ -27,17 +50,11 @@ export type EventBusiness = {
   createdAt: string;
 };
 
-export type Business = StoreBusiness | RestaurantBusiness | EventBusiness;
-
-export type CreateStoreInput = Omit<StoreBusiness, "id" | "type" | "createdAt">;
-export type CreateRestaurantInput = Omit<RestaurantBusiness, "id" | "type" | "createdAt">;
-export type CreateEventInput = Omit<EventBusiness, "id" | "type" | "createdAt">;
-
-export const BUSINESS_ROUTES: Record<BusinessType, string> = {
-  store: "/m/store",
-  restaurant: "/m/restaurant",
-  event: "/m/event",
-};
+export type Business =
+  | StoreBusiness
+  | ServicesBusiness
+  | RestaurantBusiness
+  | EventBusiness;
 
 export const STORAGE_KEY = "lume-businesses";
 export const ACTIVE_STORAGE_KEY = "lume-active-business";
