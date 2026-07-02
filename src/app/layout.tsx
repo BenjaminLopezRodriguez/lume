@@ -1,15 +1,23 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Geist, Public_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-const geistHeading = Geist({subsets:['latin'],variable:'--font-heading'});
+const bricolage = localFont({
+  src: "../../public/fonts/BricolageGrotesque.ttf",
+  variable: "--font-heading",
+  display: "swap",
+});
 
-const publicSans = Public_Sans({subsets:['latin'],variable:'--font-sans'});
+const figtree = localFont({
+  src: "../../public/fonts/Figtree.ttf",
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Lume — The checkout that grows your business",
@@ -17,16 +25,11 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-});
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={cn(geist.variable, "font-sans", publicSans.variable, geistHeading.variable)}>
+    <html lang="en" className={cn(figtree.variable, bricolage.variable, "font-sans")}>
       <body>
         <TRPCReactProvider><TooltipProvider>{children}</TooltipProvider></TRPCReactProvider>
       </body>
