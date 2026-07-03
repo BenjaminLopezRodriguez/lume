@@ -1,5 +1,6 @@
 import { accountGroupRouter } from "@/server/api/routers/accountGroup";
 import { businessRouter } from "@/server/api/routers/business";
+import { capabilitySetRouter } from "@/server/api/routers/capabilitySet";
 import { eventRouter } from "@/server/api/routers/event";
 import { integrationRouter } from "@/server/api/routers/integration";
 import { orderRouter } from "@/server/api/routers/order";
@@ -11,6 +12,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 export const appRouter = createTRPCRouter({
   accountGroup: accountGroupRouter,
   business: businessRouter,
+  capabilitySet: capabilitySetRouter,
   integration: integrationRouter,
   order: orderRouter,
   ownership: ownershipRouter,

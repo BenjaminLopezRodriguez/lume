@@ -29,6 +29,25 @@ export const accountGroups = createTable(
   (t) => [index("account_group_owner_idx").on(t.ownerId)],
 );
 
+export const customCapabilitySets = createTable(
+  "custom_capability_set",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    ownerId: d
+      .varchar({ length: 256 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    businessId: d
+      .uuid()
+      .references(() => businesses.id, { onDelete: "set null" }),
+    name: d.varchar({ length: 256 }).notNull(),
+    capabilities: d.jsonb().$type<string[]>().notNull().default([]),
+    createdAt: d.timestamp({ withTimezone: true }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$defaultFn(() => new Date()).notNull(),
+  }),
+  (t) => [index("custom_capability_set_owner_idx").on(t.ownerId)],
+);
+
 export const businesses = createTable(
   "business",
   (d) => ({
@@ -131,9 +150,15 @@ export const orders = createTable(
   ],
 );
 
+export const customCapabilitySetsRelations = relations(customCapabilitySets, ({ one }) => ({
+  owner: one(users, { fields: [customCapabilitySets.ownerId], references: [users.id] }),
+  business: one(businesses, { fields: [customCapabilitySets.businessId], references: [businesses.id] }),
+}));
+
 export const usersRelations = relations(users, ({ many }) => ({
   businesses: many(businesses),
   accountGroups: many(accountGroups),
+  customCapabilitySets: many(customCapabilitySets),
 }));
 
 export const accountGroupsRelations = relations(accountGroups, ({ one, many }) => ({
@@ -155,6 +180,7 @@ export const businessesRelations = relations(businesses, ({ one, many }) => ({
   tickets: many(tickets),
   ownerships: many(ownerships),
   ownershipCheckpoints: many(ownershipCheckpoints),
+  customCapabilitySets: many(customCapabilitySets),
 }));
 
 export const businessLocationsRelations = relations(businessLocations, ({ one }) => ({
