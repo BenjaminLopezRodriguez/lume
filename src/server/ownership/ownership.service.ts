@@ -2,13 +2,14 @@ import "server-only";
 
 import { db } from "@/server/db";
 import { ownershipEvents, ownerships } from "@/server/db/schema";
+import { emit, CAPABILITY_EVENTS } from "@/server/capabilities";
 import { OWNERSHIP_EVENT } from "./ownership.events";
 import { canTransition } from "./ownership.lifecycle";
 import * as repo from "./ownership.repository";
 import type { CreateOwnershipInput, OwnershipStatus } from "./ownership.types";
 
 export async function createOwnership(input: CreateOwnershipInput) {
-  return db.transaction(async (tx) => {
+  const result = await db.transaction(async (tx) => {
     const [ownership] = await tx
       .insert(ownerships)
       .values({
@@ -38,6 +39,15 @@ export async function createOwnership(input: CreateOwnershipInput) {
 
     return ownership!;
   });
+
+  // Emit capability event after transaction completes
+  await emit(CAPABILITY_EVENTS.OWNERSHIP_CREATED, {
+    ownershipId: result.id,
+    assetType: result.assetType,
+    businessId: result.businessId,
+  });
+
+  return result;
 }
 
 export async function appendEvent(
@@ -58,6 +68,18 @@ export async function transitionStatus(ownershipId: string, newStatus: Ownership
   }
   const updated = await repo.updateStatus(ownershipId, newStatus);
   await repo.appendEvent(ownershipId, `status_changed_to_${newStatus}`);
+
+  // Emit capability events for terminal statuses
+  const eventType =
+    newStatus === "transferred"
+      ? CAPABILITY_EVENTS.OWNERSHIP_TRANSFERRED
+      : newStatus === "completed"
+        ? CAPABILITY_EVENTS.OWNERSHIP_COMPLETED
+        : null;
+  if (eventType) {
+    await emit(eventType, { ownershipId, newStatus });
+  }
+
   return updated;
 }
 
