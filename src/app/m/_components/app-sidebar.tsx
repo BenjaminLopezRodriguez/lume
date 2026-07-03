@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { CreateBusinessDialog } from "@/app/m/_components/create-business-dialog";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import {
@@ -12,7 +12,10 @@ import {
   Gear,
   Globe,
   Headset,
+  LinkSimple,
+  Plus,
   Plugs,
+  QrCode,
   ShareNetwork,
   UsersThree,
 } from "@phosphor-icons/react";
@@ -29,6 +32,7 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -38,7 +42,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { BUSINESS_ROUTES, VERTICAL_CONFIG, type BusinessType } from "@/verticals/types";
+import { BUSINESS_ROUTES, type BusinessType } from "@/verticals/types";
 
 const PRIMARY_NAV = [
   { href: "/m/dashboard", label: "Dashboard", Icon: ChartBar },
@@ -48,6 +52,7 @@ const PRIMARY_NAV = [
 const PRIMITIVE_NAV = [
   { id: "presence", label: "Presence", Icon: Globe, route: "dynamic" },
   { id: "ownership", label: "Ownership", Icon: UsersThree, href: "/m/ownership" },
+  { id: "connect", label: "Connect", Icon: Plugs, route: "submenu" },
   { id: "support", label: "Support", Icon: Headset, href: "/m/support" },
 ] as const;
 
@@ -90,6 +95,7 @@ function NavLink({
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { isMobile, setOpenMobile } = useSidebar();
   const { activeBusiness, businesses, setActiveBusiness } = useBusinesses();
 
@@ -129,7 +135,12 @@ export function AppSidebar() {
                 businesses.map((business) => (
                   <DropdownMenuItem
                     key={business.id}
-                    onClick={() => void setActiveBusiness(business.id)}
+                    onClick={async () => {
+                      await setActiveBusiness(business.id);
+                      if (business.type in BUSINESS_ROUTES) {
+                        router.push(BUSINESS_ROUTES[business.type as BusinessType]);
+                      }
+                    }}
                   >
                     <span className="truncate">{business.name}</span>
                     <span className="ml-auto flex items-center gap-1.5 text-xs text-neutral-400 capitalize">
@@ -182,15 +193,78 @@ export function AppSidebar() {
                   const presenceHref = activeBusiness && activeBusiness.type in BUSINESS_ROUTES
                     ? BUSINESS_ROUTES[activeBusiness.type as BusinessType]
                     : "/m/dashboard";
+                  const PRESENCE_OPTIONS = [
+                    { label: "Web", Icon: Globe, href: presenceHref },
+                    { label: "QR Code", Icon: QrCode, href: "/m/share" },
+                    { label: "Link", Icon: LinkSimple, href: "/m/share" },
+                  ] as const;
                   return (
-                    <NavLink
-                      key="presence"
-                      href={presenceHref}
-                      label={item.label}
-                      Icon={item.Icon}
-                      active={presenceActive}
-                      onNavigate={closeOnNavigate}
-                    />
+                    <SidebarMenuItem key="presence">
+                      <SidebarMenuButton
+                        asChild
+                        isActive={presenceActive}
+                        className={cn(
+                          "h-10 rounded-lg px-3 text-sm font-normal text-neutral-600 hover:bg-[#f5f5f5] hover:text-neutral-900",
+                          "data-[active=true]:bg-[#e2f1af] data-[active=true]:font-medium data-[active=true]:text-neutral-900",
+                          "data-[active=true]:hover:bg-[#e2f1af] data-[active=true]:hover:text-neutral-900",
+                        )}
+                      >
+                        <Link href={presenceHref} onClick={closeOnNavigate}>
+                          <Globe size={18} weight={presenceActive ? "fill" : "regular"} />
+                          <span>Presence</span>
+                        </Link>
+                      </SidebarMenuButton>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <SidebarMenuAction
+                            className="flex size-6 items-center justify-center rounded-md text-neutral-400 hover:bg-[#f5f5f5] hover:text-neutral-700"
+                            aria-label="Add presence"
+                          >
+                            <Plus size={12} weight="bold" aria-hidden />
+                          </SidebarMenuAction>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="right" align="start" className="w-40">
+                          {PRESENCE_OPTIONS.map(({ label, Icon, href }) => (
+                            <DropdownMenuItem key={label} asChild>
+                              <Link href={href} onClick={closeOnNavigate} className="flex items-center gap-2">
+                                <Icon size={14} />
+                                {label}
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </SidebarMenuItem>
+                  );
+                }
+
+                if (item.id === "connect") {
+                  const connectActive = pathname.startsWith("/m/connect");
+                  return (
+                    <SidebarMenuItem key="connect">
+                      <SidebarMenuButton
+                        isActive={connectActive}
+                        className={cn(
+                          "h-10 rounded-lg px-3 text-sm font-normal text-neutral-600 hover:bg-[#f5f5f5] hover:text-neutral-900",
+                          "data-[active=true]:bg-[#e2f1af] data-[active=true]:font-medium data-[active=true]:text-neutral-900",
+                        )}
+                      >
+                        <Plugs size={18} weight={connectActive ? "fill" : "regular"} />
+                        <span>Connect</span>
+                      </SidebarMenuButton>
+                      <SidebarMenuSub>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === "/m/connect/in" || pathname.startsWith("/m/connect/in/")}>
+                            <Link href="/m/connect/in" onClick={closeOnNavigate}><ArrowSquareIn size={14} />In</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild isActive={pathname === "/m/connect/out" || pathname.startsWith("/m/connect/out/")}>
+                            <Link href="/m/connect/out" onClick={closeOnNavigate}><ArrowSquareOut size={14} />Out</Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      </SidebarMenuSub>
+                    </SidebarMenuItem>
                   );
                 }
 
@@ -208,50 +282,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {activeBusiness?.type === "restaurant" && (
-          <>
-            <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
-            <SidebarGroup className="p-0">
-              <SidebarGroupContent>
-                <SidebarMenu className="gap-1">
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      className="h-10 rounded-lg px-3 text-sm font-normal text-neutral-600 hover:bg-[#f5f5f5] hover:text-neutral-900"
-                    >
-                      <Plugs size={18} weight="regular" />
-                      <span>Connect</span>
-                    </SidebarMenuButton>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={pathname === "/m/connect/in" || pathname.startsWith("/m/connect/in/")}
-                        >
-                          <Link href="/m/connect/in" onClick={closeOnNavigate}>
-                            <ArrowSquareIn size={14} />
-                            In
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={pathname === "/m/connect/out" || pathname.startsWith("/m/connect/out/")}
-                        >
-                          <Link href="/m/connect/out" onClick={closeOnNavigate}>
-                            <ArrowSquareOut size={14} />
-                            Out
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </>
-        )}
 
         <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
 
