@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { accountGroups, businesses } from "@/server/db/schema";
 
@@ -29,12 +30,12 @@ export const accountGroupRouter = createTRPCRouter({
       const group = await ctx.db.query.accountGroups.findFirst({
         where: (r, { and, eq: eqOp }) => and(eqOp(r.id, input.groupId), eqOp(r.ownerId, ctx.userId)),
       });
-      if (!group) throw new Error("Group not found");
+      if (!group) throw new TRPCError({ code: "NOT_FOUND", message: "Group not found" });
 
       const business = await ctx.db.query.businesses.findFirst({
         where: (r, { and, eq: eqOp }) => and(eqOp(r.id, input.businessId), eqOp(r.ownerId, ctx.userId)),
       });
-      if (!business) throw new Error("Business not found");
+      if (!business) throw new TRPCError({ code: "NOT_FOUND", message: "Business not found" });
 
       await ctx.db
         .update(businesses)
