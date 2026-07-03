@@ -1,12 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import { ListCard, ListCardRow } from "@/app/m/_components/list-card";
 import { PageContent } from "@/app/m/_components/page-content";
 import { PageHeader } from "@/app/m/_components/page-header";
 import { SalesBarGraph } from "@/app/m/_components/sales-bar-graph";
 import { SectionHeader } from "@/app/m/_components/section-header";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { api } from "@/trpc/react";
+import { BUSINESS_ROUTES } from "@/verticals/types";
 
 const PLATFORM_COLORS: Record<string, string> = {
   ubereats: "#06c167",
@@ -36,6 +39,13 @@ const PLATFORM_LABELS: Record<string, string> = {
   lume_direct: "Lume direct",
 };
 
+const ASSET_TYPE_TO_BUSINESS: Record<string, string> = {
+  product: "store",
+  completed_work: "services",
+  attendance: "event",
+  dining_relationship: "restaurant",
+};
+
 export function DashboardPageView() {
   const { activeBusiness } = useBusinesses();
   const businessId = activeBusiness?.id;
@@ -59,6 +69,13 @@ export function DashboardPageView() {
     { businessId: businessId ?? "", limit: 10 },
     { enabled: !!businessId },
   );
+
+  const pendingByType = activeOwnerships
+    .filter((o) => o.status === "pending_action")
+    .reduce<Record<string, number>>((acc, o) => {
+      acc[o.assetType] = (acc[o.assetType] ?? 0) + 1;
+      return acc;
+    }, {});
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -102,6 +119,22 @@ export function DashboardPageView() {
           )
         }
       />
+
+      {Object.entries(pendingByType).map(([assetType, count]) => {
+        const businessType = ASSET_TYPE_TO_BUSINESS[assetType];
+        const route = businessType ? BUSINESS_ROUTES[businessType as keyof typeof BUSINESS_ROUTES] : undefined;
+        if (!route) return null;
+        const label = ASSET_TYPE_LABEL[assetType] ?? assetType;
+        return (
+          <Link key={assetType} href={route} className="mb-4 block">
+            <Alert className="hover:bg-neutral-50 transition-colors">
+              <AlertDescription>
+                {count} customer{count !== 1 ? "s" : ""} need attention ({label}) → View
+              </AlertDescription>
+            </Alert>
+          </Link>
+        );
+      })}
 
       <div className="mt-8 flex flex-col gap-8">
         <section className="flex flex-col gap-3">

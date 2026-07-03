@@ -9,6 +9,7 @@ import { SectionHeader } from "@/app/m/_components/section-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PaymentStatusChip } from "@/verticals/shared/payment-status-chip";
 import { VERTICAL_CONFIG } from "@/verticals/types";
 import { api } from "@/trpc/react";
@@ -99,6 +100,12 @@ export function EventPageView() {
         }
       />
 
+      <Tabs defaultValue="overview">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="issues">Issues</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">
       <div className="mt-8 flex flex-col gap-8">
         <section className="flex flex-col gap-3">
           <SectionHeader title="New event" />
@@ -272,6 +279,15 @@ export function EventPageView() {
           </section>
         ) : null}
       </div>
+        </TabsContent>
+        <TabsContent value="issues">
+          <div className="mt-6 flex flex-col gap-3">
+            <ListCard>
+              <ListCardRow dot="#a3a3a3" label="No issues" trailing="Coming soon" />
+            </ListCard>
+          </div>
+        </TabsContent>
+      </Tabs>
     </PageContent>
   );
 }

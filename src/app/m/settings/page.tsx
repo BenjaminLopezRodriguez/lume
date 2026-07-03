@@ -1,3 +1,4 @@
+import { AccountGroupsSection } from "@/app/m/_components/account-groups-section";
 import { ListCard, ListCardRow } from "@/app/m/_components/list-card";
 import { PageContent } from "@/app/m/_components/page-content";
 import { PageHeader } from "@/app/m/_components/page-header";
@@ -65,6 +66,8 @@ export default function SettingsPage() {
             ))}
           </ListCard>
         </section>
+
+        <AccountGroupsSection />
       </div>
     </PageContent>
   );

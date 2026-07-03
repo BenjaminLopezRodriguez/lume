@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { CreateBusinessDialog } from "@/app/m/_components/create-business-dialog";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import {
+  ArrowCounterClockwise,
   CalendarStar,
   CaretDown,
   ChartBar,
@@ -55,6 +56,7 @@ const BUSINESS_NAV: {
 ];
 
 const SECONDARY_NAV = [
+  { href: "/m/resolution", label: "Resolution Center", Icon: ArrowCounterClockwise },
   { href: "/m/settings", label: "Settings", Icon: Gear },
 ] as const;
 
@@ -144,7 +146,12 @@ export function AppSidebar() {
                     onClick={() => void setActiveBusiness(business.id)}
                   >
                     <span className="truncate">{business.name}</span>
-                    <span className="ml-auto text-xs text-neutral-400 capitalize">
+                    <span className="ml-auto flex items-center gap-1.5 text-xs text-neutral-400 capitalize">
+                      {business.groupId ? (
+                        <span className="rounded-full bg-[#ede9fe] px-1.5 py-0.5 text-[0.625rem] font-medium text-[#6366f1]">
+                          Group
+                        </span>
+                      ) : null}
                       {business.type}
                     </span>
                   </DropdownMenuItem>
