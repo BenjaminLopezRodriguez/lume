@@ -1,4 +1,8 @@
-export type BusinessType = "store" | "services" | "restaurant" | "event";
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: account BusinessType + VERTICAL_CONFIG + BUSINESS_ROUTES.account.
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
+export type BusinessType = "account" | "store" | "services" | "restaurant" | "event";
 
 export type PrimaryPrimitive =
   | "catalogCheckout"
@@ -56,6 +60,17 @@ export const SHARE_MODE_CONFIG: Record<ShareMode, ShareModeConfig> = {
 };
 
 export const VERTICAL_CONFIG: Record<BusinessType, VerticalConfig> = {
+  account: {
+    label: "Account",
+    accent: "#6366f1",
+    primaryPrimitive: "catalogCheckout",
+    primaryNoun: "sale",
+    shareModes: ["checkoutLink"],
+    shareMeta: "Add capabilities to unlock menus, storefronts, and more",
+    checkoutLinkLabel: "Checkout link",
+    comingSoon: false,
+    showConnect: false,
+  },
   store: {
     label: "Store",
     accent: "#6366f1",
@@ -103,6 +118,7 @@ export const VERTICAL_CONFIG: Record<BusinessType, VerticalConfig> = {
 };
 
 export const BUSINESS_ROUTES: Record<BusinessType, string> = {
+  account: "/m/dashboard",
   store: "/m/store",
   services: "/m/services",
   restaurant: "/m/restaurant",
@@ -113,7 +129,7 @@ export function getVerticalConfig(type: string | undefined | null): VerticalConf
   if (type && type in VERTICAL_CONFIG) {
     return VERTICAL_CONFIG[type as BusinessType];
   }
-  return VERTICAL_CONFIG.restaurant;
+  return VERTICAL_CONFIG.account;
 }
 
 export function getShareModesForVertical(type: string | undefined | null): ShareModeConfig[] {

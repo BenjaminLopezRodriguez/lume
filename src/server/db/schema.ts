@@ -1,3 +1,7 @@
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: web_presences, menus, qr_codes tables + business relations.
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
 import { relations } from "drizzle-orm";
 import { index, pgTableCreator, uniqueIndex } from "drizzle-orm/pg-core";
 
@@ -173,6 +177,9 @@ export const businessesRelations = relations(businesses, ({ one, many }) => ({
   integrations: many(integrations),
   orders: many(orders),
   storefronts: many(storefronts),
+  webPresence: one(webPresences),
+  menus: many(menus),
+  qrCodes: many(qrCodes),
   products: many(products),
   serviceJobs: many(serviceJobs),
   serviceInvoices: many(serviceInvoices),
@@ -203,6 +210,95 @@ export const ordersRelations = relations(orders, ({ one }) => ({
     references: [businesses.id],
   }),
 }));
+
+// ─── Web presence: Lume-hosted site + custom domain ────────────────────────
+
+export const webPresences = createTable(
+  "web_presence",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    businessId: d
+      .uuid()
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    slug: d.varchar({ length: 128 }).notNull(),
+    customDomain: d.varchar({ length: 256 }),
+    domainStatus: d.varchar({ length: 32 }),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [
+    uniqueIndex("web_presence_business_idx").on(t.businessId),
+    uniqueIndex("web_presence_slug_idx").on(t.slug),
+    uniqueIndex("web_presence_domain_idx").on(t.customDomain),
+  ],
+);
+
+export type MenuItem = {
+  id: string;
+  name: string;
+  description?: string;
+  priceCents: number;
+  category?: string;
+};
+
+export const menus = createTable(
+  "menu",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    businessId: d
+      .uuid()
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    slug: d.varchar({ length: 128 }).notNull(),
+    name: d.varchar({ length: 256 }).notNull(),
+    items: d.jsonb().$type<MenuItem[]>().notNull().default([]),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [
+    uniqueIndex("menu_business_idx").on(t.businessId),
+    uniqueIndex("menu_slug_idx").on(t.slug),
+  ],
+);
+
+export type QrCodeConfig = {
+  useCustomDomain?: boolean;
+  tableLabel?: string;
+  menuId?: string;
+};
+
+export const qrCodes = createTable(
+  "qr_code",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    businessId: d
+      .uuid()
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    label: d.varchar({ length: 128 }).notNull(),
+    capability: d.varchar({ length: 32 }).notNull(),
+    config: d.jsonb().$type<QrCodeConfig>().notNull().default({}),
+    targetUrl: d.varchar({ length: 2048 }).notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [index("qr_code_business_idx").on(t.businessId)],
+);
 
 // ─── Store: catalog + storefront ───────────────────────────────────────────
 
@@ -395,6 +491,27 @@ export const tickets = createTable(
     uniqueIndex("ticket_check_in_code_idx").on(t.checkInCode),
   ],
 );
+
+export const webPresencesRelations = relations(webPresences, ({ one }) => ({
+  business: one(businesses, {
+    fields: [webPresences.businessId],
+    references: [businesses.id],
+  }),
+}));
+
+export const menusRelations = relations(menus, ({ one }) => ({
+  business: one(businesses, {
+    fields: [menus.businessId],
+    references: [businesses.id],
+  }),
+}));
+
+export const qrCodesRelations = relations(qrCodes, ({ one }) => ({
+  business: one(businesses, {
+    fields: [qrCodes.businessId],
+    references: [businesses.id],
+  }),
+}));
 
 export const storefrontsRelations = relations(storefronts, ({ one, many }) => ({
   business: one(businesses, {

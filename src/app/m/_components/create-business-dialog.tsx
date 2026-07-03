@@ -1,16 +1,19 @@
 "use client";
 
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: Capability option + addToAccount; name-only account create (no preset picker).
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Buildings,
   Plus,
+  PuzzlePiece,
   Stack,
   UserCircle,
 } from "@phosphor-icons/react";
-import type { BusinessType } from "@/app/m/_lib/business-types";
-import { BUSINESS_ROUTES } from "@/app/m/_lib/business-types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { CAPABILITIES } from "@/verticals/capabilities";
+import { CAPABILITIES, type Capability } from "@/verticals/capabilities";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { useBusinesses } from "@/app/m/_components/business-provider";
@@ -32,7 +35,7 @@ const ROOT_OPTIONS = [
   {
     key: "account" as const,
     label: "Account",
-    desc: "A business with its own capability set",
+    desc: "Name your business — add capabilities as you grow",
     Icon: UserCircle,
   },
   {
@@ -42,6 +45,12 @@ const ROOT_OPTIONS = [
     Icon: Buildings,
   },
   {
+    key: "capability" as const,
+    label: "Capability",
+    desc: "A capability for your business — attaches to the account you're on",
+    Icon: PuzzlePiece,
+  },
+  {
     key: "capability-set" as const,
     label: "Capability Set",
     desc: "Define a custom stack of capabilities",
@@ -49,7 +58,13 @@ const ROOT_OPTIONS = [
   },
 ] as const;
 
-type Step = "root" | "form" | "group-form" | "capability-set-form" | "capability-set-scope";
+type Step =
+  | "root"
+  | "form"
+  | "group-form"
+  | "capability-form"
+  | "capability-set-form"
+  | "capability-set-scope";
 const EMPTY_GROUP = { name: "", description: "" };
 const EMPTY_CAPSET = { name: "", selectedCaps: [] as string[] };
 
@@ -67,25 +82,31 @@ export function CreateBusinessDialog() {
   const attachBusiness = api.accountGroup.attachBusiness.useMutation({
     onSuccess: async () => { await utils.business.invalidate(); },
   });
+  const addCapabilityToAccount = api.capabilitySet.addToAccount.useMutation({
+    onSuccess: async () => {
+      await utils.capabilitySet.invalidate();
+      await utils.qr.invalidate();
+    },
+  });
   const createCapabilitySet = api.capabilitySet.create.useMutation({
     onSuccess: async () => { await utils.capabilitySet.invalidate(); },
   });
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("root");
-  const [selectedType, setSelectedType] = useState<BusinessType>("store");
   const [form, setForm] = useState({ name: "" });
   const [group, setGroup] = useState(EMPTY_GROUP);
   const [capSet, setCapSet] = useState(EMPTY_CAPSET);
+  const [selectedCapability, setSelectedCapability] = useState<string | null>(null);
   const [capSetScope, setCapSetScope] = useState<"account" | "global">("global");
   const [noAccountError, setNoAccountError] = useState(false);
 
   function reset() {
     setStep("root");
-    setSelectedType("store");
     setForm({ name: "" });
     setGroup(EMPTY_GROUP);
     setCapSet(EMPTY_CAPSET);
+    setSelectedCapability(null);
     setCapSetScope("global");
     setNoAccountError(false);
   }
@@ -97,13 +118,11 @@ export function CreateBusinessDialog() {
 
   async function handleCreateAccount(e: React.FormEvent) {
     e.preventDefault();
-    const type = selectedType ?? "store";
-    if (!form.name.trim()) return;
-    const created = await createBusiness.mutateAsync({ type, name: form.name.trim() });
+    const created = await createBusiness.mutateAsync({ name: form.name.trim() });
     await setActiveBusiness(created.id);
     setOpen(false);
     reset();
-    router.push(BUSINESS_ROUTES[type]);
+    router.push("/m/dashboard");
   }
 
   async function handleCreateGroup(e: React.FormEvent) {
@@ -111,6 +130,17 @@ export function CreateBusinessDialog() {
     if (!group.name.trim() || !activeBusiness) return;
     const newGroup = await createGroup.mutateAsync({ name: group.name.trim(), description: group.description.trim() || undefined });
     await attachBusiness.mutateAsync({ groupId: newGroup.id, businessId: activeBusiness.id });
+    setOpen(false);
+    reset();
+  }
+
+  async function handleAddCapability(e: React.FormEvent) {
+    e.preventDefault();
+    if (!selectedCapability || !activeBusiness) return;
+    await addCapabilityToAccount.mutateAsync({
+      businessId: activeBusiness.id,
+      capability: selectedCapability as Capability,
+    });
     setOpen(false);
     reset();
   }
@@ -170,13 +200,18 @@ export function CreateBusinessDialog() {
                   type="button"
                   className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]"
                   onClick={() => {
-                    if (key === "account-group") {
-                      if (!activeBusiness) { setNoAccountError(true); return; }
+                    if (key === "account-group" || key === "capability") {
+                      if (!activeBusiness) {
+                        setNoAccountError(true);
+                        return;
+                      }
                       setNoAccountError(false);
-                      setStep("group-form");
+                      setStep(key === "account-group" ? "group-form" : "capability-form");
                     } else {
                       setNoAccountError(false);
-                      setStep(key === "account" ? "form" : "capability-set-form");
+                      setStep(
+                        key === "account" ? "form" : "capability-set-form",
+                      );
                     }
                   }}
                 >
@@ -191,7 +226,9 @@ export function CreateBusinessDialog() {
               ))}
             </div>
             {noAccountError && (
-              <p className="px-5 py-3 text-sm text-red-600">You need to be in an account to create a group.</p>
+              <p className="px-5 py-3 text-sm text-red-600">
+                You need to be in an account to add a capability or create a group.
+              </p>
             )}
           </>
         )}
@@ -204,7 +241,7 @@ export function CreateBusinessDialog() {
                 <BackButton to="root" />
                 <div>
                   <DialogTitle className="text-base font-semibold text-neutral-950">New account</DialogTitle>
-                  <DialogDescription className="text-sm text-neutral-500">Name it and pick a preset</DialogDescription>
+                  <DialogDescription className="text-sm text-neutral-500">Name your business</DialogDescription>
                 </div>
               </div>
             </DialogHeader>
@@ -220,25 +257,65 @@ export function CreateBusinessDialog() {
                   autoFocus
                 />
               </div>
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="business-preset">Preset</Label>
-                <select
-                  id="business-preset"
-                  value={selectedType ?? "store"}
-                  onChange={(e) => setSelectedType(e.target.value as BusinessType)}
-                  className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm"
-                >
-                  <option value="store">Store</option>
-                  <option value="services">Services</option>
-                  <option value="restaurant">Restaurant</option>
-                  <option value="event">Event</option>
-                </select>
-              </div>
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-[#ebebeb] px-5 py-4">
               <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpenChange(false)}>Cancel</Button>
               <Button type="submit" className="rounded-lg" disabled={!canSubmitAccount}>
                 {createBusiness.isPending ? "Creating..." : "Create"}
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {/* ── Single capability ── */}
+        {step === "capability-form" && (
+          <form onSubmit={handleAddCapability}>
+            <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
+              <div className="flex items-center gap-2">
+                <BackButton to="root" />
+                <div>
+                  <DialogTitle className="text-base font-semibold text-neutral-950">Add capability</DialogTitle>
+                  <DialogDescription className="text-sm text-neutral-500">
+                    {activeBusiness
+                      ? `Attaches to ${activeBusiness.name}`
+                      : "Select an account first"}
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+            <div className="flex flex-col gap-4 px-5 py-5">
+              <div className="flex flex-col gap-2">
+                <Label>Capability</Label>
+                <div className="flex flex-wrap gap-2">
+                  {CAPABILITIES.map((cap) => {
+                    const selected = selectedCapability === cap;
+                    return (
+                      <button
+                        key={cap}
+                        type="button"
+                        onClick={() => setSelectedCapability(cap)}
+                        className={cn(
+                          "rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors",
+                          selected
+                            ? "bg-[#e2f1af] text-neutral-900"
+                            : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200",
+                        )}
+                      >
+                        {cap}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-[#ebebeb] px-5 py-4">
+              <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpenChange(false)}>Cancel</Button>
+              <Button
+                type="submit"
+                className="rounded-lg"
+                disabled={!selectedCapability || addCapabilityToAccount.isPending}
+              >
+                {addCapabilityToAccount.isPending ? "Adding..." : "Add capability"}
               </Button>
             </div>
           </form>

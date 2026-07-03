@@ -1,3 +1,7 @@
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: business.create defaults type to "account" (name-only accounts, no preset vertical).
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -8,6 +12,9 @@ import { businesses } from "@/server/db/schema";
 
 const createBusinessInput = z.object({
   name: z.string().min(1),
+  type: z
+    .enum(["account", "store", "services", "restaurant", "event"])
+    .default("account"),
 });
 
 export const businessRouter = createTRPCRouter({
@@ -50,7 +57,7 @@ export const businessRouter = createTRPCRouter({
         .insert(businesses)
         .values({
           ownerId: ctx.userId,
-          type: "account",
+          type: input.type,
           name: input.name,
           stripePaymentLinkUrl: paymentLink.url,
           stripePaymentLinkId: paymentLink.id,

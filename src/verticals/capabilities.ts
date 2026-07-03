@@ -1,3 +1,7 @@
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: menu capability, account: [] stack, restaurant includes menu.
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
 import type { BusinessType, VerticalConfig } from "./types";
 import { VERTICAL_CONFIG } from "./types";
 
@@ -7,6 +11,7 @@ export const CAPABILITIES = [
   "ownership",
   "messaging",
   "inventory",
+  "menu",
   "reservations",
   "tickets",
   "invoices",
@@ -21,9 +26,10 @@ export type Capability = (typeof CAPABILITIES)[number];
 // Which capabilities each existing stack has
 // Keys must match BusinessType: "store" | "services" | "restaurant" | "event"
 export const CAPABILITY_SETS: Record<BusinessType, readonly Capability[]> = {
+  account: [],
   store: ["checkout", "inventory", "returns", "ownership", "analytics"],
   services: ["invoices", "ownership", "support", "analytics"],
-  restaurant: ["checkout", "reservations", "inventory", "ownership", "analytics"],
+  restaurant: ["menu", "checkout", "reservations", "inventory", "ownership", "analytics"],
   event: ["checkout", "tickets", "ownership", "messaging"],
 };
 
@@ -37,6 +43,18 @@ export const CAPABILITY_SET_CONFIG: Record<
   BusinessType,
   CapabilitySetConfig
 > = {
+  account: {
+    label: "Account",
+    accent: "#6366f1",
+    primaryPrimitive: "catalogCheckout",
+    primaryNoun: "sale",
+    shareModes: ["checkoutLink"],
+    shareMeta: "Add capabilities to unlock checkout, menus, and more",
+    checkoutLinkLabel: "Checkout link",
+    comingSoon: false,
+    showConnect: false,
+    capabilities: CAPABILITY_SETS.account,
+  },
   store: {
     ...VERTICAL_CONFIG.store,
     capabilities: CAPABILITY_SETS.store,

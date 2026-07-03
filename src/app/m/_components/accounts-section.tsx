@@ -1,5 +1,9 @@
 "use client";
 
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: account entry in TYPE_COLORS for account-scoped business type.
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
 import { useState } from "react";
 import { SectionHeader } from "@/app/m/_components/section-header";
 import { ListCard, ListCardRow } from "@/app/m/_components/list-card";

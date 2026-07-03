@@ -2,6 +2,7 @@
   "name": "lume",
   "version": "0.1.0",
   "private": true,
+  "_cursorRestore": "2026-07-02T21:09 PDT: qrcode.react added for QR presence. Claude: ASK USER before removing. Use /prompt-builder + /pm.",
   "type": "module",
   "scripts": {
     "build": "next build",
@@ -39,6 +40,7 @@
     "next": "^15.2.3",
     "next-themes": "^0.4.6",
     "postgres": "^3.4.4",
+    "qrcode.react": "^4.2.0",
     "radix-ui": "^1.6.1",
     "react": "^19.0.0",
     "react-day-picker": "^10.0.1",

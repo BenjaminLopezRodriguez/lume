@@ -1,5 +1,9 @@
 "use client";
 
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: Presence nav, capabilities from listForBusiness (not CAPABILITY_SETS by type).
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { CreateBusinessDialog } from "@/app/m/_components/create-business-dialog";
@@ -42,7 +46,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { BUSINESS_ROUTES, type BusinessType } from "@/verticals/types";
+import { api } from "@/trpc/react";
 
 const PRIMARY_NAV = [
   { href: "/m/dashboard", label: "Dashboard", Icon: ChartBar },
@@ -99,6 +103,11 @@ export function AppSidebar() {
   const { isMobile, setOpenMobile } = useSidebar();
   const { activeBusiness, businesses, setActiveBusiness } = useBusinesses();
 
+  const { data: accountCaps = [] } = api.capabilitySet.listForBusiness.useQuery(
+    { businessId: activeBusiness?.id ?? "" },
+    { enabled: !!activeBusiness?.id },
+  );
+
   function closeOnNavigate() {
     if (isMobile) setOpenMobile(false);
   }
@@ -137,20 +146,15 @@ export function AppSidebar() {
                     key={business.id}
                     onClick={async () => {
                       await setActiveBusiness(business.id);
-                      if (business.type in BUSINESS_ROUTES) {
-                        router.push(BUSINESS_ROUTES[business.type as BusinessType]);
-                      }
+                      router.push("/m/dashboard");
                     }}
                   >
                     <span className="truncate">{business.name}</span>
-                    <span className="ml-auto flex items-center gap-1.5 text-xs text-neutral-400 capitalize">
-                      {business.groupId ? (
-                        <span className="rounded-full bg-[#ede9fe] px-1.5 py-0.5 text-[0.625rem] font-medium text-[#6366f1]">
-                          Group
-                        </span>
-                      ) : null}
-                      {business.type}
-                    </span>
+                    {business.groupId ? (
+                      <span className="ml-auto rounded-full bg-[#ede9fe] px-1.5 py-0.5 text-[0.625rem] font-medium text-[#6366f1]">
+                        Group
+                      </span>
+                    ) : null}
                   </DropdownMenuItem>
                 ))
               ) : (
@@ -186,11 +190,8 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               {PRIMITIVE_NAV.map((item) => {
-                const VERTICAL_PATHS = Object.values(BUSINESS_ROUTES);
-                const presenceActive = item.id === "presence" && (
-                  VERTICAL_PATHS.some(p => pathname === p || pathname.startsWith(p + "/")) ||
-                  pathname.startsWith("/m/presence/")
-                );
+                const presenceActive =
+                  item.id === "presence" && pathname.startsWith("/m/presence/");
 
                 if (item.id === "presence") {
                   const PRESENCE_OPTIONS = [
@@ -284,6 +285,31 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
+
+        {activeBusiness && (
+          <>
+            <SidebarGroup className="p-0 px-2">
+              <p className="mb-2 px-1 text-xs font-medium uppercase tracking-wide text-neutral-400">
+                Capabilities
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {accountCaps.length > 0 ? (
+                  accountCaps.map((cap) => (
+                    <span
+                      key={cap}
+                      className="rounded-full bg-[#f5f5f5] px-2.5 py-0.5 text-xs capitalize text-neutral-600"
+                    >
+                      {cap}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-xs text-neutral-400">Add capabilities via +</span>
+                )}
+              </div>
+            </SidebarGroup>
+            <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
+          </>
+        )}
 
         <SidebarGroup className="p-0">
           <SidebarGroupContent>

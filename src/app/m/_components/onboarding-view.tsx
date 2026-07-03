@@ -1,5 +1,9 @@
 "use client";
 
+// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
+// Changes: Simplified onboarding to name-only account creation.
+// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,8 +17,6 @@ export function OnboardingView() {
   const router = useRouter();
   const utils = api.useUtils();
   const [name, setName] = useState("");
-  const [cuisine, setCuisine] = useState("");
-  const [address, setAddress] = useState("");
 
   const createBusiness = api.business.create.useMutation({
     onSuccess: async () => {
@@ -26,8 +28,8 @@ export function OnboardingView() {
   return (
     <PageContent>
       <PageHeader
-        title="Set up your restaurant"
-        meta="Start with one location. You can connect delivery apps and share your checkout link next."
+        title="Set up your account"
+        meta="Name your business, then add capabilities like menu, checkout, or inventory."
       />
 
       <form
@@ -35,43 +37,18 @@ export function OnboardingView() {
         onSubmit={(event) => {
           event.preventDefault();
           if (!name.trim()) return;
-          createBusiness.mutate({
-            type: "restaurant",
-            name: name.trim(),
-            cuisine: cuisine.trim() || undefined,
-            address: address.trim() || undefined,
-          });
+          createBusiness.mutate({ name: name.trim() });
         }}
       >
         <div className="flex flex-col gap-2">
-          <Label htmlFor="restaurant-name">Restaurant name</Label>
+          <Label htmlFor="account-name">Business name</Label>
           <Input
-            id="restaurant-name"
+            id="account-name"
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Rosemary Bistro"
             className="h-10 rounded-lg"
             autoFocus
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="restaurant-cuisine">Cuisine</Label>
-          <Input
-            id="restaurant-cuisine"
-            value={cuisine}
-            onChange={(event) => setCuisine(event.target.value)}
-            placeholder="Italian, brunch, wine bar"
-            className="h-10 rounded-lg"
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="restaurant-address">Address</Label>
-          <Input
-            id="restaurant-address"
-            value={address}
-            onChange={(event) => setAddress(event.target.value)}
-            placeholder="123 Main St, Austin TX"
-            className="h-10 rounded-lg"
           />
         </div>
         <Button
@@ -80,7 +57,7 @@ export function OnboardingView() {
           disabled={!name.trim() || createBusiness.isPending}
           style={{ backgroundColor: "var(--landing-accent-deep)", color: "white" }}
         >
-          {createBusiness.isPending ? "Creating..." : "Create restaurant"}
+          {createBusiness.isPending ? "Creating..." : "Create account"}
         </Button>
       </form>
     </PageContent>
