@@ -187,16 +187,16 @@ export function AppSidebar() {
             <SidebarMenu className="gap-1">
               {PRIMITIVE_NAV.map((item) => {
                 const VERTICAL_PATHS = Object.values(BUSINESS_ROUTES);
-                const presenceActive = item.id === "presence" && VERTICAL_PATHS.some(p => pathname === p || pathname.startsWith(p + "/"));
+                const presenceActive = item.id === "presence" && (
+                  VERTICAL_PATHS.some(p => pathname === p || pathname.startsWith(p + "/")) ||
+                  pathname.startsWith("/m/presence/")
+                );
 
                 if (item.id === "presence") {
-                  const presenceHref = activeBusiness && activeBusiness.type in BUSINESS_ROUTES
-                    ? BUSINESS_ROUTES[activeBusiness.type as BusinessType]
-                    : "/m/dashboard";
                   const PRESENCE_OPTIONS = [
-                    { label: "Web", Icon: Globe, href: presenceHref },
-                    { label: "QR Code", Icon: QrCode, href: "/m/share" },
-                    { label: "Link", Icon: LinkSimple, href: "/m/share" },
+                    { label: "Web", Icon: Globe, href: "/m/presence/web" },
+                    { label: "QR Code", Icon: QrCode, href: "/m/presence/qr" },
+                    { label: "Link", Icon: LinkSimple, href: "/m/presence/link" },
                   ] as const;
                   return (
                     <SidebarMenuItem key="presence">
@@ -209,7 +209,7 @@ export function AppSidebar() {
                           "data-[active=true]:hover:bg-[#e2f1af] data-[active=true]:hover:text-neutral-900",
                         )}
                       >
-                        <Link href={presenceHref} onClick={closeOnNavigate}>
+                        <Link href="/m/presence/web" onClick={closeOnNavigate}>
                           <Globe size={18} weight={presenceActive ? "fill" : "regular"} />
                           <span>Presence</span>
                         </Link>
