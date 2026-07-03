@@ -30,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { VERTICAL_CONFIG } from "@/verticals/types";
 import { CAPABILITY_SET_CONFIG } from "@/verticals/capabilities";
 import { api } from "@/trpc/react";
+import { useBusinesses } from "@/app/m/_components/business-provider";
 
 const ROOT_OPTIONS = [
   {
@@ -67,6 +68,7 @@ const EMPTY_GROUP = { name: "", description: "" };
 export function CreateBusinessDialog() {
   const router = useRouter();
   const utils = api.useUtils();
+  const { activeBusiness } = useBusinesses();
 
   const createBusiness = api.business.create.useMutation({
     onSuccess: async () => { await utils.business.invalidate(); },
@@ -74,18 +76,21 @@ export function CreateBusinessDialog() {
   const createGroup = api.accountGroup.create.useMutation({
     onSuccess: async () => { await utils.accountGroup.invalidate(); },
   });
+  const attachBusiness = api.accountGroup.attachBusiness.useMutation();
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("root");
   const [selectedType, setSelectedType] = useState<BusinessType | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [group, setGroup] = useState(EMPTY_GROUP);
+  const [noAccountError, setNoAccountError] = useState(false);
 
   function reset() {
     setStep("root");
     setSelectedType(null);
     setForm(EMPTY_FORM);
     setGroup(EMPTY_GROUP);
+    setNoAccountError(false);
   }
 
   function handleOpenChange(nextOpen: boolean) {
@@ -117,15 +122,16 @@ export function CreateBusinessDialog() {
 
   async function handleCreateGroup(e: React.FormEvent) {
     e.preventDefault();
-    if (!group.name.trim()) return;
-    await createGroup.mutateAsync({ name: group.name.trim(), description: group.description.trim() || undefined });
+    if (!group.name.trim() || !activeBusiness) return;
+    const newGroup = await createGroup.mutateAsync({ name: group.name.trim(), description: group.description.trim() || undefined });
+    await attachBusiness.mutateAsync({ groupId: newGroup.id, businessId: activeBusiness.id });
     setOpen(false);
     reset();
   }
 
   const selectedOption = ACCOUNT_OPTIONS.find((o) => o.type === selectedType);
   const canSubmitAccount = form.name.trim().length > 0 && !createBusiness.isPending;
-  const canSubmitGroup = group.name.trim().length > 0 && !createGroup.isPending;
+  const canSubmitGroup = group.name.trim().length > 0 && !createGroup.isPending && !attachBusiness.isPending;
 
   function BackButton({ to }: { to: Step }) {
     return (
@@ -166,7 +172,16 @@ export function CreateBusinessDialog() {
                   key={key}
                   type="button"
                   className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]"
-                  onClick={() => setStep(key === "account" ? "pick" : key === "account-group" ? "group-form" : "capability-set")}
+                  onClick={() => {
+                    if (key === "account-group") {
+                      if (!activeBusiness) { setNoAccountError(true); return; }
+                      setNoAccountError(false);
+                      setStep("group-form");
+                    } else {
+                      setNoAccountError(false);
+                      setStep(key === "account" ? "pick" : "capability-set");
+                    }
+                  }}
                 >
                   <div className="flex size-10 items-center justify-center rounded-lg bg-[#f5f5f5] text-neutral-700">
                     <Icon size={20} weight="regular" aria-hidden />
@@ -178,6 +193,9 @@ export function CreateBusinessDialog() {
                 </button>
               ))}
             </div>
+            {noAccountError && (
+              <p className="px-5 py-3 text-sm text-red-600">You need to be in an account to create a group.</p>
+            )}
           </>
         )}
 
