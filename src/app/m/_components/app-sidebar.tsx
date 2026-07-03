@@ -5,16 +5,14 @@ import { usePathname } from "next/navigation";
 import { CreateBusinessDialog } from "@/app/m/_components/create-business-dialog";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import {
-  ArrowCounterClockwise,
-  CalendarStar,
   CaretDown,
   ChartBar,
-  ForkKnife,
   Gear,
+  Globe,
+  Headset,
   Plugs,
   ShareNetwork,
-  Storefront,
-  Toolbox,
+  UsersThree,
 } from "@phosphor-icons/react";
 import {
   DropdownMenu,
@@ -43,20 +41,13 @@ const PRIMARY_NAV = [
   { href: "/m/connect", label: "Connect", Icon: Plugs, restaurantOnly: true },
 ] as const;
 
-const BUSINESS_NAV: {
-  type: BusinessType;
-  href: string;
-  label: string;
-  Icon: typeof Storefront;
-}[] = [
-  { type: "store", href: BUSINESS_ROUTES.store, label: VERTICAL_CONFIG.store.label, Icon: Storefront },
-  { type: "services", href: BUSINESS_ROUTES.services, label: VERTICAL_CONFIG.services.label, Icon: Toolbox },
-  { type: "restaurant", href: BUSINESS_ROUTES.restaurant, label: VERTICAL_CONFIG.restaurant.label, Icon: ForkKnife },
-  { type: "event", href: BUSINESS_ROUTES.event, label: VERTICAL_CONFIG.event.label, Icon: CalendarStar },
-];
+const PRIMITIVE_NAV = [
+  { id: "presence", label: "Presence", Icon: Globe, route: "dynamic" },
+  { id: "ownership", label: "Ownership", Icon: UsersThree, href: "/m/ownership" },
+  { id: "support", label: "Support", Icon: Headset, href: "/m/support" },
+] as const;
 
 const SECONDARY_NAV = [
-  { href: "/m/resolution", label: "Resolution Center", Icon: ArrowCounterClockwise },
   { href: "/m/settings", label: "Settings", Icon: Gear },
 ] as const;
 
@@ -192,17 +183,35 @@ export function AppSidebar() {
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {BUSINESS_NAV.map(({ type, href, label, Icon }) => (
-                <NavLink
-                  key={href}
-                  href={href}
-                  label={label}
-                  Icon={Icon}
-                  active={pathname === href || pathname.startsWith(`${href}/`)}
-                  onNavigate={closeOnNavigate}
-                  comingSoon={VERTICAL_CONFIG[type].comingSoon}
-                />
-              ))}
+              {PRIMITIVE_NAV.map((item) => {
+                const VERTICAL_PATHS = Object.values(BUSINESS_ROUTES);
+                const presenceActive = item.id === "presence" && VERTICAL_PATHS.some(p => pathname === p || pathname.startsWith(p + "/"));
+
+                if (item.id === "presence") {
+                  const presenceHref = activeBusiness ? BUSINESS_ROUTES[activeBusiness.type as BusinessType] : "/m/dashboard";
+                  return (
+                    <NavLink
+                      key="presence"
+                      href={presenceHref}
+                      label={item.label}
+                      Icon={item.Icon}
+                      active={presenceActive}
+                      onNavigate={closeOnNavigate}
+                    />
+                  );
+                }
+
+                return (
+                  <NavLink
+                    key={item.id}
+                    href={"href" in item ? item.href : "/m/dashboard"}
+                    label={item.label}
+                    Icon={item.Icon}
+                    active={pathname === ("href" in item ? item.href : "") || pathname.startsWith(("href" in item ? item.href : "") + "/")}
+                    onNavigate={closeOnNavigate}
+                  />
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
