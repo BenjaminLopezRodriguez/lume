@@ -57,14 +57,12 @@ function NavLink({
   Icon,
   active,
   onNavigate,
-  comingSoon,
 }: {
   href: string;
   label: string;
   Icon: React.ComponentType<{ size?: number; weight?: "regular" | "fill" }>;
   active: boolean;
   onNavigate: () => void;
-  comingSoon?: boolean;
 }) {
   return (
     <SidebarMenuItem>
@@ -79,14 +77,7 @@ function NavLink({
       >
         <Link href={href} onClick={onNavigate}>
           <Icon size={18} weight={active ? "fill" : "regular"} />
-          <span className="flex flex-1 items-center justify-between gap-2">
-            {label}
-            {comingSoon ? (
-              <span className="rounded-full bg-[#f5f5f5] px-1.5 py-0.5 text-[0.625rem] font-medium text-neutral-500">
-                Soon
-              </span>
-            ) : null}
-          </span>
+          <span>{label}</span>
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -188,7 +179,9 @@ export function AppSidebar() {
                 const presenceActive = item.id === "presence" && VERTICAL_PATHS.some(p => pathname === p || pathname.startsWith(p + "/"));
 
                 if (item.id === "presence") {
-                  const presenceHref = activeBusiness ? BUSINESS_ROUTES[activeBusiness.type as BusinessType] : "/m/dashboard";
+                  const presenceHref = activeBusiness && activeBusiness.type in BUSINESS_ROUTES
+                    ? BUSINESS_ROUTES[activeBusiness.type as BusinessType]
+                    : "/m/dashboard";
                   return (
                     <NavLink
                       key="presence"

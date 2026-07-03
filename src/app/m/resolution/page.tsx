@@ -1,13 +1,5 @@
-import { PageContent } from "@/app/m/_components/page-content";
-import { PageHeader } from "@/app/m/_components/page-header";
+import { redirect } from "next/navigation";
 
-export default function ResolutionCenterPage() {
-  return (
-    <PageContent>
-      <PageHeader
-        title="Resolution Center"
-        meta="Recovery paths and pending issues across your businesses"
-      />
-    </PageContent>
-  );
+export default function ResolutionRedirect() {
+  redirect("/m/support");
 }
