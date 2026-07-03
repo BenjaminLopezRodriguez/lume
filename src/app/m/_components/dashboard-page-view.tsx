@@ -70,6 +70,8 @@ export function DashboardPageView() {
     { enabled: !!businessId },
   );
 
+  const { data: accountGroups = [] } = api.accountGroup.list.useQuery();
+
   const pendingByType = activeOwnerships
     .filter((o) => o.status === "pending_action")
     .reduce<Record<string, number>>((acc, o) => {
@@ -205,6 +207,28 @@ export function DashboardPageView() {
                 }
               />
             ))}
+          </ListCard>
+        </section>
+
+        <section className="flex flex-col gap-3">
+          <SectionHeader title="Account groups" />
+          <ListCard>
+            {accountGroups.length > 0 ? (
+              accountGroups.map((group) => (
+                <ListCardRow
+                  key={group.id}
+                  dot="#6366f1"
+                  label={group.name}
+                  trailing={group.description ?? "No description"}
+                />
+              ))
+            ) : (
+              <ListCardRow
+                dot="#a3a3a3"
+                label="No account groups"
+                trailing="Create one with +"
+              />
+            )}
           </ListCard>
         </section>
       </div>
