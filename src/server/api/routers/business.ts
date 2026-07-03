@@ -4,35 +4,11 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createBusinessPaymentLink } from "@/server/stripe";
-import { businesses, businessLocations } from "@/server/db/schema";
+import { businesses } from "@/server/db/schema";
 
-const businessTypeSchema = z.enum(["store", "services", "restaurant", "event"]);
-
-const createBusinessInput = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("store"),
-    name: z.string().min(1),
-    description: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("services"),
-    name: z.string().min(1),
-    trade: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("restaurant"),
-    name: z.string().min(1),
-    cuisine: z.string().optional(),
-    address: z.string().optional(),
-  }),
-  z.object({
-    type: z.literal("event"),
-    name: z.string().min(1),
-    date: z.string().optional(),
-    location: z.string().optional(),
-    capacity: z.coerce.number().int().positive().optional(),
-  }),
-]);
+const createBusinessInput = z.object({
+  name: z.string().min(1),
+});
 
 export const businessRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -74,19 +50,8 @@ export const businessRouter = createTRPCRouter({
         .insert(businesses)
         .values({
           ownerId: ctx.userId,
-          type: input.type,
+          type: "account",
           name: input.name,
-          description:
-            input.type === "store" || input.type === "services"
-              ? input.type === "store"
-                ? input.description ?? null
-                : input.trade ?? null
-              : null,
-          cuisine: input.type === "restaurant" ? input.cuisine ?? null : null,
-          address: input.type === "restaurant" ? input.address ?? null : null,
-          eventDate: input.type === "event" && input.date ? input.date : null,
-          location: input.type === "event" ? input.location ?? null : null,
-          capacity: input.type === "event" ? input.capacity ?? null : null,
           stripePaymentLinkUrl: paymentLink.url,
           stripePaymentLinkId: paymentLink.id,
         })
@@ -94,14 +59,6 @@ export const businessRouter = createTRPCRouter({
 
       if (!business) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-
-      if (input.type === "restaurant" && input.address) {
-        await ctx.db.insert(businessLocations).values({
-          businessId: business.id,
-          name: input.name,
-          address: input.address,
-        });
       }
 
       return business;
@@ -126,5 +83,34 @@ export const businessRouter = createTRPCRouter({
         .returning();
 
       return updated;
+    }),
+
+  update: protectedProcedure
+    .input(z.object({ id: z.string().uuid(), name: z.string().min(1).max(256) }))
+    .mutation(async ({ ctx, input }) => {
+      const business = await ctx.db.query.businesses.findFirst({
+        where: (r, { and, eq: equals }) =>
+          and(equals(r.id, input.id), equals(r.ownerId, ctx.userId)),
+      });
+      if (!business) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const [updated] = await ctx.db
+        .update(businesses)
+        .set({ name: input.name, updatedAt: new Date() })
+        .where(eq(businesses.id, input.id))
+        .returning();
+      return updated!;
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const business = await ctx.db.query.businesses.findFirst({
+        where: (r, { and, eq: equals }) =>
+          and(equals(r.id, input.id), equals(r.ownerId, ctx.userId)),
+      });
+      if (!business) throw new TRPCError({ code: "NOT_FOUND" });
+
+      await ctx.db.delete(businesses).where(eq(businesses.id, input.id));
     }),
 });
