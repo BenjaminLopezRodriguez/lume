@@ -19,11 +19,10 @@ import { PageHeader } from "@/app/m/_components/page-header";
 import { SectionHeader } from "@/app/m/_components/section-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LUME_SITES_HOST } from "@/lib/presence";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
-const LUME_SITES_A_RECORD = "76.76.21.21";
+const VERCEL_A_RECORD = "76.76.21.21";
 
 const DOMAIN_STEPS = [
   { id: 1, label: "Your domain" },
@@ -101,8 +100,8 @@ export function WebPresencePageView() {
     return (
       <PageContent>
         <PageHeader
-          title="Web Presence"
-          meta="Connect a domain — Lume hosts your website"
+          title="Entry Points"
+          meta="Connect a domain — Lume hosts your site"
         />
         <div className="mt-8 rounded-xl border border-[#ebebeb] bg-white px-5 py-8 text-center">
           <p className="text-sm text-neutral-500">
@@ -116,7 +115,7 @@ export function WebPresencePageView() {
   return (
     <PageContent>
       <PageHeader
-        title="Web Presence"
+        title="Entry Points"
         meta={
           domainActive && customDomain ? (
             <>
@@ -126,7 +125,7 @@ export function WebPresencePageView() {
             </>
           ) : (
             <span className="text-neutral-500">
-              Connect a domain — Lume hosts your website
+              Connect a domain — Lume hosts your site
             </span>
           )
         }
@@ -362,30 +361,9 @@ export function WebPresencePageView() {
                         label={
                           <div className="flex flex-col gap-0.5">
                             <span className="text-xs font-medium uppercase tracking-wide text-neutral-400">
-                              CNAME
-                            </span>
-                            <span>www → {LUME_SITES_HOST}</span>
-                          </div>
-                        }
-                        trailing={
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 px-2 text-neutral-500"
-                            onClick={() => copyText(LUME_SITES_HOST, "cname")}
-                          >
-                            {copied === "cname" ? "Copied" : "Copy"}
-                          </Button>
-                        }
-                      />
-                      <ListCardRow
-                        label={
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-xs font-medium uppercase tracking-wide text-neutral-400">
                               A record
                             </span>
-                            <span>@ → {LUME_SITES_A_RECORD}</span>
+                            <span>@ → {VERCEL_A_RECORD}</span>
                           </div>
                         }
                         trailing={
@@ -394,17 +372,22 @@ export function WebPresencePageView() {
                             variant="ghost"
                             size="sm"
                             className="h-8 px-2 text-neutral-500"
-                            onClick={() => copyText(LUME_SITES_A_RECORD, "a")}
+                            onClick={() => copyText(VERCEL_A_RECORD, "a")}
                           >
                             {copied === "a" ? "Copied" : "Copy"}
                           </Button>
                         }
                       />
                     </ListCard>
-                    <p className="text-xs text-neutral-400">
-                      DNS changes can take up to 48 hours. Most providers update within
-                      a few minutes.
-                    </p>
+                    <div className="flex flex-col gap-1.5">
+                      <p className="text-xs text-neutral-400">
+                        DNS changes can take a few minutes to a few hours to propagate.
+                      </p>
+                      <p className="text-xs text-neutral-400">
+                        <span className="font-medium text-neutral-500">Using Cloudflare?</span>{" "}
+                        Set the record to DNS only (grey cloud icon) — proxied mode will block verification.
+                      </p>
+                    </div>
                     {verifyMutation.error ? (
                       <p className="text-sm text-red-600">
                         {verifyMutation.error.message}

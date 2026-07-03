@@ -46,7 +46,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
 
 const PRIMARY_NAV = [
   { href: "/m/dashboard", label: "Dashboard", Icon: ChartBar },
@@ -102,11 +101,6 @@ export function AppSidebar() {
   const router = useRouter();
   const { isMobile, setOpenMobile } = useSidebar();
   const { activeBusiness, businesses, setActiveBusiness } = useBusinesses();
-
-  const { data: accountCaps = [] } = api.capabilitySet.listForBusiness.useQuery(
-    { businessId: activeBusiness?.id ?? "" },
-    { enabled: !!activeBusiness?.id },
-  );
 
   function closeOnNavigate() {
     if (isMobile) setOpenMobile(false);
@@ -212,7 +206,7 @@ export function AppSidebar() {
                       >
                         <Link href="/m/presence/web" onClick={closeOnNavigate}>
                           <Globe size={18} weight={presenceActive ? "fill" : "regular"} />
-                          <span>Presence</span>
+                          <span>Entry Points</span>
                         </Link>
                       </SidebarMenuButton>
                       <DropdownMenu>
@@ -285,31 +279,6 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
-
-        {activeBusiness && (
-          <>
-            <SidebarGroup className="p-0 px-2">
-              <p className="mb-2 px-1 text-xs font-medium uppercase tracking-wide text-neutral-400">
-                Capabilities
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {accountCaps.length > 0 ? (
-                  accountCaps.map((cap) => (
-                    <span
-                      key={cap}
-                      className="rounded-full bg-[#f5f5f5] px-2.5 py-0.5 text-xs capitalize text-neutral-600"
-                    >
-                      {cap}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-neutral-400">Add capabilities via +</span>
-                )}
-              </div>
-            </SidebarGroup>
-            <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
-          </>
-        )}
 
         <SidebarGroup className="p-0">
           <SidebarGroupContent>

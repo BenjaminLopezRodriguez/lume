@@ -14,8 +14,8 @@ export async function ensureUser() {
   const kindeUser = await getUser();
   if (!kindeUser?.id) return null;
 
-  const email = kindeUser.email;
-  if (!email) return null;
+  const email =
+    kindeUser.email ?? `${kindeUser.id}@users.onlume.co`;
 
   const name =
     [kindeUser.given_name, kindeUser.family_name].filter(Boolean).join(" ") ||

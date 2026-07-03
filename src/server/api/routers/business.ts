@@ -9,6 +9,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createBusinessPaymentLink } from "@/server/stripe";
 import { businesses } from "@/server/db/schema";
+import { env } from "@/env";
 
 const createBusinessInput = z.object({
   name: z.string().min(1),
@@ -51,7 +52,18 @@ export const businessRouter = createTRPCRouter({
   create: protectedProcedure
     .input(createBusinessInput)
     .mutation(async ({ ctx, input }) => {
-      const paymentLink = await createBusinessPaymentLink(input.name);
+      let stripePaymentLinkUrl: string | null = null;
+      let stripePaymentLinkId: string | null = null;
+
+      if (env.STRIPE_SECRET_KEY) {
+        try {
+          const paymentLink = await createBusinessPaymentLink(input.name);
+          stripePaymentLinkUrl = paymentLink.url;
+          stripePaymentLinkId = paymentLink.id;
+        } catch (error) {
+          console.error("[business.create] Stripe payment link failed:", error);
+        }
+      }
 
       const [business] = await ctx.db
         .insert(businesses)
@@ -59,8 +71,8 @@ export const businessRouter = createTRPCRouter({
           ownerId: ctx.userId,
           type: input.type,
           name: input.name,
-          stripePaymentLinkUrl: paymentLink.url,
-          stripePaymentLinkId: paymentLink.id,
+          stripePaymentLinkUrl,
+          stripePaymentLinkId,
         })
         .returning();
 

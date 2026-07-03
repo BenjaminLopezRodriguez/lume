@@ -59,6 +59,9 @@ export function OnboardingView() {
         >
           {createBusiness.isPending ? "Creating..." : "Create account"}
         </Button>
+        {createBusiness.error ? (
+          <p className="text-sm text-red-600">{createBusiness.error.message}</p>
+        ) : null}
       </form>
     </PageContent>
   );

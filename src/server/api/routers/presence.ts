@@ -9,6 +9,38 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { assertBusinessOwner } from "@/server/api/lib/assert-business-owner";
 import { webPresences } from "@/server/db/schema";
+import { env } from "@/env";
+
+const VERCEL_A_RECORD = "76.76.21.21";
+
+async function registerVercelDomain(domain: string) {
+  if (!env.VERCEL_TOKEN || !env.VERCEL_PROJECT_ID) return;
+  await fetch(
+    `https://api.vercel.com/v10/projects/${env.VERCEL_PROJECT_ID}/domains`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.VERCEL_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: domain }),
+    },
+  );
+}
+
+async function checkDnsResolvesToVercel(domain: string): Promise<boolean> {
+  try {
+    const res = await fetch(
+      `https://cloudflare-dns.com/dns-query?name=${domain}&type=A`,
+      { headers: { Accept: "application/dns-json" } },
+    );
+    if (!res.ok) return false;
+    const data = (await res.json()) as { Answer?: { data: string }[] };
+    return (data.Answer ?? []).some((r) => r.data === VERCEL_A_RECORD);
+  } catch {
+    return false;
+  }
+}
 
 export const LUME_SITES_HOST = "sites.onlume.co";
 
@@ -128,6 +160,8 @@ export const presenceRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND", message: "Web presence not found" });
       }
 
+      await registerVercelDomain(input.domain);
+
       return updated;
     }),
 
@@ -144,6 +178,15 @@ export const presenceRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Connect a domain before verifying",
+        });
+      }
+
+      const dnsOk = await checkDnsResolvesToVercel(presence.customDomain);
+      if (!dnsOk) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message:
+            "DNS not pointing to Lume yet. Make sure the A record (@ → 76.76.21.21) is saved and set to DNS-only if using Cloudflare. Changes can take a few minutes.",
         });
       }
 
