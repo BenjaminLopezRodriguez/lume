@@ -70,7 +70,7 @@ const EMPTY_CAPSET = { name: "", selectedCaps: [] as string[] };
 export function CreateBusinessDialog() {
   const router = useRouter();
   const utils = api.useUtils();
-  const { activeBusiness } = useBusinesses();
+  const { activeBusiness, setActiveBusiness } = useBusinesses();
 
   const createBusiness = api.business.create.useMutation({
     onSuccess: async () => { await utils.business.invalidate(); },
@@ -117,15 +117,17 @@ export function CreateBusinessDialog() {
   async function handleCreateAccount(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedType || !form.name.trim()) return;
+    let created;
     if (selectedType === "store") {
-      await createBusiness.mutateAsync({ type: "store", name: form.name.trim(), description: form.description.trim() || undefined });
+      created = await createBusiness.mutateAsync({ type: "store", name: form.name.trim(), description: form.description.trim() || undefined });
     } else if (selectedType === "services") {
-      await createBusiness.mutateAsync({ type: "services", name: form.name.trim(), trade: form.trade.trim() || undefined });
+      created = await createBusiness.mutateAsync({ type: "services", name: form.name.trim(), trade: form.trade.trim() || undefined });
     } else if (selectedType === "restaurant") {
-      await createBusiness.mutateAsync({ type: "restaurant", name: form.name.trim(), cuisine: form.cuisine.trim() || undefined, address: form.address.trim() || undefined });
+      created = await createBusiness.mutateAsync({ type: "restaurant", name: form.name.trim(), cuisine: form.cuisine.trim() || undefined, address: form.address.trim() || undefined });
     } else {
-      await createBusiness.mutateAsync({ type: "event", name: form.name.trim(), date: form.date || undefined, location: form.location.trim() || undefined, capacity: form.capacity ? parseInt(form.capacity, 10) : undefined });
+      created = await createBusiness.mutateAsync({ type: "event", name: form.name.trim(), date: form.date || undefined, location: form.location.trim() || undefined, capacity: form.capacity ? parseInt(form.capacity, 10) : undefined });
     }
+    await setActiveBusiness(created.id);
     setOpen(false);
     reset();
     router.push(BUSINESS_ROUTES[selectedType]);
