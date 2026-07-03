@@ -37,6 +37,9 @@ export const businesses = createTable(
       .varchar({ length: 256 })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    groupId: d
+      .uuid()
+      .references(() => accountGroups.id, { onDelete: "set null" }),
     type: d.varchar({ length: 32 }).notNull(),
     name: d.varchar({ length: 256 }).notNull(),
     description: d.text(),
@@ -47,9 +50,6 @@ export const businesses = createTable(
     capacity: d.integer(),
     stripePaymentLinkUrl: d.varchar({ length: 1024 }),
     stripePaymentLinkId: d.varchar({ length: 256 }),
-    groupId: d
-      .uuid()
-      .references(() => accountGroups.id, { onDelete: "set null" }),
     createdAt: d
       .timestamp({ withTimezone: true })
       .$defaultFn(() => new Date())
@@ -138,7 +138,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 
 export const accountGroupsRelations = relations(accountGroups, ({ one, many }) => ({
   owner: one(users, { fields: [accountGroups.ownerId], references: [users.id] }),
-  accounts: many(businesses),
+  businesses: many(businesses),
 }));
 
 export const businessesRelations = relations(businesses, ({ one, many }) => ({
