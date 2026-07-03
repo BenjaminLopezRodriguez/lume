@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 const VERCEL_A_RECORD = "76.76.21.21";
+const VERCEL_CNAME = "cname.vercel-dns.com";
 
 const DOMAIN_STEPS = [
   { id: 1, label: "Your domain" },
@@ -395,6 +396,27 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
                             onClick={() => copyText(VERCEL_A_RECORD, "a")}
                           >
                             {copied === "a" ? "Copied" : "Copy"}
+                          </Button>
+                        }
+                      />
+                      <ListCardRow
+                        label={
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+                              CNAME record
+                            </span>
+                            <span>www → {VERCEL_CNAME}</span>
+                          </div>
+                        }
+                        trailing={
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2 text-neutral-500"
+                            onClick={() => copyText(VERCEL_CNAME, "cname")}
+                          >
+                            {copied === "cname" ? "Copied" : "Copy"}
                           </Button>
                         }
                       />

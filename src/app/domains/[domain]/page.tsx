@@ -10,7 +10,8 @@ export default async function DomainPage({
 }: {
   params: Promise<{ domain: string }>;
 }) {
-  const { domain } = await params;
+  const { domain: rawDomain } = await params;
+  const domain = rawDomain.replace(/^www\./, "");
 
   const presence = await db.query.webPresences.findFirst({
     where: eq(webPresences.customDomain, domain),

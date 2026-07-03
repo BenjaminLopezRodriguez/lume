@@ -167,6 +167,7 @@ export const presenceRouter = createTRPCRouter({
       }
 
       await registerVercelDomain(input.domain);
+      await registerVercelDomain(`www.${input.domain}`);
 
       return updated;
     }),
@@ -189,6 +190,7 @@ export const presenceRouter = createTRPCRouter({
 
       // Ensure domain is registered with Vercel — idempotent, 409 = already there
       await registerVercelDomain(presence.customDomain);
+      await registerVercelDomain(`www.${presence.customDomain}`);
 
       const dnsOk = await checkDnsResolvesToVercel(presence.customDomain);
       if (!dnsOk) {
