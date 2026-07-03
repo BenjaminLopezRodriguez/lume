@@ -17,9 +17,9 @@ export default withAuth(
   async function middleware(request: NextRequest) {
     const host = request.headers.get("host") ?? "";
     if (isCustomDomain(host)) {
+      if (request.nextUrl.pathname.startsWith("/domains")) return NextResponse.next();
       const url = request.nextUrl.clone();
-      url.pathname = "/site";
-      url.searchParams.set("domain", host);
+      url.pathname = `/domains/${host}${request.nextUrl.pathname}`;
       return NextResponse.rewrite(url);
     }
   },
@@ -29,7 +29,7 @@ export default withAuth(
       "/",
       "/sign-in",
       "/sign-up",
-      "/site(.*)",
+      "/domains/(.*)",
       "/s(.*)",
       "/w(.*)",
       "/menu(.*)",

@@ -10,12 +10,13 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { assertBusinessOwner } from "@/server/api/lib/assert-business-owner";
 import { webPresences } from "@/server/db/schema";
 import { env } from "@/env";
+import { resend } from "@/server/resend";
 
 const VERCEL_A_RECORD = "76.76.21.21";
 
 async function registerVercelDomain(domain: string) {
   if (!env.VERCEL_TOKEN || !env.VERCEL_PROJECT_ID) return;
-  await fetch(
+  const res = await fetch(
     `https://api.vercel.com/v10/projects/${env.VERCEL_PROJECT_ID}/domains`,
     {
       method: "POST",
@@ -26,6 +27,11 @@ async function registerVercelDomain(domain: string) {
       body: JSON.stringify({ name: domain }),
     },
   );
+  // 409 = already registered (fine). Log anything unexpected.
+  if (!res.ok && res.status !== 409) {
+    const body = await res.text().catch(() => "");
+    console.error(`[presence] Vercel domain registration failed ${res.status}:`, body);
+  }
 }
 
 async function checkDnsResolvesToVercel(domain: string): Promise<boolean> {
@@ -181,6 +187,9 @@ export const presenceRouter = createTRPCRouter({
         });
       }
 
+      // Ensure domain is registered with Vercel — idempotent, 409 = already there
+      await registerVercelDomain(presence.customDomain);
+
       const dnsOk = await checkDnsResolvesToVercel(presence.customDomain);
       if (!dnsOk) {
         throw new TRPCError({
@@ -204,6 +213,21 @@ export const presenceRouter = createTRPCRouter({
       }
 
       return updated;
+    }),
+
+  scheduleReminder: protectedProcedure
+    .input(z.object({ businessId: z.string().uuid(), email: z.string().email() }))
+    .mutation(async ({ ctx, input }) => {
+      await assertBusinessOwner(ctx.db, input.businessId, ctx.userId);
+
+      await ctx.db
+        .update(webPresences)
+        .set({
+          dnsReminderEmail: input.email,
+          dnsReminderAt: new Date(Date.now() + 60 * 60 * 1000),
+          updatedAt: new Date(),
+        })
+        .where(eq(webPresences.businessId, input.businessId));
     }),
 
   disconnectDomain: protectedProcedure

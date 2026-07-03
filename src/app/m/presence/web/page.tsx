@@ -1,9 +1,8 @@
-// CURSOR-RESTORE 2026-07-02T21:09 PDT — Restored after Claude wiped during dummy-data purge.
-// Changes: Route shell for WebPresencePageView at /m/presence/web.
-// Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
-
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { WebPresencePageView } from "@/app/m/_components/web-presence-page-view";
 
-export default function PresenceWebPage() {
-  return <WebPresencePageView />;
+export default async function PresenceWebPage() {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+  return <WebPresencePageView userEmail={user?.email ?? ""} />;
 }

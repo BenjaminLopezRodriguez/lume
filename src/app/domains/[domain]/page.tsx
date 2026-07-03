@@ -5,14 +5,12 @@ import { db } from "@/server/db";
 import { businesses, webPresences } from "@/server/db/schema";
 import { getVerticalConfig } from "@/verticals/types";
 
-export default async function SitePage({
-  searchParams,
+export default async function DomainPage({
+  params,
 }: {
-  searchParams: Promise<{ domain?: string }>;
+  params: Promise<{ domain: string }>;
 }) {
-  const { domain } = await searchParams;
-
-  if (!domain) notFound();
+  const { domain } = await params;
 
   const presence = await db.query.webPresences.findFirst({
     where: eq(webPresences.customDomain, domain),

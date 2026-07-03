@@ -4,7 +4,7 @@
 // Changes: Web presence UI (Lume site URL, custom domain 3-step DNS wizard).
 // Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowSquareOut,
   Check,
@@ -12,6 +12,7 @@ import {
   Copy,
   Globe,
 } from "@phosphor-icons/react";
+import { toast } from "sonner";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import { ListCard, ListCardRow } from "@/app/m/_components/list-card";
 import { PageContent } from "@/app/m/_components/page-content";
@@ -30,10 +31,11 @@ const DOMAIN_STEPS = [
   { id: 3, label: "Go live" },
 ] as const;
 
-export function WebPresencePageView() {
+export function WebPresencePageView({ userEmail }: { userEmail: string }) {
   const { activeBusiness } = useBusinesses();
   const utils = api.useUtils();
   const businessId = activeBusiness?.id ?? "";
+  const reminderToastShown = useRef(false);
 
   const { data: presence, isLoading } = api.presence.get.useQuery(
     { businessId },
@@ -62,6 +64,8 @@ export function WebPresencePageView() {
     },
   });
 
+  const reminderMutation = api.presence.scheduleReminder.useMutation();
+
   const [step, setStep] = useState(1);
   const [domainInput, setDomainInput] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
@@ -72,6 +76,22 @@ export function WebPresencePageView() {
       setStep(2);
     }
   }, [presence?.customDomain, presence?.domainStatus]);
+
+  useEffect(() => {
+    if (step !== 2 || reminderToastShown.current || !userEmail || !businessId) return;
+    reminderToastShown.current = true;
+    toast("DNS can take up to an hour to propagate.", {
+      description: "Want an email reminder to come back and verify?",
+      duration: 12000,
+      action: {
+        label: "Remind me",
+        onClick: () => {
+          reminderMutation.mutate({ businessId, email: userEmail });
+          toast.success("Reminder set — we'll email you in ~1 hour.");
+        },
+      },
+    });
+  }, [step, userEmail, businessId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const origin =
     typeof window !== "undefined" ? window.location.origin : "https://www.onlume.co";
@@ -381,7 +401,7 @@ export function WebPresencePageView() {
                     </ListCard>
                     <div className="flex flex-col gap-1.5">
                       <p className="text-xs text-neutral-400">
-                        DNS changes can take a few minutes to a few hours to propagate.
+                        DNS changes can take up to an hour to propagate globally.
                       </p>
                       <p className="text-xs text-neutral-400">
                         <span className="font-medium text-neutral-500">Using Cloudflare?</span>{" "}

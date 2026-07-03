@@ -224,6 +224,8 @@ export const webPresences = createTable(
     slug: d.varchar({ length: 128 }).notNull(),
     customDomain: d.varchar({ length: 256 }),
     domainStatus: d.varchar({ length: 32 }),
+    dnsReminderEmail: d.varchar({ length: 256 }),
+    dnsReminderAt: d.timestamp({ withTimezone: true }),
     createdAt: d
       .timestamp({ withTimezone: true })
       .$defaultFn(() => new Date())
