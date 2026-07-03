@@ -26,31 +26,28 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { VERTICAL_CONFIG } from "@/verticals/types";
+import { CAPABILITY_SET_CONFIG } from "@/verticals/capabilities";
 import { api } from "@/trpc/react";
 
 const CREATE_OPTIONS = [
   {
     type: "store" as const,
     label: VERTICAL_CONFIG.store.label,
-    desc: "Link-based checkout for retail",
     Icon: Storefront,
   },
   {
     type: "services" as const,
     label: VERTICAL_CONFIG.services.label,
-    desc: "Trades, freelancers — invoice after the job",
     Icon: Toolbox,
   },
   {
     type: "restaurant" as const,
     label: VERTICAL_CONFIG.restaurant.label,
-    desc: "QR ordering and kitchen sync",
     Icon: ForkKnife,
   },
   {
     type: "event" as const,
     label: VERTICAL_CONFIG.event.label,
-    desc: "Ticket sales and deposits",
     Icon: CalendarStar,
   },
 ] as const;
@@ -154,29 +151,48 @@ export function CreateBusinessDialog() {
           <>
             <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
               <DialogTitle className="text-base font-semibold text-neutral-950">
-                Create new
+                Choose your capability set
               </DialogTitle>
               <DialogDescription className="text-sm text-neutral-500">
-                Choose what you want to set up
+                Each stack includes the capabilities your business needs
               </DialogDescription>
             </DialogHeader>
             <div className="divide-y divide-[#ebebeb]">
-              {CREATE_OPTIONS.map(({ type, label, desc, Icon }) => (
-                <button
-                  key={type}
-                  type="button"
-                  className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]"
-                  onClick={() => selectType(type)}
-                >
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-[#f5f5f5] text-neutral-700">
-                    <Icon size={20} weight="regular" aria-hidden />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-neutral-900">{label}</p>
-                    <p className="text-sm text-neutral-500">{desc}</p>
-                  </div>
-                </button>
-              ))}
+              {CREATE_OPTIONS.map(({ type, label, Icon }) => {
+                const caps = CAPABILITY_SET_CONFIG[type].capabilities;
+                const visible = caps.slice(0, 4);
+                const extra = caps.length - 4;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]"
+                    onClick={() => selectType(type)}
+                  >
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-[#f5f5f5] text-neutral-700">
+                      <Icon size={20} weight="regular" aria-hidden />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-neutral-900">{label}</p>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {visible.map((cap) => (
+                          <span
+                            key={cap}
+                            className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 capitalize"
+                          >
+                            {cap}
+                          </span>
+                        ))}
+                        {extra > 0 && (
+                          <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500">
+                            +{extra} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </>
         ) : (
