@@ -1,3 +1,5 @@
+import "server-only";
+
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -37,9 +39,11 @@ export const accountGroupRouter = createTRPCRouter({
       });
       if (!business) throw new TRPCError({ code: "NOT_FOUND", message: "Business not found" });
 
-      await ctx.db
+      const [updated] = await ctx.db
         .update(businesses)
         .set({ groupId: input.groupId, updatedAt: new Date() })
-        .where(eq(businesses.id, input.businessId));
+        .where(eq(businesses.id, input.businessId))
+        .returning();
+      return updated!;
     }),
 });
