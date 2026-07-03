@@ -4,11 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  Buildings,
   CalendarStar,
   ForkKnife,
   Plus,
+  Stack,
   Storefront,
   Toolbox,
+  UserCircle,
 } from "@phosphor-icons/react";
 import type { BusinessType } from "@/app/m/_lib/business-types";
 import { BUSINESS_ROUTES } from "@/app/m/_lib/business-types";
@@ -28,111 +31,114 @@ import { VERTICAL_CONFIG } from "@/verticals/types";
 import { CAPABILITY_SET_CONFIG } from "@/verticals/capabilities";
 import { api } from "@/trpc/react";
 
-const CREATE_OPTIONS = [
+const ROOT_OPTIONS = [
   {
-    type: "store" as const,
-    label: VERTICAL_CONFIG.store.label,
-    Icon: Storefront,
+    key: "account" as const,
+    label: "Account",
+    desc: "A business with its own capability set",
+    Icon: UserCircle,
   },
   {
-    type: "services" as const,
-    label: VERTICAL_CONFIG.services.label,
-    Icon: Toolbox,
+    key: "account-group" as const,
+    label: "Account Group",
+    desc: "Organize multiple accounts under one umbrella",
+    Icon: Buildings,
   },
   {
-    type: "restaurant" as const,
-    label: VERTICAL_CONFIG.restaurant.label,
-    Icon: ForkKnife,
-  },
-  {
-    type: "event" as const,
-    label: VERTICAL_CONFIG.event.label,
-    Icon: CalendarStar,
+    key: "capability-set" as const,
+    label: "Capability Set",
+    desc: "Define a custom stack of capabilities",
+    Icon: Stack,
   },
 ] as const;
 
-type Step = "pick" | "form";
+const ACCOUNT_OPTIONS = [
+  { type: "store" as const, label: VERTICAL_CONFIG.store.label, Icon: Storefront },
+  { type: "services" as const, label: VERTICAL_CONFIG.services.label, Icon: Toolbox },
+  { type: "restaurant" as const, label: VERTICAL_CONFIG.restaurant.label, Icon: ForkKnife },
+  { type: "event" as const, label: VERTICAL_CONFIG.event.label, Icon: CalendarStar },
+] as const;
 
-const EMPTY_FORM = {
-  name: "",
-  description: "",
-  trade: "",
-  cuisine: "",
-  address: "",
-  date: "",
-  location: "",
-  capacity: "",
-};
+type Step = "root" | "pick" | "form" | "group-form" | "capability-set";
+
+const EMPTY_FORM = { name: "", description: "", trade: "", cuisine: "", address: "", date: "", location: "", capacity: "" };
+const EMPTY_GROUP = { name: "", description: "" };
 
 export function CreateBusinessDialog() {
   const router = useRouter();
   const utils = api.useUtils();
+
   const createBusiness = api.business.create.useMutation({
-    onSuccess: async () => {
-      await utils.business.invalidate();
-    },
+    onSuccess: async () => { await utils.business.invalidate(); },
   });
+  const createGroup = api.accountGroup.create.useMutation({
+    onSuccess: async () => { await utils.accountGroup.invalidate(); },
+  });
+
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<Step>("pick");
+  const [step, setStep] = useState<Step>("root");
   const [selectedType, setSelectedType] = useState<BusinessType | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [group, setGroup] = useState(EMPTY_GROUP);
 
-  function resetDialog() {
-    setStep("pick");
+  function reset() {
+    setStep("root");
     setSelectedType(null);
     setForm(EMPTY_FORM);
+    setGroup(EMPTY_GROUP);
   }
 
   function handleOpenChange(nextOpen: boolean) {
     setOpen(nextOpen);
-    if (!nextOpen) resetDialog();
+    if (!nextOpen) reset();
   }
 
-  function selectType(type: BusinessType) {
+  function selectAccountType(type: BusinessType) {
     setSelectedType(type);
     setStep("form");
   }
 
-  async function handleCreate(event: React.FormEvent) {
-    event.preventDefault();
+  async function handleCreateAccount(e: React.FormEvent) {
+    e.preventDefault();
     if (!selectedType || !form.name.trim()) return;
-
     if (selectedType === "store") {
-      await createBusiness.mutateAsync({
-        type: "store",
-        name: form.name.trim(),
-        description: form.description.trim() || undefined,
-      });
+      await createBusiness.mutateAsync({ type: "store", name: form.name.trim(), description: form.description.trim() || undefined });
     } else if (selectedType === "services") {
-      await createBusiness.mutateAsync({
-        type: "services",
-        name: form.name.trim(),
-        trade: form.trade.trim() || undefined,
-      });
+      await createBusiness.mutateAsync({ type: "services", name: form.name.trim(), trade: form.trade.trim() || undefined });
     } else if (selectedType === "restaurant") {
-      await createBusiness.mutateAsync({
-        type: "restaurant",
-        name: form.name.trim(),
-        cuisine: form.cuisine.trim() || undefined,
-        address: form.address.trim() || undefined,
-      });
+      await createBusiness.mutateAsync({ type: "restaurant", name: form.name.trim(), cuisine: form.cuisine.trim() || undefined, address: form.address.trim() || undefined });
     } else {
-      await createBusiness.mutateAsync({
-        type: "event",
-        name: form.name.trim(),
-        date: form.date || undefined,
-        location: form.location.trim() || undefined,
-        capacity: form.capacity ? parseInt(form.capacity, 10) : undefined,
-      });
+      await createBusiness.mutateAsync({ type: "event", name: form.name.trim(), date: form.date || undefined, location: form.location.trim() || undefined, capacity: form.capacity ? parseInt(form.capacity, 10) : undefined });
     }
-
     setOpen(false);
-    resetDialog();
+    reset();
     router.push(BUSINESS_ROUTES[selectedType]);
   }
 
-  const selectedOption = CREATE_OPTIONS.find((option) => option.type === selectedType);
-  const canSubmit = form.name.trim().length > 0 && !createBusiness.isPending;
+  async function handleCreateGroup(e: React.FormEvent) {
+    e.preventDefault();
+    if (!group.name.trim()) return;
+    await createGroup.mutateAsync({ name: group.name.trim(), description: group.description.trim() || undefined });
+    setOpen(false);
+    reset();
+  }
+
+  const selectedOption = ACCOUNT_OPTIONS.find((o) => o.type === selectedType);
+  const canSubmitAccount = form.name.trim().length > 0 && !createBusiness.isPending;
+  const canSubmitGroup = group.name.trim().length > 0 && !createGroup.isPending;
+
+  function BackButton({ to }: { to: Step }) {
+    return (
+      <button
+        type="button"
+        className="flex size-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-[#f5f5f5] hover:text-neutral-900"
+        onClick={() => setStep(to)}
+        aria-label="Back"
+      >
+        <ArrowLeft size={16} aria-hidden />
+      </button>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -146,18 +152,49 @@ export function CreateBusinessDialog() {
         </button>
       </DialogTrigger>
       <DialogContent className="gap-0 p-0 sm:max-w-md">
-        {step === "pick" ? (
+
+        {/* ── Root: pick what to create ── */}
+        {step === "root" && (
           <>
             <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
-              <DialogTitle className="text-base font-semibold text-neutral-950">
-                Choose your capability set
-              </DialogTitle>
-              <DialogDescription className="text-sm text-neutral-500">
-                Each stack includes the capabilities your business needs
-              </DialogDescription>
+              <DialogTitle className="text-base font-semibold text-neutral-950">Create new</DialogTitle>
+              <DialogDescription className="text-sm text-neutral-500">What do you want to set up?</DialogDescription>
             </DialogHeader>
             <div className="divide-y divide-[#ebebeb]">
-              {CREATE_OPTIONS.map(({ type, label, Icon }) => {
+              {ROOT_OPTIONS.map(({ key, label, desc, Icon }) => (
+                <button
+                  key={key}
+                  type="button"
+                  className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]"
+                  onClick={() => setStep(key === "account" ? "pick" : key === "account-group" ? "group-form" : "capability-set")}
+                >
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-[#f5f5f5] text-neutral-700">
+                    <Icon size={20} weight="regular" aria-hidden />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-neutral-900">{label}</p>
+                    <p className="text-sm text-neutral-500">{desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ── Pick capability set ── */}
+        {step === "pick" && (
+          <>
+            <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
+              <div className="flex items-center gap-2">
+                <BackButton to="root" />
+                <div>
+                  <DialogTitle className="text-base font-semibold text-neutral-950">Choose your capability set</DialogTitle>
+                  <DialogDescription className="text-sm text-neutral-500">Each stack includes the capabilities your business needs</DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+            <div className="divide-y divide-[#ebebeb]">
+              {ACCOUNT_OPTIONS.map(({ type, label, Icon }) => {
                 const caps = CAPABILITY_SET_CONFIG[type].capabilities;
                 const visible = caps.slice(0, 4);
                 const extra = caps.length - 4;
@@ -166,7 +203,7 @@ export function CreateBusinessDialog() {
                     key={type}
                     type="button"
                     className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]"
-                    onClick={() => selectType(type)}
+                    onClick={() => selectAccountType(type)}
                   >
                     <div className="flex size-10 items-center justify-center rounded-lg bg-[#f5f5f5] text-neutral-700">
                       <Icon size={20} weight="regular" aria-hidden />
@@ -175,17 +212,10 @@ export function CreateBusinessDialog() {
                       <p className="text-sm font-semibold text-neutral-900">{label}</p>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {visible.map((cap) => (
-                          <span
-                            key={cap}
-                            className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 capitalize"
-                          >
-                            {cap}
-                          </span>
+                          <span key={cap} className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 capitalize">{cap}</span>
                         ))}
                         {extra > 0 && (
-                          <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500">
-                            +{extra} more
-                          </span>
+                          <span className="rounded-full bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500">+{extra} more</span>
                         )}
                       </div>
                     </div>
@@ -194,185 +224,150 @@ export function CreateBusinessDialog() {
               })}
             </div>
           </>
-        ) : (
-          <form onSubmit={handleCreate}>
+        )}
+
+        {/* ── Account form ── */}
+        {step === "form" && (
+          <form onSubmit={handleCreateAccount}>
             <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  className="flex size-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-[#f5f5f5] hover:text-neutral-900"
-                  onClick={() => setStep("pick")}
-                  aria-label="Back"
-                >
-                  <ArrowLeft size={16} aria-hidden />
-                </button>
+                <BackButton to="pick" />
                 <div>
-                  <DialogTitle className="text-base font-semibold text-neutral-950">
-                    New {selectedOption?.label.toLowerCase()}
-                  </DialogTitle>
-                  <DialogDescription className="text-sm text-neutral-500">
-                    Add a name and a few basic details
-                  </DialogDescription>
+                  <DialogTitle className="text-base font-semibold text-neutral-950">New {selectedOption?.label.toLowerCase()}</DialogTitle>
+                  <DialogDescription className="text-sm text-neutral-500">Add a name and a few basic details</DialogDescription>
                 </div>
               </div>
             </DialogHeader>
-
             <div className="flex flex-col gap-4 px-5 py-5">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="business-name">Name</Label>
                 <Input
                   id="business-name"
                   value={form.name}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, name: event.target.value }))
-                  }
-                  placeholder={
-                    selectedType === "store"
-                      ? "Mesa Home Goods"
-                      : selectedType === "services"
-                        ? "Bright Lawn Co."
-                        : selectedType === "event"
-                          ? "Wine dinner"
-                          : "Rosemary Bistro"
-                  }
+                  onChange={(e) => setForm((c) => ({ ...c, name: e.target.value }))}
+                  placeholder={selectedType === "store" ? "Mesa Home Goods" : selectedType === "services" ? "Bright Lawn Co." : selectedType === "event" ? "Wine dinner" : "Rosemary Bistro"}
                   className="h-10 rounded-lg"
                   autoFocus
                 />
               </div>
-
-              {selectedType === "store" ? (
+              {selectedType === "store" && (
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="store-description">Description</Label>
-                  <Textarea
-                    id="store-description"
-                    value={form.description}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        description: event.target.value,
-                      }))
-                    }
-                    placeholder="What do you sell?"
-                    className="min-h-24 rounded-lg"
-                  />
+                  <Textarea id="store-description" value={form.description} onChange={(e) => setForm((c) => ({ ...c, description: e.target.value }))} placeholder="What do you sell?" className="min-h-24 rounded-lg" />
                 </div>
-              ) : null}
-
-              {selectedType === "services" ? (
+              )}
+              {selectedType === "services" && (
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="services-trade">Trade</Label>
-                  <Input
-                    id="services-trade"
-                    value={form.trade}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, trade: event.target.value }))
-                    }
-                    placeholder="Lawn care, plumbing, design"
-                    className="h-10 rounded-lg"
-                  />
+                  <Input id="services-trade" value={form.trade} onChange={(e) => setForm((c) => ({ ...c, trade: e.target.value }))} placeholder="Lawn care, plumbing, design" className="h-10 rounded-lg" />
                 </div>
-              ) : null}
-
-              {selectedType === "restaurant" ? (
+              )}
+              {selectedType === "restaurant" && (
                 <>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="restaurant-cuisine">Cuisine</Label>
-                    <Input
-                      id="restaurant-cuisine"
-                      value={form.cuisine}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          cuisine: event.target.value,
-                        }))
-                      }
-                      placeholder="Italian, brunch, wine bar"
-                      className="h-10 rounded-lg"
-                    />
+                    <Input id="restaurant-cuisine" value={form.cuisine} onChange={(e) => setForm((c) => ({ ...c, cuisine: e.target.value }))} placeholder="Italian, brunch, wine bar" className="h-10 rounded-lg" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="restaurant-address">Address</Label>
-                    <Input
-                      id="restaurant-address"
-                      value={form.address}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          address: event.target.value,
-                        }))
-                      }
-                      placeholder="123 Main St, Austin TX"
-                      className="h-10 rounded-lg"
-                    />
+                    <Input id="restaurant-address" value={form.address} onChange={(e) => setForm((c) => ({ ...c, address: e.target.value }))} placeholder="123 Main St, Austin TX" className="h-10 rounded-lg" />
                   </div>
                 </>
-              ) : null}
-
-              {selectedType === "event" ? (
+              )}
+              {selectedType === "event" && (
                 <>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="event-date">Date</Label>
-                    <Input
-                      id="event-date"
-                      type="date"
-                      value={form.date}
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, date: event.target.value }))
-                      }
-                      className="h-10 rounded-lg"
-                    />
+                    <Input id="event-date" type="date" value={form.date} onChange={(e) => setForm((c) => ({ ...c, date: e.target.value }))} className="h-10 rounded-lg" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="event-location">Location</Label>
-                    <Input
-                      id="event-location"
-                      value={form.location}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          location: event.target.value,
-                        }))
-                      }
-                      placeholder="Private dining room"
-                      className="h-10 rounded-lg"
-                    />
+                    <Input id="event-location" value={form.location} onChange={(e) => setForm((c) => ({ ...c, location: e.target.value }))} placeholder="Private dining room" className="h-10 rounded-lg" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="event-capacity">Capacity</Label>
-                    <Input
-                      id="event-capacity"
-                      type="number"
-                      min={1}
-                      value={form.capacity}
-                      onChange={(event) =>
-                        setForm((current) => ({
-                          ...current,
-                          capacity: event.target.value,
-                        }))
-                      }
-                      placeholder="24"
-                      className="h-10 rounded-lg"
-                    />
+                    <Input id="event-capacity" type="number" min={1} value={form.capacity} onChange={(e) => setForm((c) => ({ ...c, capacity: e.target.value }))} placeholder="24" className="h-10 rounded-lg" />
                   </div>
                 </>
-              ) : null}
+              )}
             </div>
-
             <div className="flex items-center justify-end gap-2 border-t border-[#ebebeb] px-5 py-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="rounded-lg"
-                onClick={() => handleOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" className="rounded-lg" disabled={!canSubmit}>
+              <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpenChange(false)}>Cancel</Button>
+              <Button type="submit" className="rounded-lg" disabled={!canSubmitAccount}>
                 {createBusiness.isPending ? "Creating..." : "Create"}
               </Button>
             </div>
           </form>
         )}
+
+        {/* ── Account Group form ── */}
+        {step === "group-form" && (
+          <form onSubmit={handleCreateGroup}>
+            <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
+              <div className="flex items-center gap-2">
+                <BackButton to="root" />
+                <div>
+                  <DialogTitle className="text-base font-semibold text-neutral-950">New account group</DialogTitle>
+                  <DialogDescription className="text-sm text-neutral-500">Group accounts that share ownership or capabilities</DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+            <div className="flex flex-col gap-4 px-5 py-5">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="group-name">Name</Label>
+                <Input
+                  id="group-name"
+                  value={group.name}
+                  onChange={(e) => setGroup((c) => ({ ...c, name: e.target.value }))}
+                  placeholder="Acme Construction, McDonald's Corporate"
+                  className="h-10 rounded-lg"
+                  autoFocus
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="group-description">Description <span className="text-neutral-400">(optional)</span></Label>
+                <Textarea
+                  id="group-description"
+                  value={group.description}
+                  onChange={(e) => setGroup((c) => ({ ...c, description: e.target.value }))}
+                  placeholder="What do these accounts have in common?"
+                  className="min-h-20 rounded-lg"
+                />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-[#ebebeb] px-5 py-4">
+              <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpenChange(false)}>Cancel</Button>
+              <Button type="submit" className="rounded-lg" disabled={!canSubmitGroup}>
+                {createGroup.isPending ? "Creating..." : "Create group"}
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {/* ── Capability Set stub ── */}
+        {step === "capability-set" && (
+          <>
+            <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
+              <div className="flex items-center gap-2">
+                <BackButton to="root" />
+                <div>
+                  <DialogTitle className="text-base font-semibold text-neutral-950">New capability set</DialogTitle>
+                  <DialogDescription className="text-sm text-neutral-500">Compose a custom stack of capabilities</DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-2 px-5 py-10 text-center">
+              <Stack size={32} className="text-neutral-300" weight="regular" />
+              <p className="text-sm font-medium text-neutral-700">Custom capability sets are coming soon</p>
+              <p className="text-sm text-neutral-400">For now, choose from predefined stacks when creating an account.</p>
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-[#ebebeb] px-5 py-4">
+              <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpenChange(false)}>Close</Button>
+              <Button type="button" className="rounded-lg" onClick={() => setStep("pick")}>Browse stacks</Button>
+            </div>
+          </>
+        )}
+
       </DialogContent>
     </Dialog>
   );
