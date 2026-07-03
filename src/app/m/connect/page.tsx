@@ -1,5 +1,5 @@
-import { ConnectPageView } from "@/app/m/_components/connect-page-view";
+import { redirect } from "next/navigation";
 
 export default function ConnectPage() {
-  return <ConnectPageView />;
+  redirect("/m/connect/in");
 }

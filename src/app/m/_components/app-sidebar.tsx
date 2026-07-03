@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { CreateBusinessDialog } from "@/app/m/_components/create-business-dialog";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import {
+  ArrowSquareIn,
+  ArrowSquareOut,
   CaretDown,
   ChartBar,
   Gear,
@@ -29,6 +31,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
@@ -38,7 +43,6 @@ import { BUSINESS_ROUTES, VERTICAL_CONFIG, type BusinessType } from "@/verticals
 const PRIMARY_NAV = [
   { href: "/m/dashboard", label: "Dashboard", Icon: ChartBar },
   { href: "/m/share", label: "Share", Icon: ShareNetwork },
-  { href: "/m/connect", label: "Connect", Icon: Plugs, restaurantOnly: true },
 ] as const;
 
 const PRIMITIVE_NAV = [
@@ -151,11 +155,7 @@ export function AppSidebar() {
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {PRIMARY_NAV.filter(
-                (item) =>
-                  !("restaurantOnly" in item && item.restaurantOnly) ||
-                  activeBusiness?.type === "restaurant",
-              ).map(({ href, label, Icon }) => (
+              {PRIMARY_NAV.map(({ href, label, Icon }) => (
                 <NavLink
                   key={href}
                   href={href}
@@ -208,6 +208,50 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {activeBusiness?.type === "restaurant" && (
+          <>
+            <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
+            <SidebarGroup className="p-0">
+              <SidebarGroupContent>
+                <SidebarMenu className="gap-1">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className="h-10 rounded-lg px-3 text-sm font-normal text-neutral-600 hover:bg-[#f5f5f5] hover:text-neutral-900"
+                    >
+                      <Plugs size={18} weight="regular" />
+                      <span>Connect</span>
+                    </SidebarMenuButton>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === "/m/connect/in" || pathname.startsWith("/m/connect/in/")}
+                        >
+                          <Link href="/m/connect/in" onClick={closeOnNavigate}>
+                            <ArrowSquareIn size={14} />
+                            In
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === "/m/connect/out" || pathname.startsWith("/m/connect/out/")}
+                        >
+                          <Link href="/m/connect/out" onClick={closeOnNavigate}>
+                            <ArrowSquareOut size={14} />
+                            Out
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </>
+        )}
 
         <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
 
