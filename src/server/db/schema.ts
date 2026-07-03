@@ -13,6 +13,22 @@ export const users = createTable("user", (d) => ({
     .notNull(),
 }));
 
+export const accountGroups = createTable(
+  "account_group",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    ownerId: d
+      .varchar({ length: 256 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: d.varchar({ length: 256 }).notNull(),
+    description: d.text(),
+    createdAt: d.timestamp({ withTimezone: true }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$defaultFn(() => new Date()).notNull(),
+  }),
+  (t) => [index("account_group_owner_idx").on(t.ownerId)],
+);
+
 export const businesses = createTable(
   "business",
   (d) => ({
@@ -31,6 +47,9 @@ export const businesses = createTable(
     capacity: d.integer(),
     stripePaymentLinkUrl: d.varchar({ length: 1024 }),
     stripePaymentLinkId: d.varchar({ length: 256 }),
+    groupId: d
+      .uuid()
+      .references(() => accountGroups.id, { onDelete: "set null" }),
     createdAt: d
       .timestamp({ withTimezone: true })
       .$defaultFn(() => new Date())
@@ -114,10 +133,17 @@ export const orders = createTable(
 
 export const usersRelations = relations(users, ({ many }) => ({
   businesses: many(businesses),
+  accountGroups: many(accountGroups),
+}));
+
+export const accountGroupsRelations = relations(accountGroups, ({ one, many }) => ({
+  owner: one(users, { fields: [accountGroups.ownerId], references: [users.id] }),
+  accounts: many(businesses),
 }));
 
 export const businessesRelations = relations(businesses, ({ one, many }) => ({
   owner: one(users, { fields: [businesses.ownerId], references: [users.id] }),
+  group: one(accountGroups, { fields: [businesses.groupId], references: [accountGroups.id] }),
   locations: many(businessLocations),
   integrations: many(integrations),
   orders: many(orders),
