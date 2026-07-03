@@ -76,7 +76,9 @@ export function CreateBusinessDialog() {
   const createGroup = api.accountGroup.create.useMutation({
     onSuccess: async () => { await utils.accountGroup.invalidate(); },
   });
-  const attachBusiness = api.accountGroup.attachBusiness.useMutation();
+  const attachBusiness = api.accountGroup.attachBusiness.useMutation({
+    onSuccess: async () => { await utils.business.invalidate(); },
+  });
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>("root");
