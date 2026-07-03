@@ -15,9 +15,10 @@ import { resend } from "@/server/resend";
 const VERCEL_A_RECORD = "76.76.21.21";
 
 async function registerVercelDomain(domain: string) {
-  if (!env.VERCEL_TOKEN || !env.VERCEL_PROJECT_ID) return;
+  if (!env.VERCEL_TOKEN) return;
+  const project = env.VERCEL_PROJECT_ID ?? "lume";
   const res = await fetch(
-    `https://api.vercel.com/v10/projects/${env.VERCEL_PROJECT_ID}/domains`,
+    `https://api.vercel.com/v10/projects/${project}/domains`,
     {
       method: "POST",
       headers: {
