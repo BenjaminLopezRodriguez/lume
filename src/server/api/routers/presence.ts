@@ -17,8 +17,9 @@ const VERCEL_A_RECORD = "76.76.21.21";
 async function registerVercelDomain(domain: string) {
   if (!env.VERCEL_TOKEN) return;
   const project = env.VERCEL_PROJECT_ID ?? "lume";
+  const teamParam = env.VERCEL_TEAM_ID ? `?teamId=${env.VERCEL_TEAM_ID}` : "";
   const res = await fetch(
-    `https://api.vercel.com/v10/projects/${project}/domains`,
+    `https://api.vercel.com/v10/projects/${project}/domains${teamParam}`,
     {
       method: "POST",
       headers: {

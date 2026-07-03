@@ -19,7 +19,8 @@ export const env = createEnv({
     CRON_SECRET: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     VERCEL_TOKEN: z.string().optional(),
-    VERCEL_PROJECT_ID: z.string().optional(), // auto-provided by Vercel system env vars
+    VERCEL_PROJECT_ID: z.string().optional(),
+    VERCEL_TEAM_ID: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url().optional(),
@@ -40,6 +41,7 @@ export const env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET,
     VERCEL_TOKEN: process.env.VERCEL_TOKEN,
     VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID,
+    VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
