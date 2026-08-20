@@ -47,15 +47,7 @@ export function RestaurantPageView() {
             label="Covers this week"
             color="var(--chart-2)"
             valueFormat="number"
-            data={[
-              { label: "Mon", value: 42 },
-              { label: "Tue", value: 38 },
-              { label: "Wed", value: 51 },
-              { label: "Thu", value: 64 },
-              { label: "Fri", value: 92 },
-              { label: "Sat", value: 118 },
-              { label: "Sun", value: 86 },
-            ]}
+            data={[]}
           />
           <SectionHeader title="Tables" />
           <ListCard

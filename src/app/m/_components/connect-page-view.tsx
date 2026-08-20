@@ -34,7 +34,7 @@ export function ConnectPageView() {
   return (
     <PageContent>
       <PageHeader
-        title="Connect"
+        title="Integrations"
         meta={
           <>
             <span className="text-foreground/70">

@@ -34,6 +34,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuAction,
@@ -47,21 +48,41 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
-const PRIMARY_NAV = [
-  { href: "/m/dashboard", label: "Dashboard", Icon: ChartBar },
-  { href: "/m/share", label: "Share", Icon: ShareNetwork },
+const NAV_GROUPS = [
+  {
+    label: "Overview",
+    items: [
+      { id: "dashboard", label: "Dashboard", Icon: ChartBar, href: "/m/dashboard" },
+      { id: "ownership", label: "Customers", Icon: UsersThree, href: "/m/ownership" },
+    ],
+  },
+  {
+    label: "Sell",
+    items: [
+      { id: "share", label: "Checkout", Icon: ShareNetwork, href: "/m/share" },
+      { id: "presence", label: "Channels", Icon: Globe },
+    ],
+  },
+  {
+    label: "Automate",
+    items: [{ id: "connect", label: "Integrations", Icon: Plugs }],
+  },
 ] as const;
 
-const PRIMITIVE_NAV = [
-  { id: "presence", label: "Presence", Icon: Globe, route: "dynamic" },
-  { id: "ownership", label: "Ownership", Icon: UsersThree, href: "/m/ownership" },
-  { id: "connect", label: "Connect", Icon: Plugs, route: "submenu" },
-  { id: "support", label: "Support", Icon: Headset, href: "/m/support" },
-] as const;
-
-const SECONDARY_NAV = [
+const FOOTER_NAV = [
+  { href: "/m/support", label: "Support", Icon: Headset },
   { href: "/m/settings", label: "Settings", Icon: Gear },
 ] as const;
+
+const ITEM_CLASS = cn(
+  "h-11 rounded-lg px-3 text-sm font-normal text-muted-foreground md:h-10",
+  "hover:bg-sidebar-accent/50 hover:text-foreground",
+  "data-[active=true]:bg-sidebar-accent/60 data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
+  "data-[active=true]:hover:bg-sidebar-accent/60 data-[active=true]:hover:text-sidebar-accent-foreground",
+);
+
+const GROUP_LABEL_CLASS =
+  "px-3 text-[0.6875rem] font-medium tracking-wider text-muted-foreground/60 uppercase";
 
 function NavLink({
   href,
@@ -78,16 +99,8 @@ function NavLink({
 }) {
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        asChild
-        isActive={active}
-        className={cn(
-          "h-10 rounded-lg px-3 text-sm font-normal text-muted-foreground hover:bg-muted hover:text-foreground",
-          "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
-          "data-[active=true]:hover:bg-sidebar-accent data-[active=true]:hover:text-sidebar-accent-foreground",
-        )}
-      >
-        <Link href={href} onClick={onNavigate}>
+      <SidebarMenuButton asChild isActive={active} className={ITEM_CLASS}>
+        <Link href={href} onClick={onNavigate} aria-current={active ? "page" : undefined}>
           <Icon size={18} weight={active ? "fill" : "regular"} />
           <span>{label}</span>
         </Link>
@@ -161,129 +174,126 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        <SidebarGroup className="p-0">
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {PRIMARY_NAV.map(({ href, label, Icon }) => (
-                <NavLink
-                  key={href}
-                  href={href}
-                  label={label}
-                  Icon={Icon}
-                  active={pathname === href || pathname.startsWith(`${href}/`)}
-                  onNavigate={closeOnNavigate}
-                />
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarSeparator className="mx-2 my-3 bg-border" />
-
-        <SidebarGroup className="p-0">
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
-              {PRIMITIVE_NAV.map((item) => {
-                const presenceActive =
-                  item.id === "presence" && pathname.startsWith("/m/presence/");
-
-                if (item.id === "presence") {
-                  const PRESENCE_OPTIONS = [
-                    { label: "Web", Icon: Globe, href: "/m/presence/web" },
-                    { label: "QR Code", Icon: QrCode, href: "/m/presence/qr" },
-                    { label: "Link", Icon: LinkSimple, href: "/m/presence/link" },
-                  ] as const;
-                  return (
-                    <SidebarMenuItem key="presence">
-                      <SidebarMenuButton
-                        asChild
-                        isActive={presenceActive}
-                        className={cn(
-                          "h-10 rounded-lg px-3 text-sm font-normal text-muted-foreground hover:bg-muted hover:text-foreground",
-                          "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
-                          "data-[active=true]:hover:bg-sidebar-accent data-[active=true]:hover:text-sidebar-accent-foreground",
-                        )}
-                      >
-                        <Link href="/m/presence/web" onClick={closeOnNavigate}>
-                          <Globe size={18} weight={presenceActive ? "fill" : "regular"} />
-                          <span>Entry Points</span>
-                        </Link>
-                      </SidebarMenuButton>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <SidebarMenuAction
-                            className="flex size-6 items-center justify-center rounded-md text-muted-foreground/70 hover:bg-muted hover:text-foreground"
-                            aria-label="Add presence"
+        {NAV_GROUPS.map((group) => (
+          <SidebarGroup key={group.label} className="p-0">
+            <SidebarGroupLabel className={GROUP_LABEL_CLASS}>
+              {group.label}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-1">
+                {group.items.map((item) => {
+                  if (item.id === "presence") {
+                    const presenceActive = pathname.startsWith("/m/presence/");
+                    const PRESENCE_OPTIONS = [
+                      { label: "Web", Icon: Globe, href: "/m/presence/web" },
+                      { label: "QR Code", Icon: QrCode, href: "/m/presence/qr" },
+                      { label: "Link", Icon: LinkSimple, href: "/m/presence/link" },
+                    ] as const;
+                    return (
+                      <SidebarMenuItem key="presence">
+                        <SidebarMenuButton
+                          asChild
+                          isActive={presenceActive}
+                          className={ITEM_CLASS}
+                        >
+                          <Link
+                            href="/m/presence/web"
+                            onClick={closeOnNavigate}
+                            aria-current={presenceActive ? "page" : undefined}
                           >
-                            <Plus size={12} weight="bold" aria-hidden />
-                          </SidebarMenuAction>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent side="right" align="start" className="w-40">
-                          {PRESENCE_OPTIONS.map(({ label, Icon, href }) => (
-                            <DropdownMenuItem key={label} asChild>
-                              <Link href={href} onClick={closeOnNavigate} className="flex items-center gap-2">
-                                <Icon size={14} />
-                                {label}
+                            <Globe size={18} weight={presenceActive ? "fill" : "regular"} />
+                            <span>{item.label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <SidebarMenuAction
+                              className="flex size-6 items-center justify-center rounded-md text-muted-foreground/70 hover:bg-sidebar-accent/50 hover:text-foreground"
+                              aria-label="Add channel"
+                            >
+                              <Plus size={12} weight="bold" aria-hidden />
+                            </SidebarMenuAction>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent side="right" align="start" className="w-40">
+                            {PRESENCE_OPTIONS.map(({ label, Icon, href }) => (
+                              <DropdownMenuItem key={label} asChild>
+                                <Link href={href} onClick={closeOnNavigate} className="flex items-center gap-2">
+                                  <Icon size={14} />
+                                  {label}
+                                </Link>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </SidebarMenuItem>
+                    );
+                  }
+
+                  if (item.id === "connect") {
+                    const connectActive = pathname.startsWith("/m/connect");
+                    const inActive =
+                      pathname === "/m/connect/in" || pathname.startsWith("/m/connect/in/");
+                    const outActive =
+                      pathname === "/m/connect/out" || pathname.startsWith("/m/connect/out/");
+                    return (
+                      <SidebarMenuItem key="connect">
+                        <SidebarMenuButton isActive={connectActive} className={ITEM_CLASS}>
+                          <Plugs size={18} weight={connectActive ? "fill" : "regular"} />
+                          <span>{item.label}</span>
+                        </SidebarMenuButton>
+                        <SidebarMenuSub>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton asChild isActive={inActive}>
+                              <Link
+                                href="/m/connect/in"
+                                onClick={closeOnNavigate}
+                                aria-current={inActive ? "page" : undefined}
+                              >
+                                <ArrowSquareIn size={14} />
+                                Incoming orders
                               </Link>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </SidebarMenuItem>
-                  );
-                }
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                          <SidebarMenuSubItem>
+                            <SidebarMenuSubButton asChild isActive={outActive}>
+                              <Link
+                                href="/m/connect/out"
+                                onClick={closeOnNavigate}
+                                aria-current={outActive ? "page" : undefined}
+                              >
+                                <ArrowSquareOut size={14} />
+                                Outgoing events
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        </SidebarMenuSub>
+                      </SidebarMenuItem>
+                    );
+                  }
 
-                if (item.id === "connect") {
-                  const connectActive = pathname.startsWith("/m/connect");
+                  const href = "href" in item ? item.href : "/m/dashboard";
                   return (
-                    <SidebarMenuItem key="connect">
-                      <SidebarMenuButton
-                        isActive={connectActive}
-                        className={cn(
-                          "h-10 rounded-lg px-3 text-sm font-normal text-muted-foreground hover:bg-muted hover:text-foreground",
-                          "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
-                        )}
-                      >
-                        <Plugs size={18} weight={connectActive ? "fill" : "regular"} />
-                        <span>Connect</span>
-                      </SidebarMenuButton>
-                      <SidebarMenuSub>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild isActive={pathname === "/m/connect/in" || pathname.startsWith("/m/connect/in/")}>
-                            <Link href="/m/connect/in" onClick={closeOnNavigate}><ArrowSquareIn size={14} />In</Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild isActive={pathname === "/m/connect/out" || pathname.startsWith("/m/connect/out/")}>
-                            <Link href="/m/connect/out" onClick={closeOnNavigate}><ArrowSquareOut size={14} />Out</Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      </SidebarMenuSub>
-                    </SidebarMenuItem>
+                    <NavLink
+                      key={item.id}
+                      href={href}
+                      label={item.label}
+                      Icon={item.Icon}
+                      active={pathname === href || pathname.startsWith(`${href}/`)}
+                      onNavigate={closeOnNavigate}
+                    />
                   );
-                }
-
-                return (
-                  <NavLink
-                    key={item.id}
-                    href={"href" in item ? item.href : "/m/dashboard"}
-                    label={item.label}
-                    Icon={item.Icon}
-                    active={pathname === ("href" in item ? item.href : "") || pathname.startsWith(("href" in item ? item.href : "") + "/")}
-                    onNavigate={closeOnNavigate}
-                  />
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
 
         <SidebarSeparator className="mx-2 my-3 bg-border" />
 
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
-              {SECONDARY_NAV.map(({ href, label, Icon }) => (
+              {FOOTER_NAV.map(({ href, label, Icon }) => (
                 <NavLink
                   key={href}
                   href={href}

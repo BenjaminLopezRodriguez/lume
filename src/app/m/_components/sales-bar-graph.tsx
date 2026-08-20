@@ -8,16 +8,6 @@ const CHART_CONFIG = {
   value: { label: "Value", color: "var(--success)" },
 } satisfies ChartConfig;
 
-const DEFAULT_DATA = [
-  { label: "Mon", value: 820 },
-  { label: "Tue", value: 940 },
-  { label: "Wed", value: 880 },
-  { label: "Thu", value: 1120 },
-  { label: "Fri", value: 1284 },
-  { label: "Sat", value: 1460 },
-  { label: "Sun", value: 1190 },
-] as const;
-
 function formatChartValue(value: number, valueFormat: "currency" | "number") {
   if (valueFormat === "currency") {
     return `$${value.toLocaleString()}`;
@@ -28,19 +18,22 @@ function formatChartValue(value: number, valueFormat: "currency" | "number") {
 
 export function SalesBarGraph({
   className,
-  data = DEFAULT_DATA,
+  data,
   label,
   color = "var(--success)",
   valueFormat = "currency",
 }: {
   className?: string;
-  data?: ReadonlyArray<{ label: string; value: number }>;
+  data: ReadonlyArray<{ label: string; value: number }>;
   label?: string;
   color?: string;
   valueFormat?: "currency" | "number";
 }) {
   const chartData = [...data];
-  const maxValue = Math.max(...chartData.map((item) => item.value));
+  const hasData = chartData.some((item) => item.value > 0);
+  const maxValue = hasData
+    ? Math.max(...chartData.map((item) => item.value))
+    : 0;
 
   return (
     <div
@@ -52,6 +45,11 @@ export function SalesBarGraph({
       {label ? (
         <p className="mb-2 text-sm text-muted-foreground">{label}</p>
       ) : null}
+      {!hasData ? (
+        <p className="py-10 text-center text-sm text-muted-foreground">
+          No data yet
+        </p>
+      ) : (
       <ChartContainer
         config={CHART_CONFIG}
         className="aspect-[3/1] h-40 w-full [&_.recharts-surface]:overflow-visible"
@@ -82,6 +80,7 @@ export function SalesBarGraph({
           </Bar>
         </BarChart>
       </ChartContainer>
+      )}
     </div>
   );
 }

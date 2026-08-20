@@ -7,6 +7,7 @@ Before product, schema, or merchant-flow changes:
 1. **[thesis.md](./thesis.md)** — north star. All decisions must align with ownership-first commerce.
 2. **[PRODUCT.md](./PRODUCT.md)** + **[VERTICALS.md](./VERTICALS.md)** — operational product and vertical primitives.
 3. **[docs/THESIS_MAP.md](./docs/THESIS_MAP.md)** — thesis concepts mapped to current code and gaps.
+4. **[docs/superpowers/specs/ontology.md](./docs/superpowers/specs/ontology.md)** — the six nouns (Catalog, Channels, Orders, Customers, Agents, Connections) and the PurchaseIntent → Order boundary. Use this vocabulary in routes, APIs, and UI labels.
 
 For implementation phases, see **[docs/superpowers/plans/ownership-roadmap.md](./docs/superpowers/plans/ownership-roadmap.md)**.
 
@@ -15,6 +16,10 @@ Session workflow: **[docs/CLAUDE_WORKFLOW.md](./docs/CLAUDE_WORKFLOW.md)**.
 ## Register
 
 **Ownership starts at checkout.** Checkout is the wedge; ownership is the product.
+
+Internal primitives are not navigation labels. `Ownership` stays the domain
+module, tables, and thesis vocabulary; merchants see **Customers**. Same for
+Share → Checkout, Entry Points → Channels, Connect → Integrations.
 
 ## Stack
 

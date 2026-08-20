@@ -4,10 +4,10 @@ import { OwnershipPageView } from "@/app/m/_components/ownership-page-view";
 
 export default function OwnershipPage() {
   return (
-    <PageContent>
+    <PageContent width="full">
       <PageHeader
-        title="Ownership"
-        meta="All customer relationships for your account"
+        title="Customers"
+        meta="Everyone who has bought from your business"
       />
       <OwnershipPageView />
     </PageContent>

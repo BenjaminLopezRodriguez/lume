@@ -76,11 +76,13 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
   const [copied, setCopied] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [domainOpen, setDomainOpen] = useState(false);
 
   useEffect(() => {
     if (presence?.domainStatus === "pending_dns" && presence.customDomain) {
       setDomainInput(presence.customDomain);
       setStep(2);
+      setDomainOpen(true);
     }
   }, [presence?.customDomain, presence?.domainStatus]);
 
@@ -106,6 +108,7 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
   const customDomain = presence?.customDomain ?? null;
   const domainActive = presence?.domainStatus === "active";
   const domainPending = presence?.domainStatus === "pending_dns";
+  const hasSite = !!presence?.layout;
 
   async function copyText(text: string, key: string) {
     await navigator.clipboard.writeText(text);
@@ -126,13 +129,10 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
   if (!activeBusiness) {
     return (
       <PageContent>
-        <PageHeader
-          title="Entry Points"
-          meta="Connect a domain — Lume hosts your site"
-        />
+        <PageHeader title="Channels" meta="Your website — hosted by Lume" />
         <div className="mt-8 rounded-xl border border-border bg-card px-5 py-8 text-center">
           <p className="text-sm text-muted-foreground">
-            Create a business to set up your web presence.
+            Create a business to set up your website.
           </p>
         </div>
       </PageContent>
@@ -143,7 +143,7 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
     <>
     <PageContent>
       <PageHeader
-        title="Entry Points"
+        title="Channels"
         meta={
           domainActive && customDomain ? (
             <>
@@ -153,101 +153,147 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
             </>
           ) : (
             <span className="text-muted-foreground">
-              Connect a domain — Lume hosts your site
+              Your website — hosted by Lume
             </span>
           )
         }
       />
 
       <div className="mt-8 flex flex-col gap-8">
-        <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <SectionHeader title="Your Lume sites" />
-            <button
-              type="button"
-              onClick={() => setCreateOpen(true)}
-              className="flex size-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
-              aria-label="Create site"
-            >
-              <Plus size={15} weight="bold" aria-hidden />
-            </button>
-          </div>
-          <CreateSiteDialog
-            businessId={businessId}
-            onEditSite={() => setEditorOpen(true)}
-            open={createOpen}
-            onOpenChange={setCreateOpen}
-          />
-          {!presence?.layout ? (
+        <CreateSiteDialog
+          businessId={businessId}
+          onEditSite={() => setEditorOpen(true)}
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+        />
+
+        {!hasSite ? (
+          <section className="flex flex-col gap-3">
+            <SectionHeader title="Website" />
             <div className="rounded-xl border border-border bg-card px-5 py-8 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <Globe size={28} className="text-muted-foreground/70" aria-hidden />
               </div>
-              <p className="mt-3 text-sm font-semibold text-foreground">No site yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Create your Lume-hosted site to get online fast.
+              <p className="mt-3 text-sm text-muted-foreground">
+                Create a storefront powered by your Lume catalog.
               </p>
               <Button
                 type="button"
-                className="mt-4 h-10 rounded-lg bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                className="mt-4 h-11 rounded-lg bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
                 onClick={() => setCreateOpen(true)}
               >
                 <Plus size={14} weight="bold" aria-hidden />
-                Create site
+                Create website
               </Button>
             </div>
-          ) : (
-            <div className="overflow-hidden rounded-xl border border-border">
-              <table className="w-full">
-                <tbody>
-                  <tr className="border-b border-border last:border-0">
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm font-medium text-foreground">
-                        {activeBusiness.name}
+          </section>
+        ) : (
+          <>
+            <section className="flex flex-col gap-3">
+              <SectionHeader title="Website" />
+              <div className="rounded-xl border border-border bg-card px-5 py-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <span className="text-sm font-medium text-foreground">
+                      {activeBusiness.name}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span
+                        className="size-1.5 rounded-full bg-[var(--success)]"
+                        aria-hidden
+                      />
+                      Live
+                    </span>
+                    {lumeUrl ? (
+                      <span className="truncate text-sm text-muted-foreground">
+                        {lumeUrl}
                       </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      {lumeUrl ? (
-                        <span className="block max-w-[180px] truncate text-sm text-muted-foreground">
-                          {lumeUrl}
-                        </span>
-                      ) : null}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          className="h-8 rounded-lg border-border px-3"
-                          onClick={() => setEditorOpen(true)}
-                        >
-                          <PencilSimple size={13} aria-hidden />
-                          Edit
-                        </Button>
-                        {lumeUrl ? (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="h-8 rounded-lg border-border px-3"
-                            asChild
-                          >
-                            <a href={lumeUrl} target="_blank" rel="noopener noreferrer">
-                              <ArrowSquareOut size={13} aria-hidden />
-                              Preview
-                            </a>
-                          </Button>
-                        ) : null}
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+                    ) : null}
+                    <span className="text-sm text-muted-foreground">
+                      Custom domain:{" "}
+                      {domainActive && customDomain
+                        ? customDomain
+                        : domainPending && customDomain
+                          ? `${customDomain} (pending DNS)`
+                          : "Not connected"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {lumeUrl ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-11 rounded-lg border-border px-3"
+                        asChild
+                      >
+                        <a href={lumeUrl} target="_blank" rel="noopener noreferrer">
+                          <ArrowSquareOut size={13} aria-hidden />
+                          Open site
+                        </a>
+                      </Button>
+                    ) : null}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-11 rounded-lg border-border px-3"
+                      onClick={() => setEditorOpen(true)}
+                    >
+                      <PencilSimple size={13} aria-hidden />
+                      Manage
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </section>
 
+            <section className="flex flex-col gap-3">
+              <SectionHeader title="Configuration" />
+              <ListCard>
+                <ListCardRow
+                  label="Domain"
+                  trailing={
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-sm text-muted-foreground">
+                        {customDomain ?? ""}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-11 rounded-lg border-border px-3"
+                        aria-expanded={domainOpen}
+                        onClick={() => setDomainOpen((v) => !v)}
+                      >
+                        {customDomain ? "Manage" : "Connect"}
+                      </Button>
+                    </span>
+                  }
+                />
+                <ListCardRow
+                  label="Theme"
+                  trailing={
+                    <span className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Default</span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-11 rounded-lg border-border px-3"
+                        onClick={() => setEditorOpen(true)}
+                      >
+                        Customize
+                      </Button>
+                    </span>
+                  }
+                />
+              </ListCard>
+            </section>
+          </>
+        )}
+
+        {hasSite && domainOpen ? (
         <section className="flex flex-col gap-3">
           <SectionHeader title="Custom domain" />
 
@@ -511,7 +557,9 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
             </div>
           )}
         </section>
+        ) : null}
 
+        {hasSite ? (
         <section className="flex flex-col gap-3">
           <SectionHeader title="What Lume handles" />
           <ListCard>
@@ -532,6 +580,7 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
             />
           </ListCard>
         </section>
+        ) : null}
       </div>
     </PageContent>
     <SiteEditorOverlay

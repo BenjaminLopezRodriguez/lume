@@ -121,7 +121,7 @@ export function StorePageView() {
         <TabsContent value="overview">
           <div className="mt-6 flex flex-col gap-8">
             <section className="flex flex-col gap-3">
-              <SalesBarGraph label="Sales this week" color={accent} />
+              <SalesBarGraph label="Sales this week" color={accent} data={[]} />
             </section>
 
             <section className="flex flex-col gap-3">
