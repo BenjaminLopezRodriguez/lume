@@ -1,5 +1,10 @@
 # Design: Limeday Design System Migration
 
+> **SUPERSEDED (2026-08-20) for motion.** The `btn-spring` / `icon-spring` /
+> `pill-spring` classes described here no longer exist. Motion is now defined by
+> [motion.md](./motion.md) — read that instead. Sections below about colour and
+> typography still stand; the motion sections are historical only.
+
 **Date:** 2026-07-01  
 **Status:** Approved
 
@@ -77,7 +82,7 @@ Three named spring animations + keyframes added to `globals.css`.
 }
 ```
 
-**Decision:** Elastic spring feel matches limeday's motion language. Named animations are composable via Tailwind `animate-[btn-spring]` or plain `animation:` property.
+**Decision:** Elastic spring feel matches limeday's motion language. Named animations are composable via a Tailwind arbitrary animation utility or plain `animation:` property.
 
 ---
 
