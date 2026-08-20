@@ -54,3 +54,28 @@ Scope: user-reported — animation jank, nonsensical borders, generic AI feel.
 | ID | Slug | Severity | Note |
 |----|------|----------|------|
 | — | aspirational-section | P2 | LumeShop markets an unbuilt shopper app; mockup data is sample, no false metrics, but the premise is forward-looking |
+
+## 2026-08-19 — Fix Session 3 (tighter Stripe register)
+
+### Changes
+| Area | Before | After |
+|------|--------|-------|
+| Heading weight | 15× font-black, 16× font-bold | all headings 600 |
+| Display scale | h1 5.5rem, category stack 8xl | h1 4rem, stack 6xl; tracking -0.02/-0.03em |
+| Control radius | 29× rounded-full pills | single 10px radius; rounded-full only on true circles |
+| Landing neutrals | warm (hue 0–60) | cool slate (hue 265) |
+| Closing CTA | full-bleed saturated magenta field | dark neutral ground, accent on the button only |
+| Eyebrows | uppercase tracking-widest ×3 | 1 remains; rest removed or sentence case |
+
+### Bugs fixed
+| ID | Slug | Severity | Fix |
+|----|------|----------|-----|
+| C1 | wcag-contrast-fail | P1 | Offering category buttons were --landing-border on --landing-shell (~1.2:1) → --landing-subtle (3.71:1, passes AA large-text 3:1) |
+| L6 | element-bleed | P2 | Channel grid cells had no horizontal padding below lg; text ran into the hairline |
+| — | fabricated-metric | P0 | "sub-2-second load times" → capability statement |
+| S2 | hero-dead-space | P2 | Right column sat empty ~500px before the mockup; items-end + larger mockup |
+
+### Verified
+- Dead links 0 · broken anchors 0 · fabricated strings 0
+- Heading weights: {600: 17} · control radii: {0px, 10px}
+- Scroll: 116 frames, 0 over 34ms, worst 17ms

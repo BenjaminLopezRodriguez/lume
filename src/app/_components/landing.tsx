@@ -33,7 +33,7 @@ const FEATURES = [
   },
   {
     title: "Fewer taps, more revenue",
-    desc: "Smart autofill, one-tap repeat checkout, and sub-2-second load times cut abandonment before it starts. Your checkout doesn't lose sales your business earned.",
+    desc: "Smart autofill, one-tap repeat checkout, and and no forced account creation cut abandonment before it starts. Your checkout doesn't lose sales your business earned.",
   },
   {
     title: "No surprise totals. Ever.",
@@ -150,7 +150,7 @@ function Nav() {
     <header className="sticky top-0 z-50 border-b border-white/30 bg-gradient-to-b from-white/85 via-white/65 to-white/40 backdrop-blur-xl backdrop-saturate-150">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <div className="flex items-center gap-2">
-          <span className="font-display text-xl font-black tracking-tight">Lume</span>
+          <span className="font-display text-xl font-semibold tracking-tight">Lume</span>
         </div>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
@@ -174,7 +174,7 @@ function Nav() {
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-full text-sm font-medium [touch-action:manipulation]"
+            className="rounded-lg text-sm font-medium [touch-action:manipulation]"
             style={{ color: "var(--landing-fg)" }}
             asChild
           >
@@ -182,7 +182,7 @@ function Nav() {
           </Button>
           <Button
             size="sm"
-            className="btn-spring rounded-full px-6 py-2 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="btn-spring rounded-lg px-6 py-2 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{ backgroundColor: "var(--landing-fg)" }}
             asChild
           >
@@ -200,12 +200,12 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden px-6 pt-20 pb-0" style={{ backgroundColor: "var(--landing-shell)" }}>
-      <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
+    <section className="relative overflow-hidden px-6 pt-16 pb-0" style={{ backgroundColor: "var(--landing-shell)" }}>
+      <div className="mx-auto grid max-w-7xl items-end gap-12 lg:grid-cols-2">
         {/* copy */}
-        <div className="flex flex-col gap-8 pb-20">
+        <div className="flex flex-col gap-7 pb-24">
           <h1
-            className="text-6xl font-black leading-[1.05] tracking-tight lg:text-[5.5rem]"
+            className="text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.03em] lg:text-[4rem]"
             style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
           >
             Your checkout.
@@ -220,7 +220,7 @@ function Hero() {
             <div className="flex items-center gap-4">
               <a
                 href="/api/auth/register?post_login_redirect_url=/m/onboarding"
-                className="btn-spring flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="btn-spring flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{
                   backgroundColor: "var(--landing-accent-deep)",
                   outlineColor: "var(--landing-accent-deep)",
@@ -238,7 +238,7 @@ function Hero() {
         {/* mockup */}
         <div className="relative flex justify-end pb-0">
           <div
-            className="relative w-full max-w-sm overflow-hidden rounded-t-3xl shadow-[0_32px_80px_rgba(0,0,0,0.12)]"
+            className="relative w-full max-w-md overflow-hidden rounded-t-xl shadow-[0_24px_64px_rgba(15,20,40,0.10)]"
             style={{ border: "1px solid var(--landing-border)" }}
           >
             {/* browser chrome */}
@@ -249,7 +249,7 @@ function Hero() {
                 <div className="size-3 rounded-full bg-green-400" />
               </div>
               <div
-                className="mx-auto flex items-center gap-1.5 rounded-full border bg-white px-3 py-1 text-xs"
+                className="mx-auto flex items-center gap-1.5 rounded-md border bg-white px-3 py-1 text-xs"
                 style={{ borderColor: "var(--landing-border)", color: "var(--landing-muted)" }}
               >
                 <LockSimple size={9} aria-hidden />
@@ -288,7 +288,7 @@ function Hero() {
                 </div>
               </div>
               <button
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full py-3.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-3.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{
                   backgroundColor: "var(--landing-accent-deep)",
                   outlineColor: "var(--landing-accent-deep)",
@@ -307,7 +307,7 @@ function Hero() {
           {/* floating confirmation chip */}
           <div
             aria-hidden
-            className="absolute left-0 top-16 hidden rounded-full px-4 py-2 text-sm font-semibold shadow-lg lg:flex lg:items-center lg:gap-2"
+            className="absolute left-0 top-16 hidden rounded-lg px-4 py-2 text-sm font-semibold shadow-lg lg:flex lg:items-center lg:gap-2"
             style={{ backgroundColor: "var(--landing-accent-deep)", color: "white" }}
           >
             <span className="inline-block size-2 rounded-full bg-white/60" />
@@ -370,7 +370,7 @@ const NAV_HEIGHT = 64; // matches header h-16
 function FeatureCheckoutMockup() {
   return (
     <div
-      className="overflow-hidden rounded-3xl"
+      className="overflow-hidden rounded-xl"
       style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}
     >
       <div className="p-8">
@@ -391,7 +391,7 @@ function FeatureCheckoutMockup() {
             { name: "Salmon Bowl", qty: "×1", price: "$18" },
             { name: "Oat Latte", qty: "×2", price: "$12" },
           ].map((item) => (
-            <div key={item.name} className="flex items-center justify-between rounded-2xl bg-white p-4">
+            <div key={item.name} className="flex items-center justify-between rounded-lg bg-white p-4">
               <div>
                 <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>{item.name}</div>
                 <div className="text-xs" style={{ color: "var(--landing-muted)" }}>{item.qty}</div>
@@ -401,7 +401,7 @@ function FeatureCheckoutMockup() {
           ))}
         </div>
         <button
-          className="w-full rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]"
+          className="w-full rounded-lg py-4 text-sm font-semibold text-white [touch-action:manipulation]"
           style={{ backgroundColor: "var(--landing-accent-deep)" }}
         >
           Pay $30.00
@@ -418,14 +418,14 @@ function FeatureCheckoutMockup() {
 
 function FeatureMockupPayments() {
   return (
-    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+    <div className="overflow-hidden rounded-xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
       <div className="p-8">
         <div className="mb-5 text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>How do you want to pay?</div>
         <div className="mb-5 space-y-2.5">
-          <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-black py-3.5 text-sm font-semibold text-white [touch-action:manipulation]">
+          <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-black py-3.5 text-sm font-semibold text-white [touch-action:manipulation]">
              Apple Pay
           </button>
-          <button className="flex w-full items-center justify-center gap-2 rounded-2xl border py-3.5 text-sm font-semibold [touch-action:manipulation]" style={{ borderColor: "var(--landing-border)", color: "var(--landing-fg)" }}>
+          <button className="flex w-full items-center justify-center gap-2 rounded-lg border py-3.5 text-sm font-semibold [touch-action:manipulation]" style={{ borderColor: "var(--landing-border)", color: "var(--landing-fg)" }}>
              Google Pay
           </button>
           <div className="flex items-center gap-3 py-1">
@@ -433,12 +433,12 @@ function FeatureMockupPayments() {
             <span className="text-xs" style={{ color: "var(--landing-muted)" }}>or card</span>
             <div className="flex-1 border-t" style={{ borderColor: "var(--landing-border)" }} />
           </div>
-          <div className="rounded-2xl border px-4 py-3" style={{ borderColor: "var(--landing-border)" }}>
+          <div className="rounded-lg border px-4 py-3" style={{ borderColor: "var(--landing-border)" }}>
             <div className="mb-1 text-xs" style={{ color: "var(--landing-muted)" }}>Card number</div>
             <div className="font-mono text-sm tracking-widest" style={{ color: "var(--landing-fg)" }}>•••• •••• •••• 4242</div>
           </div>
         </div>
-        <button className="w-full rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+        <button className="w-full rounded-lg py-4 text-sm font-semibold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
           Pay $30.00
         </button>
       </div>
@@ -448,23 +448,23 @@ function FeatureMockupPayments() {
 
 function FeatureMockupSpeed() {
   return (
-    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+    <div className="overflow-hidden rounded-xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
       <div className="p-8">
-        <div className="mb-5 flex items-center gap-3 rounded-2xl border p-3" style={{ backgroundColor: "#f0fdf4", borderColor: "#bbf7d0" }}>
-          <div className="flex size-8 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">J</div>
+        <div className="mb-5 flex items-center gap-3 rounded-lg border p-3" style={{ backgroundColor: "#f0fdf4", borderColor: "#bbf7d0" }}>
+          <div className="flex size-8 items-center justify-center rounded-full bg-green-500 text-xs font-semibold text-white">J</div>
           <div>
             <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Welcome back, Jordan</div>
             <div className="text-xs" style={{ color: "var(--landing-muted)" }}>Visa ···· 4242 · ready to go</div>
           </div>
         </div>
-        <div className="mb-5 flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: "var(--landing-border)" }}>
+        <div className="mb-5 flex items-center justify-between rounded-lg border p-4" style={{ borderColor: "var(--landing-border)" }}>
           <div>
             <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Grilled Salmon Bowl</div>
             <div className="text-xs" style={{ color: "var(--landing-muted)" }}>Your usual · Rosemary Bistro</div>
           </div>
           <div className="font-semibold tabular-nums" style={{ color: "var(--landing-fg)" }}>$29.16</div>
         </div>
-        <button className="flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+        <button className="flex w-full items-center justify-center gap-2 rounded-lg py-4 text-sm font-semibold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
           <Lightning size={14} weight="fill" aria-hidden /> Tap to pay · 1 tap
         </button>
         <p className="mt-3 text-center text-xs" style={{ color: "var(--landing-muted)" }}>Saved card, no re-entry</p>
@@ -475,7 +475,7 @@ function FeatureMockupSpeed() {
 
 function FeatureMockupTransparency() {
   return (
-    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+    <div className="overflow-hidden rounded-xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
       <div className="p-8">
         <div className="mb-4 text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Full order breakdown</div>
         <div className="mb-3 space-y-2.5">
@@ -501,11 +501,11 @@ function FeatureMockupTransparency() {
             </div>
           ))}
         </div>
-        <div className="mb-5 flex justify-between border-t pt-3 font-bold" style={{ borderColor: "var(--landing-border)" }}>
+        <div className="mb-5 flex justify-between border-t pt-3 font-semibold" style={{ borderColor: "var(--landing-border)" }}>
           <span style={{ color: "var(--landing-fg)" }}>Total</span>
           <span className="tabular-nums" style={{ color: "var(--landing-fg)" }}>$33.29</span>
         </div>
-        <button className="w-full rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+        <button className="w-full rounded-lg py-4 text-sm font-semibold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
           Confirm $33.29
         </button>
       </div>
@@ -515,10 +515,10 @@ function FeatureMockupTransparency() {
 
 function FeatureMockupSupport() {
   return (
-    <div className="overflow-hidden rounded-3xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
+    <div className="overflow-hidden rounded-xl" style={{ backgroundColor: "var(--landing-bg)", border: "1px solid var(--landing-border)" }}>
       <div className="border-b px-6 py-4" style={{ borderColor: "var(--landing-border)" }}>
         <div className="flex items-center gap-3">
-          <div className="flex size-9 items-center justify-center rounded-full bg-green-500 text-sm font-bold text-white">S</div>
+          <div className="flex size-9 items-center justify-center rounded-full bg-green-500 text-sm font-semibold text-white">S</div>
           <div>
             <div className="text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>Sam · Lume Support</div>
             <div className="flex items-center gap-1.5">
@@ -529,13 +529,13 @@ function FeatureMockupSupport() {
         </div>
       </div>
       <div className="space-y-3 p-6">
-        <div className="max-w-[80%] rounded-2xl rounded-tl-sm p-3" style={{ backgroundColor: "#f5f2ee" }}>
+        <div className="max-w-[80%] rounded-lg rounded-tl-sm p-3" style={{ backgroundColor: "#f5f2ee" }}>
           <p className="text-sm" style={{ color: "var(--landing-fg)" }}>Hi! I see you're a restaurant on Lume. What can I help with?</p>
         </div>
-        <div className="ml-auto max-w-[80%] rounded-2xl rounded-tr-sm p-3 text-white" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+        <div className="ml-auto max-w-[80%] rounded-lg rounded-tr-sm p-3 text-white" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
           <p className="text-sm">QR code at table 12 isn't working</p>
         </div>
-        <div className="max-w-[80%] rounded-2xl rounded-tl-sm p-3" style={{ backgroundColor: "#f5f2ee" }}>
+        <div className="max-w-[80%] rounded-lg rounded-tl-sm p-3" style={{ backgroundColor: "#f5f2ee" }}>
           <p className="text-sm" style={{ color: "var(--landing-fg)" }}>Fixed — table 12 QR refreshed. Should work now!</p>
         </div>
       </div>
@@ -605,14 +605,12 @@ function FeatureScroll() {
   return (
     <section id="features" className="px-6 py-24">
       <div className="mx-auto max-w-7xl">
-        <p className="mb-4 text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
-          Platform features
-        </p>
+
         <h2
-          className="mb-16 text-4xl font-black lg:text-5xl"
+          className="mb-16 text-[2rem] font-semibold tracking-[-0.025em] lg:text-[2.6rem]"
           style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
         >
-          Your everyday checkout platform
+          Five things your current checkout gets wrong
         </h2>
 
         {/* Each card owns one viewport-height of scroll runway */}
@@ -630,7 +628,7 @@ function FeatureScroll() {
               >
                 <div
                   data-feature-inner
-                  className="grid items-center gap-12 rounded-3xl border bg-white p-8 shadow-[0_-8px_40px_rgba(0,0,0,0.06)] lg:grid-cols-2 lg:gap-16 lg:p-12"
+                  className="grid items-center gap-12 rounded-xl border bg-white p-8 shadow-[0_-8px_40px_rgba(0,0,0,0.06)] lg:grid-cols-2 lg:gap-16 lg:p-12"
                   style={{
                     borderColor: "var(--landing-border)",
                     transformOrigin: "top center",
@@ -639,7 +637,7 @@ function FeatureScroll() {
                 >
                   <div className="flex flex-col gap-6">
                     <h3
-                      className="text-3xl font-black lg:text-4xl"
+                      className="text-2xl font-semibold tracking-[-0.02em] lg:text-[1.75rem]"
                       style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
                     >
                       {title}
@@ -668,7 +666,7 @@ function Offering() {
     <section id="merchants" className="px-6 py-24" style={{ backgroundColor: "var(--landing-shell)" }}>
       <div className="mx-auto max-w-5xl">
         <h2
-          className="mb-16 max-w-2xl text-4xl font-black lg:text-5xl"
+          className="mb-16 max-w-2xl text-[2rem] font-semibold tracking-[-0.025em] lg:text-[2.6rem]"
           style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
         >
           Your category is not a configuration screen.
@@ -684,8 +682,8 @@ function Offering() {
                 aria-pressed={i === active}
               >
                 <h3
-                  className="cursor-pointer text-6xl font-black transition-colors lg:text-8xl"
-                  style={{ color: i === active ? "var(--landing-fg)" : "var(--landing-border)" }}
+                  className="cursor-pointer text-4xl font-semibold tracking-[-0.03em] transition-colors lg:text-6xl"
+                  style={{ color: i === active ? "var(--landing-fg)" : "var(--landing-subtle)" }}
                 >
                   {name}
                 </h3>
@@ -700,7 +698,7 @@ function Offering() {
                   </p>
                   <a
                     href="/api/auth/register?post_login_redirect_url=/m/onboarding"
-                    className="btn-spring inline-flex rounded-full px-6 py-2.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
+                    className="btn-spring inline-flex rounded-lg px-6 py-2.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       backgroundColor: "var(--landing-fg)",
                       outlineColor: "var(--landing-fg)",
@@ -726,7 +724,7 @@ function HowYouSell() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-14 max-w-2xl">
           <h2
-            className="mb-4 text-4xl font-black lg:text-5xl"
+            className="mb-4 text-[2rem] font-semibold tracking-[-0.025em] lg:text-[2.6rem]"
             style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
           >
             The counter moved. The checkout should too.
@@ -740,10 +738,10 @@ function HowYouSell() {
         {/* Hairlines separate peers here, which is what a rule is for */}
         <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ backgroundColor: "var(--landing-border)" }}>
           {SELL_METHODS.map(({ Icon, label, desc }) => (
-            <div key={label} className="flex flex-col gap-4 bg-white pt-8 lg:px-7 lg:first:pl-0">
+            <div key={label} className="flex flex-col gap-4 bg-white px-6 py-8 first:pl-0 sm:even:pl-6 lg:px-7 lg:first:pl-0">
               <Icon size={22} weight="regular" style={{ color: "var(--landing-accent-deep)" }} aria-hidden />
               <div>
-                <div className="mb-2 text-base font-bold" style={{ color: "var(--landing-fg)" }}>{label}</div>
+                <div className="mb-2 text-base font-semibold" style={{ color: "var(--landing-fg)" }}>{label}</div>
                 <div className="text-sm leading-relaxed" style={{ color: "var(--landing-muted)" }}>{desc}</div>
               </div>
             </div>
@@ -759,11 +757,11 @@ function RestaurantSection() {
   return (
     <section className="px-6 py-24" style={{ backgroundColor: "var(--landing-shell)" }}>
       <div className="mx-auto max-w-7xl">
-        <p className="mb-4 text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
+        <p className="mb-4 text-sm font-semibold" style={{ color: "var(--landing-accent-deep)" }}>
           For restaurants
         </p>
         <h2
-          className="mb-4 text-4xl font-black lg:text-5xl"
+          className="mb-4 text-[2rem] font-semibold tracking-[-0.025em] lg:text-[2.6rem]"
           style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
         >
           The table is yours. Keep it.
@@ -774,9 +772,9 @@ function RestaurantSection() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Card 1 — Unified delivery inbox */}
-          <div className="flex flex-col gap-6 rounded-3xl border bg-white p-8" style={{ borderColor: "var(--landing-border)" }}>
+          <div className="flex flex-col gap-6 rounded-xl border bg-white p-8" style={{ borderColor: "var(--landing-border)" }}>
             <div>
-              <div className="mb-2 text-lg font-black" style={{ color: "var(--landing-fg)" }}>All orders. One place.</div>
+              <div className="mb-2 text-lg font-semibold" style={{ color: "var(--landing-fg)" }}>All orders. One place.</div>
               <p className="text-sm leading-relaxed" style={{ color: "var(--landing-muted)" }}>
                 Uber Eats, DoorDash, and Grubhub — every order flows into Lume. No more juggling three tablets.
               </p>
@@ -805,25 +803,25 @@ function RestaurantSection() {
                   <span className="size-2 rounded-full flex-shrink-0 bg-white" aria-hidden />
                   <span className="text-sm font-semibold text-white">Lume dashboard</span>
                 </div>
-                <span className="text-xs font-bold tabular-nums text-white">26 total</span>
+                <span className="text-xs font-semibold tabular-nums text-white">26 total</span>
               </div>
             </div>
           </div>
 
           {/* Card 2 — QR codes + savings */}
           <div
-            className="flex flex-col gap-6 rounded-3xl p-8"
+            className="flex flex-col gap-6 rounded-xl p-8"
             style={{ backgroundColor: "var(--landing-fg)" }}
           >
             <div>
-              <div className="mb-2 text-lg font-black text-white">Your QR. $0 commission.</div>
+              <div className="mb-2 text-lg font-semibold text-white">Your QR. $0 commission.</div>
               <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
                 Guests scan, order, and pay direct. You keep 100% — no 30% Uber fee eating your margins.
               </p>
             </div>
             {/* QR visual */}
             <div
-              className="flex items-center justify-center rounded-2xl p-6"
+              className="flex items-center justify-center rounded-lg p-6"
               style={{ backgroundColor: "rgba(255,255,255,0.08)" }}
             >
               <div className="relative flex size-24 items-center justify-center">
@@ -842,15 +840,15 @@ function RestaurantSection() {
               </div>
               <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ backgroundColor: "rgba(255,255,255,0.12)" }}>
                 <span className="text-sm text-white font-medium">Lume direct order</span>
-                <span className="text-sm font-bold" style={{ color: "var(--landing-accent)" }}>$0 fee</span>
+                <span className="text-sm font-semibold" style={{ color: "var(--landing-accent)" }}>$0 fee</span>
               </div>
             </div>
           </div>
 
           {/* Card 3 — Complaint handling */}
-          <div className="flex flex-col gap-6 rounded-3xl border bg-white p-8" style={{ borderColor: "var(--landing-border)" }}>
+          <div className="flex flex-col gap-6 rounded-xl border bg-white p-8" style={{ borderColor: "var(--landing-border)" }}>
             <div>
-              <div className="mb-2 text-lg font-black" style={{ color: "var(--landing-fg)" }}>Handle complaints in one tap.</div>
+              <div className="mb-2 text-lg font-semibold" style={{ color: "var(--landing-fg)" }}>Handle complaints in one tap.</div>
               <p className="text-sm leading-relaxed" style={{ color: "var(--landing-muted)" }}>
                 A guest flags a cold dish. Lume notifies you instantly. Resolve, refund, or reply — without leaving the dashboard.
               </p>
@@ -888,7 +886,7 @@ function LumeShop() {
         <div className="flex flex-col gap-8">
           <div>
             <span
-              className="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest"
+              className="rounded-md px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
               style={{ backgroundColor: "var(--landing-accent-deep)", color: "white" }}
             >
               Lume Shop
@@ -896,7 +894,7 @@ function LumeShop() {
           </div>
 
           <h2
-            className="text-5xl font-black leading-[1.05] tracking-tight text-white lg:text-6xl"
+            className="text-5xl font-semibold leading-[1.05] tracking-tight text-white lg:text-6xl"
             style={{ textWrap: "balance" } as React.CSSProperties}
           >
             One app.<br />Every seller.
@@ -925,7 +923,7 @@ function LumeShop() {
 
           <div className="flex flex-wrap items-center gap-4">
             <button
-              className="btn-spring flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="btn-spring flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               style={{ backgroundColor: "var(--landing-accent-deep)" }}
             >
               Download the app <ArrowRight size={16} aria-hidden />
@@ -951,7 +949,7 @@ function LumeShop() {
 
             <div className="px-4 pb-8">
               <div className="mb-4 flex items-center justify-between py-2">
-                <span className="text-base font-black text-white">Lume Shop</span>
+                <span className="text-base font-semibold text-white">Lume Shop</span>
                 <div
                   className="flex size-7 items-center justify-center rounded-full"
                   style={{ backgroundColor: "var(--landing-accent-deep)" }}
@@ -961,7 +959,7 @@ function LumeShop() {
               </div>
 
               <div
-                className="mb-4 flex items-center gap-2 rounded-2xl px-3 py-2.5"
+                className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2.5"
                 style={{ backgroundColor: "#2e2520" }}
               >
                 <MagnifyingGlass size={12} style={{ color: "#6b5f5a" }} aria-hidden />
@@ -972,7 +970,7 @@ function LumeShop() {
                 {["All", "Food", "Services", "Shop"].map((cat, i) => (
                   <span
                     key={cat}
-                    className="shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold"
+                    className="shrink-0 rounded-md px-3 py-1 text-[11px] font-semibold"
                     style={{
                       backgroundColor: i === 0 ? "var(--landing-accent-deep)" : "#2e2520",
                       color: i === 0 ? "white" : "#9e9693",
@@ -987,10 +985,10 @@ function LumeShop() {
                 {SHOP_LISTINGS.map(({ name, tag, color }) => (
                   <div
                     key={name}
-                    className="flex items-center gap-3 rounded-2xl p-3"
+                    className="flex items-center gap-3 rounded-lg p-3"
                     style={{ backgroundColor: "#2e2520" }}
                   >
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white" style={{ backgroundColor: color }} aria-hidden>
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white" style={{ backgroundColor: color }} aria-hidden>
                       {name[0]}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -1023,7 +1021,7 @@ function LumeShop() {
 
           <div
             aria-hidden
-            className="absolute -left-6 top-16 hidden rounded-2xl px-4 py-3 shadow-xl lg:block"
+            className="absolute -left-6 top-16 hidden rounded-lg px-4 py-3 shadow-xl lg:block"
             style={{ backgroundColor: "#2e2520", border: "1px solid #3d3028" }}
           >
             <div className="text-xs font-semibold text-white">Order placed</div>
@@ -1032,10 +1030,10 @@ function LumeShop() {
 
           <div
             aria-hidden
-            className="absolute -right-6 bottom-20 hidden rounded-2xl px-4 py-3 shadow-xl lg:block"
+            className="absolute -right-6 bottom-20 hidden rounded-lg px-4 py-3 shadow-xl lg:block"
             style={{ backgroundColor: "var(--landing-accent-deep)" }}
           >
-            <div className="text-xs font-bold text-white">Booking confirmed</div>
+            <div className="text-xs font-semibold text-white">Booking confirmed</div>
             <div className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>Luxe Cuts · 3:00 PM today</div>
           </div>
         </div>
@@ -1048,10 +1046,10 @@ function LumeShop() {
 
 function BottomCTA() {
   return (
-    <section className="px-6 py-32" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
+    <section className="px-6 py-28" style={{ backgroundColor: "var(--landing-fg)" }}>
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
         <h2
-          className="text-4xl font-black text-white lg:text-6xl"
+          className="text-[2rem] font-semibold tracking-[-0.025em] text-white lg:text-[2.75rem]"
           style={{ textWrap: "balance" } as React.CSSProperties}
         >
           Take your first payment today.
@@ -1063,14 +1061,14 @@ function BottomCTA() {
 
         <a
           href="/api/auth/register?post_login_redirect_url=/m/onboarding"
-          className="btn-spring flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold [touch-action:manipulation] hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          style={{ backgroundColor: "var(--landing-fg)", color: "white" }}
+          className="btn-spring flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          style={{ backgroundColor: "var(--landing-accent-deep)" }}
         >
           Create your free account <ArrowRight size={16} aria-hidden />
         </a>
 
         {/* Real sequence, so the numbering carries information the reader needs */}
-        <ol className="mt-2 grid w-full gap-px overflow-hidden rounded-2xl border border-white/20 bg-white/20 sm:grid-cols-3">
+        <ol className="mt-2 grid w-full gap-px overflow-hidden rounded-lg border border-white/20 bg-white/20 sm:grid-cols-3">
           {[
             { n: "1", label: "Create your account", meta: "Email or Google" },
             { n: "2", label: "Add what you sell", meta: "Menu, services, or products" },
@@ -1079,9 +1077,9 @@ function BottomCTA() {
             <li
               key={n}
               className="flex flex-col items-center gap-1 px-5 py-5 text-center"
-              style={{ backgroundColor: "var(--landing-accent-deep)" }}
+              style={{ backgroundColor: "var(--landing-fg)" }}
             >
-              <span className="text-[0.625rem] font-bold tracking-widest text-white/50">
+              <span className="text-[0.625rem] font-semibold tracking-widest text-white/65">
                 STEP {n}
               </span>
               <span className="text-sm font-semibold text-white">{label}</span>
@@ -1110,7 +1108,7 @@ function Footer() {
   return (
     <footer className="bg-white px-6 py-16">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 lg:grid-cols-4">
+        <div className="grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-1">
             <div className="mb-4 flex items-center gap-2">
               <div
@@ -1119,7 +1117,7 @@ function Footer() {
               >
                 <Lightning size={13} weight="fill" className="text-white" aria-hidden />
               </div>
-              <span className="text-lg font-black" style={{ color: "var(--landing-fg)" }}>Lume</span>
+              <span className="text-lg font-semibold" style={{ color: "var(--landing-fg)" }}>Lume</span>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: "var(--landing-muted)" }}>
               The checkout button for every business.
@@ -1128,7 +1126,7 @@ function Footer() {
 
           {FOOTER_LINKS.map(({ heading, links }) => (
             <div key={heading}>
-              <h4 className="mb-4 text-sm font-bold" style={{ color: "var(--landing-fg)" }}>{heading}</h4>
+              <h4 className="mb-4 text-sm font-semibold" style={{ color: "var(--landing-fg)" }}>{heading}</h4>
               <ul className="space-y-2.5">
                 {links.map(({ label, href }) => (
                   <li key={label}>

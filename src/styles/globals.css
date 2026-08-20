@@ -58,14 +58,14 @@ h1, h2, h3, h4 {
   --sidebar-ring: oklch(0.58 0.25 340);
   /* Landing / app shell */
   --landing-bg: oklch(1 0 0);
-  --landing-fg: oklch(0.12 0.018 30);
-  --landing-muted: oklch(0.47 0.008 0);
-  --landing-subtle: oklch(0.62 0.008 0);
+  --landing-fg: oklch(0.16 0.014 265);
+  --landing-muted: oklch(0.47 0.013 265);
+  --landing-subtle: oklch(0.60 0.011 265);
   --landing-accent: oklch(0.72 0.22 340);
   --landing-accent-deep: var(--primary);
   --landing-on-accent: oklch(1 0 0);
-  --landing-border: oklch(0.93 0.003 0);
-  --landing-shell: oklch(0.98 0.004 60);
+  --landing-border: oklch(0.922 0.005 265);
+  --landing-shell: oklch(0.978 0.004 265);
   --landing-surface: oklch(1 0 0);
 }
 
