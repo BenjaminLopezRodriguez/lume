@@ -84,30 +84,6 @@ const SHOP_LISTINGS = [
   { name: "Mesa Home Goods", tag: "Merchant · Ships today", rating: "4.7", color: "#1a3d2a" },
 ];
 
-const REVIEWS = [
-  {
-    name: "Maria R.",
-    initials: "MR",
-    text: "Lume cut our checkout abandonment in half. Our regulars tap once and they're done. That's the product you want.",
-    when: "2 weeks ago",
-    featured: false,
-  },
-  {
-    name: "James K.",
-    initials: "JK",
-    text: "We went from a clunky POS to Lume in an afternoon. Revenue was up 22% the next week. I wish I'd done it sooner.",
-    when: "1 month ago",
-    featured: true,
-  },
-  {
-    name: "Priya S.",
-    initials: "PS",
-    text: "Three locations, one dashboard. Lume is the backbone of how we operate. Can't imagine going back.",
-    when: "3 weeks ago",
-    featured: false,
-  },
-];
-
 const FOOTER_LINKS: Record<string, string[]> = {
   Product: ["Features", "Pricing", "Changelog", "Roadmap"],
   Merchants: ["Restaurants", "Services", "Retail", "Case studies"],
@@ -135,7 +111,6 @@ export function Landing() {
       <HowYouSell />
       <RestaurantSection />
       <LumeShop />
-      <Testimonials />
       <BottomCTA />
       <Footer />
     </div>
@@ -146,7 +121,7 @@ export function Landing() {
 
 function TopBar() {
   return (
-    <div className="flex items-center justify-center gap-8 border-b border-gray-100 py-2 text-sm" style={{ color: "var(--landing-muted)" }}>
+    <div className="flex items-center justify-center gap-8 border-b border-[var(--landing-border)] py-2 text-sm" style={{ color: "var(--landing-muted)" }}>
       <a href="#" className="font-medium transition-opacity hover:opacity-60" style={{ color: "var(--landing-fg)" }}>
         For merchants
       </a>
@@ -573,7 +548,11 @@ function FeatureScroll() {
     );
     const n = cards.length;
 
-    const update = () => {
+    // Motion is decorative: honour the OS setting and leave the cards static.
+    // These are inline style writes, so the CSS prefers-reduced-motion block can't cover them.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const paint = () => {
       const scrolled = Math.max(0, -container.getBoundingClientRect().top);
       const slotH = window.innerHeight * 0.75;
 
@@ -587,9 +566,21 @@ function FeatureScroll() {
       });
     };
 
+    // Coalesce to one read+write per frame. Scroll fires faster than frames, and
+    // reading getBoundingClientRect after writing styles forces a sync reflow each time.
+    let queued = false;
+    const update = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        paint();
+      });
+    };
+
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
-    update();
+    paint();
     return () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
@@ -665,7 +656,7 @@ function Offering() {
   const current = OFFERINGS[active]!;
 
   return (
-    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
+    <section className="px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
       <div className="mx-auto max-w-5xl">
         <p className="mb-16 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
           Built for your category
@@ -718,7 +709,7 @@ function Offering() {
 
 function HowYouSell() {
   return (
-    <section className="border-t border-gray-100 bg-white px-6 py-24">
+    <section className="bg-white px-6 py-24">
       <div className="mx-auto max-w-7xl">
         <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
           Every channel
@@ -761,7 +752,7 @@ function HowYouSell() {
 
 function RestaurantSection() {
   return (
-    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
+    <section className="px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
       <div className="mx-auto max-w-7xl">
         <p className="mb-4 text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
           For restaurants
@@ -1052,71 +1043,6 @@ function LumeShop() {
   );
 }
 
-// ─── Testimonials ─────────────────────────────────────────────────────────────
-
-function Testimonials() {
-  return (
-    <section className="border-t border-gray-100 px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
-      <div className="mx-auto max-w-7xl">
-        <p className="mb-2 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
-          Reviews
-        </p>
-        <h2
-          className="mb-12 text-center text-4xl font-black lg:text-5xl"
-          style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
-        >
-          4.8 stars from real merchants
-        </h2>
-
-        <div className="grid gap-4 lg:grid-cols-3">
-          {REVIEWS.map(({ name, initials, text, when, featured }) => (
-            <figure
-              key={name}
-              className="flex flex-col gap-5 rounded-3xl p-8 transition-transform"
-              style={{
-                backgroundColor: featured ? "var(--landing-fg)" : "white",
-                color: featured ? "white" : "var(--landing-fg)",
-                transform: featured ? "scale(1.03)" : "none",
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex size-10 items-center justify-center rounded-full text-sm font-bold"
-                  style={{
-                    backgroundColor: featured ? "var(--landing-accent-deep)" : "#ede9e6",
-                    color: featured ? "white" : "var(--landing-fg)",
-                  }}
-                >
-                  {initials}
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">{name}</div>
-                  <div className="flex gap-0.5" aria-label="5 out of 5 stars">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} size={12} weight="fill" style={{ color: "#fbbf24" }} aria-hidden />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <blockquote
-                className="flex-1 text-base leading-relaxed"
-                style={{ color: featured ? "#e5e5e5" : "var(--landing-muted)" }}
-              >
-                &ldquo;{text}&rdquo;
-              </blockquote>
-
-              <figcaption className="text-xs" style={{ color: featured ? "#9e9693" : "#aaa" }}>
-                {when}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ─── Bottom CTA ───────────────────────────────────────────────────────────────
 
 function BottomCTA() {
@@ -1127,25 +1053,51 @@ function BottomCTA() {
           className="text-4xl font-black text-white lg:text-6xl"
           style={{ textWrap: "balance" } as React.CSSProperties}
         >
-          No setup fees. No contracts.
+          Take your first payment today.
         </h2>
-        <p className="text-xl" style={{ color: "rgba(255,255,255,0.75)" }}>
-          Just a checkout that works — for every type of business, from day one.
+        <p className="max-w-xl text-xl" style={{ color: "rgba(255,255,255,0.75)" }}>
+          No setup fees, no contracts, no code. Most merchants send their first
+          checkout link within ten minutes of signing up.
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
+
+        <a
+          href="/api/auth/register?post_login_redirect_url=/m/onboarding"
+          className="btn-spring flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold [touch-action:manipulation] hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          style={{ backgroundColor: "var(--landing-fg)", color: "white" }}
+        >
+          Create your free account <ArrowRight size={16} aria-hidden />
+        </a>
+
+        {/* Real sequence, so the numbering carries information the reader needs */}
+        <ol className="mt-2 grid w-full gap-px overflow-hidden rounded-2xl border border-white/20 bg-white/20 sm:grid-cols-3">
+          {[
+            { n: "1", label: "Create your account", meta: "Email or Google" },
+            { n: "2", label: "Add what you sell", meta: "Menu, services, or products" },
+            { n: "3", label: "Share your link", meta: "Get paid the same day" },
+          ].map(({ n, label, meta }) => (
+            <li
+              key={n}
+              className="flex flex-col items-center gap-1 px-5 py-5 text-center"
+              style={{ backgroundColor: "var(--landing-accent-deep)" }}
+            >
+              <span className="text-[0.625rem] font-bold tracking-widest text-white/50">
+                STEP {n}
+              </span>
+              <span className="text-sm font-semibold text-white">{label}</span>
+              <span className="text-xs text-white/60">{meta}</span>
+            </li>
+          ))}
+        </ol>
+
+        <p className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
+          Already selling with Lume?{" "}
           <a
-            href="/api/auth/register?post_login_redirect_url=/m/onboarding"
-            className="btn-spring flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold [touch-action:manipulation] hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            style={{ backgroundColor: "var(--landing-fg)", color: "white" }}
+            href="/api/auth/login?post_login_redirect_url=/m/dashboard"
+            className="font-semibold text-white underline underline-offset-4 hover:opacity-80"
           >
-            Get started free <ArrowRight size={16} aria-hidden />
+            Log in
           </a>
-          <button
-            className="btn-spring rounded-full border border-white/30 px-8 py-4 text-base font-bold text-white [touch-action:manipulation] hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          >
-            Talk to sales
-          </button>
-        </div>
+        </p>
       </div>
     </section>
   );
@@ -1155,7 +1107,7 @@ function BottomCTA() {
 
 function Footer() {
   return (
-    <footer className="border-t border-gray-100 bg-white px-6 py-16">
+    <footer className="bg-white px-6 py-16">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-12 lg:grid-cols-5">
           <div className="lg:col-span-1">
@@ -1194,7 +1146,7 @@ function Footer() {
         </div>
 
         <div
-          className="mt-12 flex flex-col justify-between gap-4 border-t border-gray-100 pt-8 sm:flex-row"
+          className="mt-12 flex flex-col justify-between gap-4 border-t border-[var(--landing-border)] pt-8 sm:flex-row"
         >
           <p className="text-sm" style={{ color: "var(--landing-muted)" }}>© 2026 Lume, Inc. All rights reserved.</p>
           <p className="text-sm" style={{ color: "var(--landing-muted)" }}>Every seller. One checkout.</p>
