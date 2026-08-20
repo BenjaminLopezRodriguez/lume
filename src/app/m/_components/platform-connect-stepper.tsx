@@ -173,7 +173,7 @@ export function PlatformConnectStepper({
                     key={location}
                     type="button"
                     className={cn(
-                      "flex min-h-11 items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors",
+                      "motion-control flex min-h-11 items-center justify-between rounded-lg border px-4 py-3 text-left text-sm",
                       selected
                         ? "border-primary bg-muted font-medium text-foreground"
                         : "border-border text-foreground/70 hover:bg-muted",

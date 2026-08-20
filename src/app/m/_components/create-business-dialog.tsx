@@ -95,7 +95,7 @@ export function CreateBusinessDialog() {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted"
+          className="motion-control motion-control-icon flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted"
           aria-label="Create new"
         >
           <Plus size={16} weight="bold" aria-hidden />
@@ -115,7 +115,7 @@ export function CreateBusinessDialog() {
                 <button
                   key={key}
                   type="button"
-                  className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-muted"
+                  className="motion-control flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-muted"
                   onClick={() => {
                     setSelectedPrototype(key);
                     setStep("form");
@@ -141,7 +141,7 @@ export function CreateBusinessDialog() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="motion-control motion-control-icon flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
                   onClick={() => setStep("root")}
                   aria-label="Back"
                 >

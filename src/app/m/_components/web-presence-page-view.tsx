@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowSquareOut,
+  CaretDown,
   Check,
   CheckCircle,
   Copy,
@@ -248,6 +249,7 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
               </div>
             </section>
 
+            <div className="flex flex-col">
             <section className="flex flex-col gap-3">
               <SectionHeader title="Configuration" />
               <ListCard>
@@ -264,9 +266,18 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
                         size="sm"
                         className="h-11 rounded-lg border-border px-3"
                         aria-expanded={domainOpen}
+                        aria-controls="custom-domain-panel"
                         onClick={() => setDomainOpen((v) => !v)}
                       >
                         {customDomain ? "Manage" : "Connect"}
+                        <CaretDown
+                          size={13}
+                          aria-hidden
+                          className={cn(
+                            "transition-transform duration-[var(--duration-standard)] ease-[var(--ease-move)]",
+                            domainOpen && "rotate-180",
+                          )}
+                        />
                       </Button>
                     </span>
                   }
@@ -290,11 +301,13 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
                 />
               </ListCard>
             </section>
-          </>
-        )}
-
-        {hasSite && domainOpen ? (
-        <section className="flex flex-col gap-3">
+            <div
+              id="custom-domain-panel"
+              className="motion-disclosure"
+              data-open={domainOpen}
+            >
+              <div inert={!domainOpen}>
+          <section className="flex flex-col gap-3 pt-8">
           <SectionHeader title="Custom domain" />
 
           {domainActive && customDomain ? (
@@ -557,7 +570,11 @@ export function WebPresencePageView({ userEmail }: { userEmail: string }) {
             </div>
           )}
         </section>
-        ) : null}
+              </div>
+            </div>
+            </div>
+          </>
+        )}
 
         {hasSite ? (
         <section className="flex flex-col gap-3">

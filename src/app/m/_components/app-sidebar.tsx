@@ -75,7 +75,7 @@ const FOOTER_NAV = [
 ] as const;
 
 const ITEM_CLASS = cn(
-  "h-11 rounded-lg px-3 text-sm font-normal text-muted-foreground md:h-10",
+  "motion-control h-11 rounded-lg px-3 text-sm font-normal text-muted-foreground md:h-10",
   "hover:bg-sidebar-accent/50 hover:text-foreground",
   "data-[active=true]:bg-sidebar-accent/60 data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
   "data-[active=true]:hover:bg-sidebar-accent/60 data-[active=true]:hover:text-sidebar-accent-foreground",
@@ -138,7 +138,7 @@ export function AppSidebar() {
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex h-10 min-w-0 flex-1 items-center justify-between rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground"
+                className="motion-control flex h-10 min-w-0 flex-1 items-center justify-between rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground"
               >
                 <span className="truncate">
                   {activeBusiness?.name ?? "Select business"}
@@ -208,7 +208,7 @@ export function AppSidebar() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <SidebarMenuAction
-                              className="flex size-6 items-center justify-center rounded-md text-muted-foreground/70 hover:bg-sidebar-accent/50 hover:text-foreground"
+                              className="motion-control motion-control-icon flex size-6 items-center justify-center rounded-md text-muted-foreground/70 hover:bg-sidebar-accent/50 hover:text-foreground"
                               aria-label="Add channel"
                             >
                               <Plus size={12} weight="bold" aria-hidden />
@@ -243,7 +243,7 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                         <SidebarMenuSub>
                           <SidebarMenuSubItem>
-                            <SidebarMenuSubButton asChild isActive={inActive}>
+                            <SidebarMenuSubButton asChild isActive={inActive} className="motion-control">
                               <Link
                                 href="/m/connect/in"
                                 onClick={closeOnNavigate}
@@ -255,7 +255,7 @@ export function AppSidebar() {
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                           <SidebarMenuSubItem>
-                            <SidebarMenuSubButton asChild isActive={outActive}>
+                            <SidebarMenuSubButton asChild isActive={outActive} className="motion-control">
                               <Link
                                 href="/m/connect/out"
                                 onClick={closeOnNavigate}

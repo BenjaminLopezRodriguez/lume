@@ -9,8 +9,24 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-heading: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  --ease-uber: cubic-bezier(0.2, 0, 0, 1);
-  --ease-uber-exit: cubic-bezier(0.4, 0, 1, 1);
+  /* ── Motion system ──────────────────────────────────────────────────────
+     Grammar, not decoration. Motion here communicates cause/effect, spatial
+     origin, state change, hierarchy, or continuity — nothing else.
+     Docs: docs/superpowers/specs/motion.md */
+  --duration-instant: 100ms;   /* pointer feedback, hover */
+  --duration-fast: 160ms;      /* popovers, menus, exits */
+  --duration-standard: 220ms;  /* surfaces entering, disclosure */
+  --duration-deliberate: 340ms; /* high-confidence confirmations only */
+
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);        /* decisive settle */
+  --ease-enter: cubic-bezier(0.34, -0.02, 0.2, 1); /* slight anticipation, smooth arrival */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);         /* accelerate away, faster than entry */
+  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);       /* position/size continuity */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1); /* direct manipulation only */
+
+  /* Retained aliases — landing.tsx and marquee still reference these. */
+  --ease-uber: var(--ease-snap);
+  --ease-uber-exit: var(--ease-exit);
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
 }
@@ -167,101 +183,78 @@ h1, h2, h3, h4 {
   }
 }
 
-/* ─── Spring motion language ─────────────────────────────────────────────────
-   Cubic-bezier(0.34, 1.56, 0.64, 1) — "rubber spring"
-   Overshoots the target by ~3-5%, then snaps back. Fast press-in (80-90ms),
-   springy release (340-420ms). Mirrors Facebook/Uber tactile feedback. */
+/* ─── Motion keyframes ───────────────────────────────────────────────────────
+   Only what is referenced. Eight unused keyframes were removed with the old
+   spring classes; see docs/superpowers/specs/motion.md for the grammar. */
 
-/* Keyframes */
-@keyframes spring-pop-in {
-  from { opacity: 0; scale: 0.94; }
-  to   { opacity: 1; scale: 1; }
-}
-@keyframes spring-pop-out {
-  from { opacity: 1; scale: 1; }
-  to   { opacity: 0; scale: 0.96; }
-}
-/* Polished surface entrance: fade + lift + gentle scale — no overshoot */
+/* Surface entrance: content arriving. Shell never uses this. */
 @keyframes surface-enter {
-  from { opacity: 0; transform: translateY(6px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes surface-exit {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(4px) scale(0.98); }
-}
-@keyframes sheet-slide-up {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-@keyframes sheet-slide-down {
-  from { transform: translateY(0); }
-  to   { transform: translateY(100%); }
-}
-@keyframes spring-scale-in {
-  from { opacity: 0; transform: scale(0.94); }
-  to   { opacity: 1; transform: scale(1); }
-}
-@keyframes spring-scale-out {
-  from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0; transform: scale(0.96); }
-}
+
 @keyframes spring-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
-}
-@keyframes spring-fade-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
 }
 
 /* Overrides layer: declared after @import "tailwindcss" so it beats @layer utilities.
    This ensures the spring press survives transition-colors/transition-all on buttons. */
 @layer overrides {
-  /* ── btn-spring: rubber press for all buttons ─────────────────────────────
-     Press: compresses to 94% in 90ms (fast, tactile)
-     Release: springs back to 100% in 380ms with 3-5% overshoot */
-  .btn-spring {
+  /* ── Control: pointer feedback on anything you press ────────────────────
+     1.5% compression in, snap back out. Compression stays small on purpose —
+     a button is confirming your press, not performing. */
+  .motion-control {
     transition:
-      transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      background-color 150ms ease,
-      color 150ms ease,
-      border-color 150ms ease,
-      box-shadow 200ms ease,
-      opacity 150ms ease;
+      transform var(--duration-fast) var(--ease-spring),
+      background-color var(--duration-instant) var(--ease-snap),
+      border-color var(--duration-instant) var(--ease-snap),
+      color var(--duration-instant) var(--ease-snap),
+      box-shadow var(--duration-fast) var(--ease-snap),
+      opacity var(--duration-instant) var(--ease-snap);
   }
-  .btn-spring:not(:disabled):active {
+  .motion-control:not(:disabled):active {
+    transform: scale(0.985);
+    transition-duration: 60ms;
+    transition-timing-function: var(--ease-exit);
+  }
+  /* Icon-only controls are smaller, so the same optical compression is larger. */
+  .motion-control-icon:not(:disabled):active {
     transform: scale(0.94);
-    transition-duration: 90ms;
-    transition-timing-function: ease-in;
   }
 
-  /* ── icon-spring: tighter press for small icon buttons ────────────────── */
-  .icon-spring {
+  /* ── Popover: menus, dropdowns, tooltips ────────────────────────────────
+     Enters from its trigger, exits faster than it entered. */
+  .motion-popover {
     transition:
-      transform 340ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      background-color 150ms ease,
-      color 150ms ease,
-      opacity 150ms ease;
+      opacity var(--duration-fast) var(--ease-enter),
+      transform var(--duration-fast) var(--ease-enter);
   }
-  .icon-spring:not(:disabled):active {
-    transform: scale(0.86);
-    transition-duration: 80ms;
-    transition-timing-function: ease-in;
+  .motion-popover[data-state="closed"] {
+    transition-duration: var(--duration-instant);
+    transition-timing-function: var(--ease-exit);
   }
 
-  /* ── pill-spring: channel filters, small toggles ─────────────────────── */
-  .pill-spring {
-    transition:
-      transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
-      background-color 150ms ease,
-      color 150ms ease,
-      border-color 150ms ease;
+  /* ── Disclosure: accordions, expanding sections ─────────────────────────
+     grid-template-rows animates height without measuring or layout jump. */
+  .motion-disclosure {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-standard) var(--ease-move);
   }
-  .pill-spring:not(:disabled):active {
-    transform: scale(0.96);
-    transition-duration: 70ms;
-    transition-timing-function: ease-in;
+  .motion-disclosure[data-open="true"] { grid-template-rows: 1fr; }
+  .motion-disclosure > * { overflow: hidden; }
+
+  /* ── Page: content enter only. The shell never animates. ────────────────*/
+  .motion-page {
+    animation: surface-enter var(--duration-standard) var(--ease-enter) both;
+  }
+
+  /* ── Continuity: position/size changes that must stay traceable ─────────*/
+  .motion-move {
+    transition:
+      transform var(--duration-standard) var(--ease-move),
+      opacity var(--duration-fast) var(--ease-snap);
   }
 }
 
@@ -280,5 +273,11 @@ h1, h2, h3, h4 {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+  /* Press feedback is the one thing worth keeping: it confirms the control
+     received the press. It is a transform, not travel, so it is safe. */
+  .motion-control:not(:disabled):active { transform: scale(0.985); }
+  /* Disclosure must land open, not mid-collapse. */
+  .motion-disclosure { transition: none !important; }
 }

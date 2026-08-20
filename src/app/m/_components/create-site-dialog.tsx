@@ -130,7 +130,7 @@ export function CreateSiteDialog({ businessId, onEditSite, open: openProp, onOpe
                     type="button"
                     onClick={() => selectCategory(id, defaults)}
                     className={cn(
-                      "w-full px-5 py-4 text-left transition-colors",
+                      "motion-control w-full px-5 py-4 text-left",
                       active ? "bg-muted" : "hover:bg-muted",
                     )}
                   >
@@ -183,7 +183,7 @@ export function CreateSiteDialog({ businessId, onEditSite, open: openProp, onOpe
                         key={type}
                         type="button"
                         onClick={() => removeCap(type)}
-                        className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground"
+                        className="motion-control flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground"
                       >
                         {ELEMENT_LABEL[type] ?? type}
                         <X size={10} weight="bold" />
@@ -195,7 +195,7 @@ export function CreateSiteDialog({ businessId, onEditSite, open: openProp, onOpe
                       key={type}
                       type="button"
                       onClick={() => addCap(type)}
-                      className="flex items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-0.5 text-xs text-muted-foreground/70 hover:border-foreground/30 hover:text-foreground"
+                      className="motion-control flex items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-0.5 text-xs text-muted-foreground/70 hover:border-foreground/30 hover:text-foreground"
                     >
                       <Plus size={10} weight="bold" />
                       {label}
@@ -238,7 +238,7 @@ export function CreateSiteDialog({ businessId, onEditSite, open: openProp, onOpe
                     <button
                       key={scheme}
                       type="button"
-                      className="flex flex-col items-center gap-1.5"
+                      className="motion-control flex flex-col items-center gap-1.5"
                       onClick={() => setSelectedScheme(scheme)}
                     >
                       <span

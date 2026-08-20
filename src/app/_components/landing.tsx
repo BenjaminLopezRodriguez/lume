@@ -163,7 +163,7 @@ function Nav() {
           </Button>
           <Button
             size="sm"
-            className="btn-spring rounded-lg px-6 py-2 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:ring-2 focus-visible:ring-offset-2"
+            className="motion-control rounded-lg px-6 py-2 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{ backgroundColor: "var(--landing-fg)" }}
             asChild
           >
@@ -201,7 +201,7 @@ function Hero() {
             <div className="flex items-center gap-4">
               <a
                 href="/api/auth/register?post_login_redirect_url=/m/onboarding"
-                className="btn-spring flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="motion-control flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
                 style={{
                   backgroundColor: "var(--landing-accent-deep)",
                   outlineColor: "var(--landing-accent-deep)",
@@ -679,7 +679,7 @@ function Offering() {
                   </p>
                   <a
                     href="/api/auth/register?post_login_redirect_url=/m/onboarding"
-                    className="btn-spring inline-flex rounded-lg px-6 py-2.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
+                    className="motion-control inline-flex rounded-lg px-6 py-2.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       backgroundColor: "var(--landing-fg)",
                       outlineColor: "var(--landing-fg)",
@@ -945,7 +945,7 @@ function BottomCTA() {
 
         <a
           href="/api/auth/register?post_login_redirect_url=/m/onboarding"
-          className="btn-spring flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          className="motion-control flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           style={{ backgroundColor: "var(--landing-accent-deep)" }}
         >
           Create your free account <ArrowRight size={16} aria-hidden />

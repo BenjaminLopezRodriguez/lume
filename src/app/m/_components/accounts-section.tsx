@@ -92,7 +92,7 @@ export function AccountsSection() {
               ) : (
                 <button
                   type="button"
-                  className="text-xs text-muted-foreground/70 hover:text-foreground"
+                  className="motion-control text-xs text-muted-foreground/70 hover:text-foreground"
                   onClick={() => startEdit(b.id, b.name)}
                 >
                   Rename
@@ -100,7 +100,7 @@ export function AccountsSection() {
               )}
               <button
                 type="button"
-                className="text-xs text-red-400 hover:text-red-600"
+                className="motion-control text-xs text-red-400 hover:text-red-600"
                 onClick={() => void deleteBusiness.mutateAsync({ id: b.id })}
                 disabled={deleteBusiness.isPending}
               >

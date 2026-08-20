@@ -17,7 +17,7 @@ export function PageContent({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("mx-auto w-full px-6 pb-12 md:px-10", WIDTHS[width], className)}>
+    <div className={cn("motion-page mx-auto w-full px-6 pb-12 md:px-10", WIDTHS[width], className)}>
       {children}
     </div>
   );

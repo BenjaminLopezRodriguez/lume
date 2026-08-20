@@ -12,3 +12,5 @@
 | 2026-08-20T00:00:00Z | ia-channels-disclosure | general-purpose | 98s | completed | web-presence-page-view.tsx — gate domain config behind site existence |
 | 2026-08-20T00:00:00Z | ia-dashboard-restructure | general-purpose | 86s | completed | dashboard-page-view.tsx — four-question structure, real data only |
 | 2026-08-20T00:00:00Z | orchestrator-integration | orchestrator | — | completed | ontology.md, CLAUDE.md register, page titles, sales-bar-graph fabricated DEFAULT_DATA removed |
+| 2026-08-20T00:00:00Z | motion-token-layer | orchestrator | — | completed | globals.css motion tokens + 6 semantic classes; docs/superpowers/specs/motion.md; landing.tsx migrated |
+| 2026-08-20T00:00:00Z | motion-primitives-migrate | general-purpose | 207s | completed | src/components/ui/** ×18 files — ad-hoc timing → tokens |

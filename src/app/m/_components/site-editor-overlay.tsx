@@ -173,7 +173,7 @@ export function SiteEditorOverlay({ open, onClose, businessId, presence }: Props
       <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
         <button
           onClick={onClose}
-          className="flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
+          className="motion-control motion-control-icon flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted"
         >
           <X size={18} />
         </button>
@@ -181,7 +181,7 @@ export function SiteEditorOverlay({ open, onClose, businessId, presence }: Props
         <button
           onClick={handleSave}
           disabled={saveMutation.isPending}
-          className="h-8 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+          className="motion-control h-8 rounded-lg bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-50"
         >
           {saveMutation.isPending ? "Saving…" : "Save"}
         </button>
@@ -194,7 +194,7 @@ export function SiteEditorOverlay({ open, onClose, businessId, presence }: Props
         </p>
         <button
           onClick={() => setShowLayoutPicker(true)}
-          className="text-xs font-medium text-primary"
+          className="motion-control text-xs font-medium text-primary"
         >
           Change
         </button>
@@ -214,7 +214,7 @@ export function SiteEditorOverlay({ open, onClose, businessId, presence }: Props
                 key={i}
                 type="button"
                 onClick={() => setActiveSlot(i)}
-                className="flex min-h-[96px] w-full flex-col items-center justify-center gap-3 rounded-xl border transition-colors"
+                className="motion-control flex min-h-[96px] w-full flex-col items-center justify-center gap-3 rounded-xl border"
                 style={{ background: scheme.bg, borderColor: scheme.border }}
               >
                 <SlotPreview type={slot.type} scheme={scheme} />
@@ -230,7 +230,7 @@ export function SiteEditorOverlay({ open, onClose, businessId, presence }: Props
                 key={i}
                 type="button"
                 onClick={() => setActiveSlot(i)}
-                className="flex min-h-[96px] w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-transparent text-muted-foreground/70 transition-colors hover:border-foreground/30"
+                className="motion-control flex min-h-[96px] w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-transparent text-muted-foreground/70 hover:border-foreground/30"
               >
                 <Plus size={20} />
                 <p className="text-xs">Add element</p>
@@ -253,7 +253,7 @@ export function SiteEditorOverlay({ open, onClose, businessId, presence }: Props
                 type="button"
                 onClick={() => handleLayoutChange(l.id)}
                 className={cn(
-                  "flex items-center gap-3 py-4 text-left",
+                  "motion-control flex items-center gap-3 py-4 text-left",
                   layout === l.id && "text-primary",
                 )}
               >

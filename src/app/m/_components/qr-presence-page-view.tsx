@@ -221,7 +221,7 @@ export function QrPresencePageView() {
       <button
         type="button"
         onClick={onClick}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="motion-control mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft size={16} aria-hidden />
         Back
@@ -261,7 +261,7 @@ export function QrPresencePageView() {
                   <button
                     type="button"
                     onClick={() => openExisting(qr)}
-                    className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                    className="motion-control flex min-w-0 flex-1 items-center gap-3 text-left"
                   >
                     <span
                       className="size-2 shrink-0 rounded-full"
@@ -346,7 +346,7 @@ export function QrPresencePageView() {
                 key={cap.id}
                 type="button"
                 onClick={() => selectCapability(cap.id)}
-                className="flex w-full items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-muted"
+                className="motion-control flex w-full items-start gap-3 px-5 py-4 text-left hover:bg-muted"
               >
                 <span
                   className="mt-1.5 size-2 shrink-0 rounded-full"

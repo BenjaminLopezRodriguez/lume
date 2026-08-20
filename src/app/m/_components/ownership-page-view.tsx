@@ -98,7 +98,7 @@ export function OwnershipPageView() {
   }
 
   return (
-    <div className="mt-8 flex flex-col gap-8">
+    <div key={hasAny ? "populated" : "empty"} className="motion-page mt-8 flex flex-col gap-8">
       {!hasAny ? (
         <section className="flex flex-col gap-6">
           <Empty className="border">

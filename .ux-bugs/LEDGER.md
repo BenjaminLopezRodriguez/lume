@@ -79,3 +79,33 @@ Scope: user-reported — animation jank, nonsensical borders, generic AI feel.
 - Dead links 0 · broken anchors 0 · fabricated strings 0
 - Heading weights: {600: 17} · control radii: {0px, 10px}
 - Scroll: 116 frames, 0 over 34ms, worst 17ms
+
+## 2026-08-20 — Motion system
+
+### Defects found (fixed)
+| ID | Slug | File | Severity | Fix |
+|----|------|------|----------|-----|
+| A2 | dead-keyframes | globals.css | P2 | 8 of 10 keyframes had zero references; removed |
+| I3 | press-overcompression | globals.css | P2 | .btn-spring 6% / .icon-spring 14% → 1.5% (0.94 icon-only) |
+| A4 | reduced-motion-blunt | globals.css | P2 | Press feedback now survives (transform in place); disclosure lands open |
+| — | css-syntax-corruption | globals.css | P0 | Self-inflicted: keyframe-delete regex used [^}]* and truncated 5 blocks. Caught by subagent, repaired. typecheck does NOT catch this — only a build or CSS parse does. |
+
+### Defects found (logged, not fixed — out of scope)
+| ID | Slug | File | Severity | Note |
+|----|------|------|----------|------|
+| A2 | layout-animated-sidebar | components/ui/sidebar.tsx | P2 | Animates width/left rather than transform. Timing retuned; structural fix is a rewrite. |
+| — | fragile-site-existence | web-presence-page-view.tsx:112 | P1 | `hasSite = !!presence?.layout`. `layout` is a nullable site-builder column, not an existence signal — a presence row without it shows "Create website" despite a live site. Pre-dates this work (committed 2026-08-19). Needs a product call on what "site exists" means. |
+| — | lint-errors-landing | landing.tsx | P2 | 4 errors + 2 warnings (unescaped entities, unnecessary assertions, unused cn/MagnifyingGlass). All pre-date this session's work; verified against commit 0b2ee99. |
+
+### Verified
+- Tokens resolve in browser; all 5 semantic classes compile to real transitions
+- 0 elements animating width/height/top/left on the public page
+- Reduced-motion block compiles with all 3 intended rules
+- Residual one-off timing: only the looping OTP caret (duration-1000)
+- All 10 sidebar nav destinations resolve
+- No fabricated data introduced; Example table aria-hidden + labelling intact
+
+### Not verified
+- /m/* is Kinde-gated. Sidebar active transition, business selector, Channels
+  disclosure, Customers empty→populated, dashboard states, dialogs, and responsive
+  behaviour were NOT visually confirmed. Static + compiled-CSS verification only.
