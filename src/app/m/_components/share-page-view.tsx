@@ -65,12 +65,12 @@ export function SharePageView() {
         meta={
           activeBusiness?.type === "restaurant" ? (
             <>
-              <span className="text-neutral-700">$0 commission</span>
-              <span className="text-neutral-400"> · </span>
-              <span className="text-neutral-500">{vertical.shareMeta}</span>
+              <span className="text-foreground/70">$0 commission</span>
+              <span className="text-muted-foreground/70"> · </span>
+              <span className="text-muted-foreground">{vertical.shareMeta}</span>
             </>
           ) : (
-            <span className="text-neutral-500">{vertical.shareMeta}</span>
+            <span className="text-muted-foreground">{vertical.shareMeta}</span>
           )
         }
       />
@@ -78,15 +78,15 @@ export function SharePageView() {
       <div className="mt-8 flex flex-col gap-8">
         <section className="flex flex-col gap-3">
           <SectionHeader title={vertical.checkoutLinkLabel} />
-          <div className="flex items-center gap-2 rounded-xl border border-[#ebebeb] bg-white px-4 py-3">
-            <p className="min-w-0 flex-1 truncate text-sm text-neutral-600">
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
+            <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
               {checkoutUrl ?? "Create a business to generate your checkout link"}
             </p>
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="h-8 shrink-0 rounded-lg border-[#ebebeb] px-3"
+              className="h-8 shrink-0 rounded-lg border-border px-3"
               onClick={copyLink}
               disabled={!checkoutUrl}
             >

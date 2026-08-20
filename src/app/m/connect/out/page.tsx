@@ -7,7 +7,7 @@ const OUT_PLATFORMS = [
   { id: "zapier", label: "Zapier", dot: "#ff4a00", desc: "Automate workflows with 6,000+ apps" },
   { id: "google", label: "Google Workspace", dot: "#4285f4", desc: "Sync contacts and calendar events" },
   { id: "slack", label: "Slack", dot: "#611f69", desc: "Send notifications to your team" },
-  { id: "webhooks", label: "Webhooks", dot: "#6366f1", desc: "POST events to any custom endpoint" },
+  { id: "webhooks", label: "Webhooks", dot: "var(--chart-1)", desc: "POST events to any custom endpoint" },
 ] as const;
 
 export default function ConnectOutPage() {

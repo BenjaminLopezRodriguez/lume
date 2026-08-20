@@ -20,11 +20,11 @@ export default async function SettingsPage() {
         title="Settings"
         meta={
           <>
-            <span className="text-neutral-700">{name}</span>
+            <span className="text-foreground/70">{name}</span>
             {email && (
               <>
-                <span className="text-neutral-400"> · </span>
-                <span className="text-neutral-500">{email}</span>
+                <span className="text-muted-foreground/70"> · </span>
+                <span className="text-muted-foreground">{email}</span>
               </>
             )}
           </>

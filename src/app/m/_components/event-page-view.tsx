@@ -81,11 +81,11 @@ export function EventPageView() {
         meta={
           selectedEvent ? (
             <>
-              <span className="text-neutral-700">
+              <span className="text-foreground/70">
                 {formatEventDate(selectedEvent.eventDate)}
               </span>
-              <span className="text-neutral-400"> · </span>
-              <span className="text-neutral-500">
+              <span className="text-muted-foreground/70"> · </span>
+              <span className="text-muted-foreground">
                 {selectedEvent.location ?? "Location not set"}
                 {totalCapacity > 0
                   ? ` · ${soldSeats}/${totalCapacity} seats`
@@ -93,7 +93,7 @@ export function EventPageView() {
               </span>
             </>
           ) : (
-            <span className="text-neutral-500">
+            <span className="text-muted-foreground">
               Ticket checkout — sell seats and check in attendees
             </span>
           )
@@ -110,7 +110,7 @@ export function EventPageView() {
         <section className="flex flex-col gap-3">
           <SectionHeader title="New event" />
           <form
-            className="flex flex-col gap-3 rounded-xl border border-[#ebebeb] bg-white p-5"
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5"
             onSubmit={(event) => {
               event.preventDefault();
               const priceCents = Math.round(parseFloat(tierPrice) * 100);
@@ -227,7 +227,7 @@ export function EventPageView() {
               ))
             ) : (
               <ListCardRow
-                dot="#a3a3a3"
+                dot="var(--muted-foreground)"
                 label="No events yet"
                 trailing="Create one above"
               />
@@ -238,7 +238,7 @@ export function EventPageView() {
         <section className="flex flex-col gap-3">
           <SectionHeader title="CheckInScanner" />
           <form
-            className="flex gap-2 rounded-xl border border-[#ebebeb] bg-white p-5"
+            className="flex gap-2 rounded-xl border border-border bg-card p-5"
             onSubmit={(event) => {
               event.preventDefault();
               if (!checkInCode.trim()) return;
@@ -283,7 +283,7 @@ export function EventPageView() {
         <TabsContent value="issues">
           <div className="mt-6 flex flex-col gap-3">
             <ListCard>
-              <ListCardRow dot="#a3a3a3" label="No issues" trailing="Coming soon" />
+              <ListCardRow dot="var(--muted-foreground)" label="No issues" trailing="Coming soon" />
             </ListCard>
           </div>
         </TabsContent>

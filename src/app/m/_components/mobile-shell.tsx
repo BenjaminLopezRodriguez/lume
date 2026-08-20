@@ -9,7 +9,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
     <BusinessProvider>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="min-h-dvh bg-white text-neutral-950">
+        <SidebarInset className="min-h-dvh bg-card text-foreground">
           {children}
         </SidebarInset>
       </SidebarProvider>

@@ -14,17 +14,17 @@ const ASSET_TYPE_LABEL: Record<string, string> = {
 };
 
 const ASSET_TYPE_DOT: Record<string, string> = {
-  product: "#6366f1",
-  dining_relationship: "#e85d04",
-  completed_work: "#2d5be3",
-  attendance: "#e85d9b",
+  product: "var(--chart-1)",
+  dining_relationship: "var(--chart-2)",
+  completed_work: "var(--chart-3)",
+  attendance: "var(--chart-4)",
 };
 
 const STATUS_DOT: Record<string, string> = {
-  active: "#22c55e",
-  pending_action: "#f97316",
-  completed: "#a3a3a3",
-  transferred: "#a3a3a3",
+  active: "var(--success)",
+  pending_action: "var(--warning)",
+  completed: "var(--muted-foreground)",
+  transferred: "var(--muted-foreground)",
 };
 
 export function OwnershipPageView() {
@@ -67,7 +67,7 @@ export function OwnershipPageView() {
         <section className="flex flex-col gap-3">
           <ListCard>
             <ListCardRow
-              dot="#a3a3a3"
+              dot="var(--muted-foreground)"
               label="No customers yet"
               trailing="Ownerships are created at checkout"
             />
@@ -82,7 +82,7 @@ export function OwnershipPageView() {
                 {groupedOwnerships.active.map((o) => (
                   <ListCardRow
                     key={o.id}
-                    dot={ASSET_TYPE_DOT[o.assetType] ?? "#a3a3a3"}
+                    dot={ASSET_TYPE_DOT[o.assetType] ?? "var(--muted-foreground)"}
                     label={o.customerName}
                     trailing={ASSET_TYPE_LABEL[o.assetType] ?? o.assetType}
                   />

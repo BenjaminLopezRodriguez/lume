@@ -37,11 +37,11 @@ export function ConnectPageView() {
         title="Connect"
         meta={
           <>
-            <span className="text-neutral-700">
+            <span className="text-foreground/70">
               {connectedCount} of {CONNECT_PLATFORMS.length} connected
             </span>
-            <span className="text-neutral-400"> · </span>
-            <span className="text-neutral-500">
+            <span className="text-muted-foreground/70"> · </span>
+            <span className="text-muted-foreground">
               Bring Uber Eats, DoorDash, and Grubhub into one dashboard
             </span>
           </>
@@ -52,7 +52,7 @@ export function ConnectPageView() {
         <Tabs defaultValue="ubereats" className="gap-6">
           <TabsList
             variant="line"
-            className="h-auto w-full justify-start gap-0 border-b border-[#ebebeb] bg-transparent p-0"
+            className="h-auto w-full justify-start gap-0 border-b border-border bg-transparent p-0"
           >
             {CONNECT_PLATFORMS.map((platform) => {
               const isConnected = connected.includes(platform.id);
@@ -61,7 +61,7 @@ export function ConnectPageView() {
                 <TabsTrigger
                   key={platform.id}
                   value={platform.id}
-                  className="rounded-none px-4 py-3 text-sm text-neutral-500 after:bottom-0 after:h-0.5 data-active:text-neutral-950"
+                  className="rounded-none px-4 py-3 text-sm text-muted-foreground after:bottom-0 after:h-0.5 data-active:text-foreground"
                 >
                   <span
                     className="size-2 rounded-full"
@@ -70,7 +70,7 @@ export function ConnectPageView() {
                   />
                   {platform.label}
                   {isConnected ? (
-                    <span className="rounded-full bg-[#e2f1af] px-2 py-0.5 text-[0.625rem] font-medium text-neutral-700">
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-[0.625rem] font-medium text-accent-foreground">
                       Live
                     </span>
                   ) : null}

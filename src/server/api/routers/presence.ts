@@ -234,6 +234,33 @@ export const presenceRouter = createTRPCRouter({
         .where(eq(webPresences.businessId, input.businessId));
     }),
 
+  saveSite: protectedProcedure
+    .input(
+      z.object({
+        businessId: z.string().uuid(),
+        scheme: z.string().optional(),
+        layout: z.string().optional(),
+        sections: z.array(z.record(z.unknown())).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await assertBusinessOwner(ctx.db, input.businessId, ctx.userId);
+
+      const [updated] = await ctx.db
+        .update(webPresences)
+        .set({
+          ...(input.scheme !== undefined && { scheme: input.scheme }),
+          ...(input.layout !== undefined && { layout: input.layout }),
+          ...(input.sections !== undefined && { sections: input.sections }),
+          updatedAt: new Date(),
+        })
+        .where(eq(webPresences.businessId, input.businessId))
+        .returning();
+
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND" });
+      return updated;
+    }),
+
   disconnectDomain: protectedProcedure
     .input(z.object({ businessId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {

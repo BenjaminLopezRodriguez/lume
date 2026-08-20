@@ -13,16 +13,16 @@ export function ListCard({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border border-[#ebebeb] bg-white",
+        "overflow-hidden rounded-xl border border-border bg-card",
         className,
       )}
     >
-      <div className="divide-y divide-[#ebebeb]">{children}</div>
+      <div className="divide-y divide-border">{children}</div>
       {footer ? (
-        <div className="border-t border-[#ebebeb] px-5 py-4">
+        <div className="border-t border-border px-5 py-4">
           <Link
             href={footer.href}
-            className="text-sm text-neutral-500 transition-colors hover:text-neutral-800"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             {footer.label}
           </Link>
@@ -58,10 +58,10 @@ export function ListCardRow({
             aria-hidden
           />
         ) : null}
-        <span className="truncate text-sm text-neutral-900">{label}</span>
+        <span className="truncate text-sm text-foreground">{label}</span>
       </div>
       {trailing ? (
-        <span className="shrink-0 text-sm text-neutral-400">{trailing}</span>
+        <span className="shrink-0 text-sm text-muted-foreground/70">{trailing}</span>
       ) : null}
     </div>
   );

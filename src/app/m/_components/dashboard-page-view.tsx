@@ -15,7 +15,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   ubereats: "#06c167",
   doordash: "#ff3008",
   grubhub: "#f63440",
-  lume_direct: "#6366f1",
+  lume_direct: "var(--chart-1)",
 };
 
 const ASSET_TYPE_LABEL: Record<string, string> = {
@@ -26,10 +26,10 @@ const ASSET_TYPE_LABEL: Record<string, string> = {
 };
 
 const ASSET_TYPE_DOT: Record<string, string> = {
-  product: "#6366f1",
-  dining_relationship: "#e85d04",
-  completed_work: "#2d5be3",
-  attendance: "#e85d9b",
+  product: "var(--chart-1)",
+  dining_relationship: "var(--chart-2)",
+  completed_work: "var(--chart-3)",
+  attendance: "var(--chart-4)",
 };
 
 const PLATFORM_LABELS: Record<string, string> = {
@@ -105,17 +105,17 @@ export function DashboardPageView() {
         meta={
           activeBusiness ? (
             <>
-              <span className="text-neutral-700">
+              <span className="text-foreground/70">
                 {todaysOrders.length} orders today
               </span>
-              <span className="text-neutral-400"> · </span>
-              <span className="text-neutral-500">
+              <span className="text-muted-foreground/70"> · </span>
+              <span className="text-muted-foreground">
                 ${(todaysRevenueCents / 100).toLocaleString()} revenue · $
                 {avgTicket.toFixed(0)} avg. ticket
               </span>
             </>
           ) : (
-            <span className="text-neutral-500">
+            <span className="text-muted-foreground">
               Create a restaurant to start tracking orders
             </span>
           )
@@ -129,7 +129,7 @@ export function DashboardPageView() {
         const label = ASSET_TYPE_LABEL[assetType] ?? assetType;
         return (
           <Link key={assetType} href={route} className="mb-4 block">
-            <Alert className="hover:bg-neutral-50 transition-colors">
+            <Alert className="hover:bg-muted transition-colors">
               <AlertDescription>
                 {count} customer{count !== 1 ? "s" : ""} need attention ({label}) → View
               </AlertDescription>
@@ -155,14 +155,14 @@ export function DashboardPageView() {
               orders.map((order) => (
                 <ListCardRow
                   key={order.id}
-                  dot={PLATFORM_COLORS[order.platform] ?? "#a3a3a3"}
+                  dot={PLATFORM_COLORS[order.platform] ?? "var(--muted-foreground)"}
                   label={order.label}
                   trailing={`$${(order.totalCents / 100).toFixed(2)}`}
                 />
               ))
             ) : (
               <ListCardRow
-                dot="#a3a3a3"
+                dot="var(--muted-foreground)"
                 label="No orders yet"
                 trailing="Connect a platform"
               />
@@ -177,14 +177,14 @@ export function DashboardPageView() {
               activeOwnerships.map((o) => (
                 <ListCardRow
                   key={o.id}
-                  dot={ASSET_TYPE_DOT[o.assetType] ?? "#a3a3a3"}
+                  dot={ASSET_TYPE_DOT[o.assetType] ?? "var(--muted-foreground)"}
                   label={o.customerName}
                   trailing={ASSET_TYPE_LABEL[o.assetType] ?? o.assetType}
                 />
               ))
             ) : (
               <ListCardRow
-                dot="#a3a3a3"
+                dot="var(--muted-foreground)"
                 label="No ownerships yet"
                 trailing="Created at checkout"
               />
@@ -217,14 +217,14 @@ export function DashboardPageView() {
               accountGroups.map((group) => (
                 <ListCardRow
                   key={group.id}
-                  dot="#6366f1"
+                  dot="var(--chart-1)"
                   label={group.name}
                   trailing={group.description ?? "No description"}
                 />
               ))
             ) : (
               <ListCardRow
-                dot="#a3a3a3"
+                dot="var(--muted-foreground)"
                 label="No account groups"
                 trailing="Create one with +"
               />

@@ -8,10 +8,10 @@ import { SalesBarGraph } from "@/app/m/_components/sales-bar-graph";
 import { SectionHeader } from "@/app/m/_components/section-header";
 
 const DEFAULT_TABLES = [
-  { label: "Table 1", trailing: "Open", dot: "#22c55e" },
-  { label: "Table 4", trailing: "Ordering", dot: "#f59e0b" },
-  { label: "Table 7", trailing: "Paid", dot: "#6366f1" },
-  { label: "Patio 2", trailing: "Open", dot: "#22c55e" },
+  { label: "Table 1", trailing: "Open", dot: "var(--success)" },
+  { label: "Table 4", trailing: "Ordering", dot: "var(--warning)" },
+  { label: "Table 7", trailing: "Paid", dot: "var(--chart-1)" },
+  { label: "Patio 2", trailing: "Open", dot: "var(--success)" },
 ] as const;
 
 export function RestaurantPageView() {
@@ -25,16 +25,16 @@ export function RestaurantPageView() {
         meta={
           restaurant ? (
             <>
-              <span className="text-neutral-700">
+              <span className="text-foreground/70">
                 {restaurant.cuisine || "Cuisine not set"}
               </span>
-              <span className="text-neutral-400"> · </span>
-              <span className="text-neutral-500">
+              <span className="text-muted-foreground/70"> · </span>
+              <span className="text-muted-foreground">
                 {restaurant.address || "Address not set"}
               </span>
             </>
           ) : (
-            <span className="text-neutral-500">
+            <span className="text-muted-foreground">
               Create a restaurant to set up QR ordering and kitchen sync
             </span>
           )
@@ -45,7 +45,7 @@ export function RestaurantPageView() {
         <section className="flex flex-col gap-3">
           <SalesBarGraph
             label="Covers this week"
-            color="#e85d04"
+            color="var(--chart-2)"
             valueFormat="number"
             data={[
               { label: "Mon", value: 42 },

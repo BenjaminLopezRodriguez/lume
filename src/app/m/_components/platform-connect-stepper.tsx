@@ -56,8 +56,8 @@ export function PlatformConnectStepper({
 
   if (!activeBusiness) {
     return (
-      <div className="rounded-xl border border-[#ebebeb] bg-white px-5 py-8 text-center">
-        <p className="text-sm text-neutral-500">
+      <div className="rounded-xl border border-border bg-card px-5 py-8 text-center">
+        <p className="text-sm text-muted-foreground">
           Create a restaurant first, then connect delivery platforms.
         </p>
       </div>
@@ -66,17 +66,17 @@ export function PlatformConnectStepper({
 
   if (done) {
     return (
-      <div className="rounded-xl border border-[#ebebeb] bg-white px-5 py-8 text-center">
+      <div className="rounded-xl border border-border bg-card px-5 py-8 text-center">
         <div
           className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full"
           style={{ backgroundColor: `${platform.color}20`, color: platform.color }}
         >
           <CheckCircle size={28} weight="fill" aria-hidden />
         </div>
-        <h3 className="text-base font-semibold text-neutral-950">
+        <h3 className="text-base font-semibold text-foreground">
           {platform.label} connected
         </h3>
-        <p className="mt-2 text-sm text-neutral-500">
+        <p className="mt-2 text-sm text-muted-foreground">
           Orders from {selectedLocation ?? "your location"} will now flow into Lume.
         </p>
       </div>
@@ -96,9 +96,9 @@ export function PlatformConnectStepper({
                 <span
                   className={cn(
                     "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-                    complete && "bg-neutral-900 text-white",
+                    complete && "bg-primary text-primary-foreground",
                     active && !complete && "text-white",
-                    !active && !complete && "bg-[#f5f5f5] text-neutral-500",
+                    !active && !complete && "bg-muted text-muted-foreground",
                   )}
                   style={
                     active && !complete
@@ -111,7 +111,7 @@ export function PlatformConnectStepper({
                 <span
                   className={cn(
                     "hidden text-center text-[0.625rem] font-medium sm:block",
-                    active ? "text-neutral-900" : "text-neutral-400",
+                    active ? "text-foreground" : "text-muted-foreground/70",
                   )}
                 >
                   {label}
@@ -121,7 +121,7 @@ export function PlatformConnectStepper({
                 <span
                   className={cn(
                     "mb-4 h-px flex-1",
-                    step > id ? "bg-neutral-900" : "bg-[#ebebeb]",
+                    step > id ? "bg-primary" : "bg-border",
                   )}
                   aria-hidden
                 />
@@ -131,14 +131,14 @@ export function PlatformConnectStepper({
         })}
       </ol>
 
-      <div className="rounded-xl border border-[#ebebeb] bg-white p-5">
+      <div className="rounded-xl border border-border bg-card p-5">
         {step === 1 ? (
           <div className="flex flex-col gap-4">
             <div>
-              <h3 className="text-base font-semibold text-neutral-950">
+              <h3 className="text-base font-semibold text-foreground">
                 Sign in to {platform.label}
               </h3>
-              <p className="mt-1 text-sm leading-relaxed text-neutral-500">
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                 {platform.description} You&apos;ll be redirected to {platform.label} to
                 authorize access.
               </p>
@@ -157,10 +157,10 @@ export function PlatformConnectStepper({
         {step === 2 ? (
           <div className="flex flex-col gap-4">
             <div>
-              <h3 className="text-base font-semibold text-neutral-950">
+              <h3 className="text-base font-semibold text-foreground">
                 Choose your location
               </h3>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Pick the {platform.label} business you want to connect to Lume.
               </p>
             </div>
@@ -175,8 +175,8 @@ export function PlatformConnectStepper({
                     className={cn(
                       "flex min-h-11 items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors",
                       selected
-                        ? "border-neutral-900 bg-[#fafafa] font-medium text-neutral-900"
-                        : "border-[#ebebeb] text-neutral-700 hover:bg-[#fafafa]",
+                        ? "border-primary bg-muted font-medium text-foreground"
+                        : "border-border text-foreground/70 hover:bg-muted",
                     )}
                     onClick={() => setSelectedLocation(location)}
                   >
@@ -194,14 +194,14 @@ export function PlatformConnectStepper({
         {step === 3 ? (
           <div className="flex flex-col gap-4">
             <div>
-              <h3 className="text-base font-semibold text-neutral-950">
+              <h3 className="text-base font-semibold text-foreground">
                 Confirm connection
               </h3>
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Review what Lume will sync from {platform.label}.
               </p>
             </div>
-            <div className="divide-y divide-[#ebebeb] rounded-lg border border-[#ebebeb]">
+            <div className="divide-y divide-border rounded-lg border border-border">
               {[
                 ["Platform", platform.label],
                 ["Location", selectedLocation ?? "—"],
@@ -212,8 +212,8 @@ export function PlatformConnectStepper({
                   key={label}
                   className="flex items-center justify-between px-4 py-3 text-sm"
                 >
-                  <span className="text-neutral-500">{label}</span>
-                  <span className="font-medium text-neutral-900">{value}</span>
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className="font-medium text-foreground">{value}</span>
                 </div>
               ))}
             </div>
@@ -254,7 +254,7 @@ export function PlatformConnectStepper({
       ) : null}
 
       {step === 1 ? (
-        <p className="text-center text-xs text-neutral-400">
+        <p className="text-center text-xs text-muted-foreground/70">
           Secure OAuth connection · read-only until you confirm
         </p>
       ) : null}

@@ -16,14 +16,14 @@ export function PageHeader({
     <header className={cn("flex flex-col gap-6 pt-6 md:pt-10", className)}>
       <div className="flex items-start gap-3">
         <SidebarTrigger
-          className="mt-0.5 size-9 shrink-0 rounded-lg border border-[#ebebeb] bg-white text-neutral-700 md:hidden"
+          className="mt-0.5 size-9 shrink-0 rounded-lg border border-border bg-card text-foreground/70 md:hidden"
         />
         <div className="min-w-0 flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight text-neutral-950 md:text-4xl">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
             {title}
           </h1>
           {meta ? (
-            <div className="text-sm leading-relaxed text-neutral-500">{meta}</div>
+            <div className="text-sm leading-relaxed text-muted-foreground">{meta}</div>
           ) : null}
         </div>
       </div>

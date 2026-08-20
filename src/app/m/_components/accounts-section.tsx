@@ -14,11 +14,11 @@ import { VERTICAL_CONFIG } from "@/verticals/types";
 import type { BusinessType } from "@/verticals/types";
 
 const TYPE_COLORS: Record<BusinessType, string> = {
-  account: "#6366f1",
-  store: "#6366f1",
-  services: "#2d5be3",
-  restaurant: "#e85d04",
-  event: "#e85d9b",
+  account: "var(--chart-1)",
+  store: "var(--chart-1)",
+  services: "var(--chart-3)",
+  restaurant: "var(--chart-2)",
+  event: "var(--chart-4)",
 };
 
 export function AccountsSection() {
@@ -57,7 +57,7 @@ export function AccountsSection() {
                 className="size-2 shrink-0 rounded-full"
                 style={{
                   backgroundColor:
-                    TYPE_COLORS[b.type as BusinessType] ?? "#a3a3a3",
+                    TYPE_COLORS[b.type as BusinessType] ?? "var(--muted-foreground)",
                 }}
               />
               {editingId === b.id ? (
@@ -72,11 +72,11 @@ export function AccountsSection() {
                   autoFocus
                 />
               ) : (
-                <span className="flex-1 truncate text-sm text-neutral-900">
+                <span className="flex-1 truncate text-sm text-foreground">
                   {b.name}
                 </span>
               )}
-              <span className="shrink-0 text-xs capitalize text-neutral-400">
+              <span className="shrink-0 text-xs capitalize text-muted-foreground/70">
                 {VERTICAL_CONFIG[b.type as BusinessType]?.label ?? b.type}
               </span>
               {editingId === b.id ? (
@@ -92,7 +92,7 @@ export function AccountsSection() {
               ) : (
                 <button
                   type="button"
-                  className="text-xs text-neutral-400 hover:text-neutral-700"
+                  className="text-xs text-muted-foreground/70 hover:text-foreground"
                   onClick={() => startEdit(b.id, b.name)}
                 >
                   Rename
@@ -110,7 +110,7 @@ export function AccountsSection() {
           ))
         ) : (
           <ListCardRow
-            dot="#a3a3a3"
+            dot="var(--muted-foreground)"
             label="No accounts yet"
             trailing="Create one with +"
           />

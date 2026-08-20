@@ -66,7 +66,7 @@ export function ServicesPageView() {
         <section className="flex flex-col gap-3">
           <SectionHeader title="New job" />
           <form
-            className="flex flex-col gap-3 rounded-xl border border-[#ebebeb] bg-white p-5"
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5"
             onSubmit={(event) => {
               event.preventDefault();
               if (!businessId || !clientName.trim() || !title.trim()) return;
@@ -111,7 +111,7 @@ export function ServicesPageView() {
           <section className="flex flex-col gap-3">
             <SectionHeader title="InvoiceCheckout" />
             <form
-              className="flex flex-col gap-3 rounded-xl border border-[#ebebeb] bg-white p-5"
+              className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5"
               onSubmit={(event) => {
                 event.preventDefault();
                 const cents = Math.round(parseFloat(lineAmount) * 100);
@@ -210,7 +210,7 @@ export function ServicesPageView() {
               })
             ) : (
               <ListCardRow
-                dot="#a3a3a3"
+                dot="var(--muted-foreground)"
                 label="No jobs yet"
                 trailing="Create one above"
               />
@@ -222,7 +222,7 @@ export function ServicesPageView() {
         <TabsContent value="issues">
           <div className="mt-6 flex flex-col gap-3">
             <ListCard>
-              <ListCardRow dot="#a3a3a3" label="No issues" trailing="Coming soon" />
+              <ListCardRow dot="var(--muted-foreground)" label="No issues" trailing="Coming soon" />
             </ListCard>
           </div>
         </TabsContent>

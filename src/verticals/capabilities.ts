@@ -45,7 +45,7 @@ export const CAPABILITY_SET_CONFIG: Record<
 > = {
   account: {
     label: "Account",
-    accent: "#6366f1",
+    accent: "var(--chart-1)",
     primaryPrimitive: "catalogCheckout",
     primaryNoun: "sale",
     shareModes: ["checkoutLink"],

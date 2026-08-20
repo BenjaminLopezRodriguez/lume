@@ -62,7 +62,7 @@ export const SHARE_MODE_CONFIG: Record<ShareMode, ShareModeConfig> = {
 export const VERTICAL_CONFIG: Record<BusinessType, VerticalConfig> = {
   account: {
     label: "Account",
-    accent: "#6366f1",
+    accent: "var(--chart-1)",
     primaryPrimitive: "catalogCheckout",
     primaryNoun: "sale",
     shareModes: ["checkoutLink"],
@@ -73,7 +73,7 @@ export const VERTICAL_CONFIG: Record<BusinessType, VerticalConfig> = {
   },
   store: {
     label: "Store",
-    accent: "#6366f1",
+    accent: "var(--chart-1)",
     primaryPrimitive: "catalogCheckout",
     primaryNoun: "product",
     shareModes: ["productLink", "storefront", "embedButton"],
@@ -84,7 +84,7 @@ export const VERTICAL_CONFIG: Record<BusinessType, VerticalConfig> = {
   },
   services: {
     label: "Services",
-    accent: "#2d5be3",
+    accent: "var(--chart-3)",
     primaryPrimitive: "invoiceCheckout",
     primaryNoun: "job",
     shareModes: ["invoiceLink", "quoteLink", "paymentReminder"],
@@ -95,7 +95,7 @@ export const VERTICAL_CONFIG: Record<BusinessType, VerticalConfig> = {
   },
   restaurant: {
     label: "Restaurant",
-    accent: "#e85d04",
+    accent: "var(--chart-2)",
     primaryPrimitive: "platformManagement",
     primaryNoun: "order",
     shareModes: ["tableQr", "checkoutLink", "textToGuest"],
@@ -106,7 +106,7 @@ export const VERTICAL_CONFIG: Record<BusinessType, VerticalConfig> = {
   },
   event: {
     label: "Event",
-    accent: "#e85d9b",
+    accent: "var(--chart-4)",
     primaryPrimitive: "ticketCheckout",
     primaryNoun: "ticket",
     shareModes: ["ticketLink", "depositLink"],

@@ -82,9 +82,9 @@ function NavLink({
         asChild
         isActive={active}
         className={cn(
-          "h-10 rounded-lg px-3 text-sm font-normal text-neutral-600 hover:bg-[#f5f5f5] hover:text-neutral-900",
-          "data-[active=true]:bg-[#e2f1af] data-[active=true]:font-medium data-[active=true]:text-neutral-900",
-          "data-[active=true]:hover:bg-[#e2f1af] data-[active=true]:hover:text-neutral-900",
+          "h-10 rounded-lg px-3 text-sm font-normal text-muted-foreground hover:bg-muted hover:text-foreground",
+          "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
+          "data-[active=true]:hover:bg-sidebar-accent data-[active=true]:hover:text-sidebar-accent-foreground",
         )}
       >
         <Link href={href} onClick={onNavigate}>
@@ -109,13 +109,13 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="offcanvas"
-      className="border-r border-[#ebebeb] bg-white text-neutral-900"
+      className="border-r border-border bg-card text-foreground"
     >
       <SidebarHeader className="gap-4 px-4 pt-6 pb-2">
         <Link
           href="/m/dashboard"
           onClick={closeOnNavigate}
-          className="px-2 text-xl font-bold tracking-tight text-neutral-950"
+          className="px-2 text-xl font-bold tracking-tight text-foreground"
         >
           Lume
         </Link>
@@ -125,12 +125,12 @@ export function AppSidebar() {
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex h-10 min-w-0 flex-1 items-center justify-between rounded-lg border border-[#ebebeb] bg-white px-3 text-sm font-medium text-neutral-900"
+                className="flex h-10 min-w-0 flex-1 items-center justify-between rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground"
               >
                 <span className="truncate">
                   {activeBusiness?.name ?? "Select business"}
                 </span>
-                <CaretDown size={14} className="shrink-0 text-neutral-400" aria-hidden />
+                <CaretDown size={14} className="shrink-0 text-muted-foreground/70" aria-hidden />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
@@ -145,7 +145,7 @@ export function AppSidebar() {
                   >
                     <span className="truncate">{business.name}</span>
                     {business.groupId ? (
-                      <span className="ml-auto rounded-full bg-[#ede9fe] px-1.5 py-0.5 text-[0.625rem] font-medium text-[#6366f1]">
+                      <span className="ml-auto rounded-full bg-accent px-1.5 py-0.5 text-[0.625rem] font-medium text-accent-foreground">
                         Group
                       </span>
                     ) : null}
@@ -178,7 +178,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
+        <SidebarSeparator className="mx-2 my-3 bg-border" />
 
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
@@ -199,9 +199,9 @@ export function AppSidebar() {
                         asChild
                         isActive={presenceActive}
                         className={cn(
-                          "h-10 rounded-lg px-3 text-sm font-normal text-neutral-600 hover:bg-[#f5f5f5] hover:text-neutral-900",
-                          "data-[active=true]:bg-[#e2f1af] data-[active=true]:font-medium data-[active=true]:text-neutral-900",
-                          "data-[active=true]:hover:bg-[#e2f1af] data-[active=true]:hover:text-neutral-900",
+                          "h-10 rounded-lg px-3 text-sm font-normal text-muted-foreground hover:bg-muted hover:text-foreground",
+                          "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
+                          "data-[active=true]:hover:bg-sidebar-accent data-[active=true]:hover:text-sidebar-accent-foreground",
                         )}
                       >
                         <Link href="/m/presence/web" onClick={closeOnNavigate}>
@@ -212,7 +212,7 @@ export function AppSidebar() {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <SidebarMenuAction
-                            className="flex size-6 items-center justify-center rounded-md text-neutral-400 hover:bg-[#f5f5f5] hover:text-neutral-700"
+                            className="flex size-6 items-center justify-center rounded-md text-muted-foreground/70 hover:bg-muted hover:text-foreground"
                             aria-label="Add presence"
                           >
                             <Plus size={12} weight="bold" aria-hidden />
@@ -240,8 +240,8 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         isActive={connectActive}
                         className={cn(
-                          "h-10 rounded-lg px-3 text-sm font-normal text-neutral-600 hover:bg-[#f5f5f5] hover:text-neutral-900",
-                          "data-[active=true]:bg-[#e2f1af] data-[active=true]:font-medium data-[active=true]:text-neutral-900",
+                          "h-10 rounded-lg px-3 text-sm font-normal text-muted-foreground hover:bg-muted hover:text-foreground",
+                          "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
                         )}
                       >
                         <Plugs size={18} weight={connectActive ? "fill" : "regular"} />
@@ -278,7 +278,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarSeparator className="mx-2 my-3 bg-[#ebebeb]" />
+        <SidebarSeparator className="mx-2 my-3 bg-border" />
 
         <SidebarGroup className="p-0">
           <SidebarGroupContent>

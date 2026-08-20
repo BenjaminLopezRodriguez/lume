@@ -95,7 +95,7 @@ export function CreateBusinessDialog() {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-[#ebebeb] bg-white text-neutral-900 transition-colors hover:bg-[#f5f5f5]"
+          className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground transition-colors hover:bg-muted"
           aria-label="Create new"
         >
           <Plus size={16} weight="bold" aria-hidden />
@@ -106,27 +106,27 @@ export function CreateBusinessDialog() {
         {/* ── Root: prototype picker ── */}
         {step === "root" && (
           <>
-            <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
-              <DialogTitle className="text-base font-semibold text-neutral-950">Create new</DialogTitle>
-              <DialogDescription className="text-sm text-neutral-500">What would you like to start with?</DialogDescription>
+            <DialogHeader className="border-b border-border px-5 py-4">
+              <DialogTitle className="text-base font-semibold text-foreground">Create new</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">What would you like to start with?</DialogDescription>
             </DialogHeader>
-            <div className="divide-y divide-[#ebebeb]">
+            <div className="divide-y divide-border">
               {(Object.entries(PROTOTYPES) as [PrototypeKey, typeof PROTOTYPES[PrototypeKey]][]).map(([key, { label, desc, Icon }]) => (
                 <button
                   key={key}
                   type="button"
-                  className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-[#fafafa]"
+                  className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-muted"
                   onClick={() => {
                     setSelectedPrototype(key);
                     setStep("form");
                   }}
                 >
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-[#f5f5f5] text-neutral-700">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-foreground/70">
                     <Icon size={20} weight="regular" aria-hidden />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-neutral-900">{label}</p>
-                    <p className="text-sm text-neutral-500">{desc}</p>
+                    <p className="text-sm font-semibold text-foreground">{label}</p>
+                    <p className="text-sm text-muted-foreground">{desc}</p>
                   </div>
                 </button>
               ))}
@@ -137,21 +137,21 @@ export function CreateBusinessDialog() {
         {/* ── Form: name input ── */}
         {step === "form" && selectedPrototype && (
           <form onSubmit={handleSubmit}>
-            <DialogHeader className="border-b border-[#ebebeb] px-5 py-4">
+            <DialogHeader className="border-b border-border px-5 py-4">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="flex size-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-[#f5f5f5] hover:text-neutral-900"
+                  className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   onClick={() => setStep("root")}
                   aria-label="Back"
                 >
                   <ArrowLeft size={16} aria-hidden />
                 </button>
                 <div>
-                  <DialogTitle className="text-base font-semibold text-neutral-950">
+                  <DialogTitle className="text-base font-semibold text-foreground">
                     New {PROTOTYPES[selectedPrototype].label}
                   </DialogTitle>
-                  <DialogDescription className="text-sm text-neutral-500">Name your business</DialogDescription>
+                  <DialogDescription className="text-sm text-muted-foreground">Name your business</DialogDescription>
                 </div>
               </div>
             </DialogHeader>
@@ -168,7 +168,7 @@ export function CreateBusinessDialog() {
                 />
               </div>
             </div>
-            <div className="flex items-center justify-end gap-2 border-t border-[#ebebeb] px-5 py-4">
+            <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-4">
               <Button type="button" variant="outline" className="rounded-lg" onClick={() => handleOpenChange(false)}>Cancel</Button>
               <Button type="submit" className="rounded-lg" disabled={!canSubmit}>
                 {isPending ? "Creating..." : "Create"}

@@ -5,7 +5,7 @@ import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 const CHART_CONFIG = {
-  value: { label: "Value", color: "#22c55e" },
+  value: { label: "Value", color: "var(--success)" },
 } satisfies ChartConfig;
 
 const DEFAULT_DATA = [
@@ -30,7 +30,7 @@ export function SalesBarGraph({
   className,
   data = DEFAULT_DATA,
   label,
-  color = "#22c55e",
+  color = "var(--success)",
   valueFormat = "currency",
 }: {
   className?: string;
@@ -45,12 +45,12 @@ export function SalesBarGraph({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border border-[#ebebeb] bg-white px-4 pt-4 pb-2",
+        "overflow-hidden rounded-xl border border-border bg-card px-4 pt-4 pb-2",
         className,
       )}
     >
       {label ? (
-        <p className="mb-2 text-sm text-neutral-500">{label}</p>
+        <p className="mb-2 text-sm text-muted-foreground">{label}</p>
       ) : null}
       <ChartContainer
         config={CHART_CONFIG}
@@ -66,7 +66,7 @@ export function SalesBarGraph({
             dataKey="label"
             axisLine={false}
             tickLine={false}
-            tick={{ fill: "#a3a3a3", fontSize: 11 }}
+            tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
             dy={4}
           />
           <YAxis hide domain={[0, maxValue * 1.2]} />
@@ -76,7 +76,7 @@ export function SalesBarGraph({
               position="top"
               offset={8}
               formatter={(value) => formatChartValue(Number(value), valueFormat)}
-              className="fill-neutral-700"
+              className="fill-muted-foreground"
               style={{ fontSize: 11, fontWeight: 600 }}
             />
           </Bar>

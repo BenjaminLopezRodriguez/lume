@@ -34,14 +34,14 @@ type WizardStep = "list" | "capability" | "configure" | "label" | "result";
 type QrCode = RouterOutputs["qr"]["list"][number];
 type CreatedQr = RouterOutputs["qr"]["create"];
 
-const MENU_ACCENT = "#e85d04";
+const MENU_ACCENT = "var(--chart-2)";
 
 const CAPABILITY_DOT: Record<QrCapabilityId, string> = {
   menu: MENU_ACCENT,
-  web: "#2d5be3",
-  checkout: "#22c55e",
-  storefront: "#6366f1",
-  tickets: "#e85d9b",
+  web: "var(--chart-3)",
+  checkout: "var(--success)",
+  storefront: "var(--chart-1)",
+  tickets: "var(--chart-4)",
 };
 
 function formatPrice(cents: number) {
@@ -221,7 +221,7 @@ export function QrPresencePageView() {
       <button
         type="button"
         onClick={onClick}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft size={16} aria-hidden />
         Back
@@ -237,16 +237,16 @@ export function QrPresencePageView() {
           {!businessId ? (
             <ListCard>
               <ListCardRow
-                dot="#a3a3a3"
+                dot="var(--muted-foreground)"
                 label="Create a business to generate QR codes"
               />
             </ListCard>
           ) : listLoading ? (
-            <p className="text-sm text-neutral-500">Loading…</p>
+            <p className="text-sm text-muted-foreground">Loading…</p>
           ) : existingQrs.length === 0 ? (
             <ListCard>
               <ListCardRow
-                dot="#a3a3a3"
+                dot="var(--muted-foreground)"
                 label="No QR codes yet"
                 trailing="Create one below"
               />
@@ -256,7 +256,7 @@ export function QrPresencePageView() {
               {existingQrs.map((qr) => (
                 <div
                   key={qr.id}
-                  className="flex items-center justify-between gap-3 border-b border-[#ebebeb] px-5 py-4 last:border-b-0"
+                  className="flex items-center justify-between gap-3 border-b border-border px-5 py-4 last:border-b-0"
                 >
                   <button
                     type="button"
@@ -268,15 +268,15 @@ export function QrPresencePageView() {
                       style={{
                         backgroundColor:
                           CAPABILITY_DOT[qr.capability as QrCapabilityId] ??
-                          "#a3a3a3",
+                          "var(--muted-foreground)",
                       }}
                       aria-hidden
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm text-neutral-900">
+                      <span className="block truncate text-sm text-foreground">
                         {qr.label}
                       </span>
-                      <span className="block truncate text-xs text-neutral-400">
+                      <span className="block truncate text-xs text-muted-foreground/70">
                         {capabilityLabel(qr.capability)}
                       </span>
                     </span>
@@ -285,7 +285,7 @@ export function QrPresencePageView() {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    className="shrink-0 text-neutral-400 hover:text-red-600"
+                    className="shrink-0 text-muted-foreground/70 hover:text-red-600"
                     disabled={removeQr.isPending}
                     onClick={() =>
                       removeQr.mutate({ id: qr.id, businessId })
@@ -318,7 +318,7 @@ export function QrPresencePageView() {
               <Button
                 type="button"
                 variant="outline"
-                className="h-10 w-full justify-center rounded-lg border-[#ebebeb]"
+                className="h-10 w-full justify-center rounded-lg border-border"
                 onClick={() => setStep("capability")}
               >
                 <Plus size={16} aria-hidden />
@@ -337,7 +337,7 @@ export function QrPresencePageView() {
         {renderBackButton(goToList)}
         <section className="flex flex-col gap-3">
           <SectionHeader title="What should this QR do?" />
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Options are based on your account capabilities.
           </p>
           <ListCard>
@@ -346,7 +346,7 @@ export function QrPresencePageView() {
                 key={cap.id}
                 type="button"
                 onClick={() => selectCapability(cap.id)}
-                className="flex w-full items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-neutral-50"
+                className="flex w-full items-start gap-3 px-5 py-4 text-left transition-colors hover:bg-muted"
               >
                 <span
                   className="mt-1.5 size-2 shrink-0 rounded-full"
@@ -354,10 +354,10 @@ export function QrPresencePageView() {
                   aria-hidden
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-medium text-neutral-900">
+                  <span className="block text-sm font-medium text-foreground">
                     {cap.label}
                   </span>
-                  <span className="mt-0.5 block text-sm text-neutral-500">
+                  <span className="mt-0.5 block text-sm text-muted-foreground">
                     {cap.description}
                   </span>
                 </span>
@@ -385,7 +385,7 @@ export function QrPresencePageView() {
         })}
         <section className="flex flex-col gap-3">
           <SectionHeader title={`Configure ${config.label}`} />
-          <p className="text-sm text-neutral-500">{config.description}</p>
+          <p className="text-sm text-muted-foreground">{config.description}</p>
 
           {selectedCapability === "menu" ? (
             <div className="flex flex-col gap-4">
@@ -398,27 +398,27 @@ export function QrPresencePageView() {
                   placeholder="Table 4, Patio, Bar"
                   className="h-10 rounded-lg"
                 />
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-muted-foreground/70">
                   Optional. Guests see this when they scan so orders route to the
                   right table.
                 </p>
               </div>
 
               {menu ? (
-                <div className="overflow-hidden rounded-xl border border-[#ebebeb] bg-white">
+                <div className="overflow-hidden rounded-xl border border-border bg-card">
                   <div
-                    className="border-b border-[#ebebeb] px-5 py-4"
+                    className="border-b border-border px-5 py-4"
                     style={{ borderLeftWidth: 3, borderLeftColor: MENU_ACCENT }}
                   >
-                    <p className="text-sm font-medium text-neutral-900">
+                    <p className="text-sm font-medium text-foreground">
                       {menu.name}
                     </p>
-                    <p className="mt-0.5 text-xs text-neutral-500">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                       {menu.items.length} item
                       {menu.items.length === 1 ? "" : "s"} · /menu/{menu.slug}
                     </p>
                   </div>
-                  <div className="divide-y divide-[#ebebeb]">
+                  <div className="divide-y divide-border">
                     {menuPreviewItems.length > 0 ? (
                       menuPreviewItems.map((item) => (
                         <div
@@ -426,29 +426,29 @@ export function QrPresencePageView() {
                           className="flex items-center justify-between gap-4 px-5 py-3"
                         >
                           <div className="min-w-0">
-                            <p className="truncate text-sm text-neutral-900">
+                            <p className="truncate text-sm text-foreground">
                               {item.name}
                             </p>
                             {item.description ? (
-                              <p className="truncate text-xs text-neutral-400">
+                              <p className="truncate text-xs text-muted-foreground/70">
                                 {item.description}
                               </p>
                             ) : null}
                           </div>
-                          <span className="shrink-0 text-sm text-neutral-500">
+                          <span className="shrink-0 text-sm text-muted-foreground">
                             {formatPrice(item.priceCents)}
                           </span>
                         </div>
                       ))
                     ) : (
-                      <div className="px-5 py-4 text-sm text-neutral-500">
+                      <div className="px-5 py-4 text-sm text-muted-foreground">
                         Menu items will appear here once added.
                       </div>
                     )}
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-neutral-500">Loading menu preview…</p>
+                <p className="text-sm text-muted-foreground">Loading menu preview…</p>
               )}
             </div>
           ) : null}
@@ -462,13 +462,13 @@ export function QrPresencePageView() {
                   onValueChange={(value) =>
                     setWebTargetId(value as "lume" | "custom")
                   }
-                  className="overflow-hidden rounded-xl border border-[#ebebeb] bg-white"
+                  className="overflow-hidden rounded-xl border border-border bg-card"
                 >
                   {webTargets.map((target) => (
                     <label
                       key={target.id}
                       htmlFor={`web-target-${target.id}`}
-                      className="flex cursor-pointer items-start gap-3 border-b border-[#ebebeb] px-5 py-4 last:border-b-0 has-[button[data-state=checked]]:bg-neutral-50"
+                      className="flex cursor-pointer items-start gap-3 border-b border-border px-5 py-4 last:border-b-0 has-[button[data-state=checked]]:bg-muted"
                     >
                       <RadioGroupItem
                         id={`web-target-${target.id}`}
@@ -476,10 +476,10 @@ export function QrPresencePageView() {
                         className="mt-0.5"
                       />
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-neutral-900">
+                        <span className="block text-sm font-medium text-foreground">
                           {target.label}
                         </span>
-                        <span className="mt-0.5 block truncate text-xs text-neutral-500">
+                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">
                           {target.url}
                         </span>
                       </span>
@@ -487,7 +487,7 @@ export function QrPresencePageView() {
                   ))}
                 </RadioGroup>
               ) : (
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-muted-foreground">
                   Loading web destinations…
                 </p>
               )}
@@ -525,7 +525,7 @@ export function QrPresencePageView() {
         })}
         <section className="flex flex-col gap-4">
           <SectionHeader title="Name this QR code" />
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             A label helps you tell codes apart — e.g. table numbers or placement
             locations.
           </p>
@@ -573,13 +573,13 @@ export function QrPresencePageView() {
         <section className="flex flex-col items-center gap-6">
           <div className="text-center">
             <SectionHeader title={activeQr.label} className="text-center" />
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               {capabilityLabel(activeQr.capability)}
             </p>
           </div>
 
           <div
-            className="rounded-2xl border border-[#ebebeb] bg-white p-6 shadow-sm"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
             style={isMenu ? { borderTopWidth: 3, borderTopColor: MENU_ACCENT } : undefined}
           >
             <QRCodeSVG
@@ -592,15 +592,15 @@ export function QrPresencePageView() {
           </div>
 
           <div className="w-full max-w-md">
-            <div className="flex items-center gap-2 rounded-xl border border-[#ebebeb] bg-white px-4 py-3">
-              <p className="min-w-0 flex-1 truncate text-sm text-neutral-600">
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3">
+              <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">
                 {activeUrl}
               </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-8 shrink-0 rounded-lg border-[#ebebeb] px-3"
+                className="h-8 shrink-0 rounded-lg border-border px-3"
                 onClick={copyLink}
               >
                 {copied ? (
@@ -619,7 +619,7 @@ export function QrPresencePageView() {
           </div>
 
           {createdQr ? (
-            <p className="text-center text-sm text-neutral-500">
+            <p className="text-center text-sm text-muted-foreground">
               QR code saved. Print or display it where guests can scan.
             </p>
           ) : null}

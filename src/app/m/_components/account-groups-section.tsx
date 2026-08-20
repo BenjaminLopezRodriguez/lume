@@ -33,14 +33,14 @@ export function AccountGroupsSection() {
           groups.map((group) => (
             <ListCardRow
               key={group.id}
-              dot="#6366f1"
+              dot="var(--chart-1)"
               label={group.name}
               trailing={group.description ?? "No description"}
             />
           ))
         ) : (
           <ListCardRow
-            dot="#a3a3a3"
+            dot="var(--muted-foreground)"
             label="No groups yet"
             trailing="Groups let you share capabilities across accounts"
           />

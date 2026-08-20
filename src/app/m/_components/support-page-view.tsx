@@ -15,10 +15,10 @@ const ASSET_TYPE_LABEL: Record<string, string> = {
 };
 
 const ASSET_TYPE_DOT: Record<string, string> = {
-  product: "#6366f1",
-  dining_relationship: "#e85d04",
-  completed_work: "#2d5be3",
-  attendance: "#e85d9b",
+  product: "var(--chart-1)",
+  dining_relationship: "var(--chart-2)",
+  completed_work: "var(--chart-3)",
+  attendance: "var(--chart-4)",
 };
 
 const ASSET_TYPE_TO_ROUTE: Record<string, string> = {
@@ -74,7 +74,7 @@ export function SupportPageView() {
                 {items.map((o) => (
                   <ListCardRow
                     key={o.id}
-                    dot={ASSET_TYPE_DOT[assetType] ?? "#a3a3a3"}
+                    dot={ASSET_TYPE_DOT[assetType] ?? "var(--muted-foreground)"}
                     label={o.customerName}
                     trailing={daysSince(o.createdAt)}
                   />
@@ -88,7 +88,7 @@ export function SupportPageView() {
           <SectionHeader title="No pending issues" />
           <ListCard>
             <ListCardRow
-              dot="#a3a3a3"
+              dot="var(--muted-foreground)"
               label="All customers are up to date"
               trailing="Great job!"
             />

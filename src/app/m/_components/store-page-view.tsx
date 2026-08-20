@@ -98,12 +98,12 @@ export function StorePageView() {
         meta={
           storefrontUrl ? (
             <>
-              <span className="text-neutral-700">StorefrontEndpoint</span>
-              <span className="text-neutral-400"> · </span>
-              <span className="truncate text-neutral-500">{storefrontUrl}</span>
+              <span className="text-foreground/70">StorefrontEndpoint</span>
+              <span className="text-muted-foreground/70"> · </span>
+              <span className="truncate text-muted-foreground">{storefrontUrl}</span>
             </>
           ) : (
-            <span className="text-neutral-500">
+            <span className="text-muted-foreground">
               Catalog checkout — add products and share your storefront
             </span>
           )
@@ -127,7 +127,7 @@ export function StorePageView() {
             <section className="flex flex-col gap-3">
               <SectionHeader title="Add product" />
               <form
-                className="flex flex-col gap-3 rounded-xl border border-[#ebebeb] bg-white p-5"
+                className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5"
                 onSubmit={(event) => {
                   event.preventDefault();
                   const cents = Math.round(parseFloat(productPrice) * 100);
@@ -180,14 +180,14 @@ export function StorePageView() {
                   products.map((product) => (
                     <ListCardRow
                       key={product.id}
-                      dot={product.inventory > 0 ? "#22c55e" : "#ef4444"}
+                      dot={product.inventory > 0 ? "var(--success)" : "var(--destructive)"}
                       label={product.name}
                       trailing={`$${(product.priceCents / 100).toFixed(2)}`}
                     />
                   ))
                 ) : (
                   <ListCardRow
-                    dot="#a3a3a3"
+                    dot="var(--muted-foreground)"
                     label="No products yet"
                     trailing="Add your first SKU"
                   />
@@ -206,11 +206,11 @@ export function StorePageView() {
                   issues.map((o) => (
                     <ListCardRow
                       key={o.id}
-                      dot="#f97316"
+                      dot="var(--warning)"
                       label={o.customerName}
                       trailing={
                         <span className="flex items-center gap-3">
-                          <span className="text-sm text-neutral-400">
+                          <span className="text-sm text-muted-foreground/70">
                             {daysSince(o.purchasedAt)}
                           </span>
                           {resolvedIds.has(o.id) ? (
@@ -237,7 +237,7 @@ export function StorePageView() {
                   ))
                 ) : (
                   <ListCardRow
-                    dot="#a3a3a3"
+                    dot="var(--muted-foreground)"
                     label="No issues"
                     trailing="Ownerships are up to date"
                   />
