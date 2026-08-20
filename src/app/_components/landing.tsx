@@ -10,7 +10,7 @@ import {
   LockSimple,
   ShoppingCart,
   CheckCircle,
-  Star,
+  Receipt,
   ForkKnife,
   Briefcase,
   Storefront,
@@ -65,31 +65,46 @@ const OFFERINGS = [
 ];
 
 const SELL_METHODS = [
-  { Icon: ForkKnife, label: "At the table", bg: "#fff0e8", fg: "#e85d04", desc: "QR codes, table ordering, kitchen sync" },
-  { Icon: Briefcase, label: "Book a service", bg: "#e8f0ff", fg: "#2d5be3", desc: "Scheduling, deposits, recurring billing" },
-  { Icon: Storefront, label: "In-store", bg: "#eafaf1", fg: "#1a7a4a", desc: "POS replacement, tap to pay, inventory" },
-  { Icon: Globe, label: "Online", bg: "#f3e8ff", fg: "#7c3aed", desc: "Embed checkout anywhere, any device" },
+  { Icon: ForkKnife, label: "At the table", desc: "Guests scan the QR on the table, order, and pay before you clear it." },
+  { Icon: Briefcase, label: "Booked ahead", desc: "Take a deposit at booking so a no-show costs you less than the slot." },
+  { Icon: Storefront, label: "Across the counter", desc: "Tap to pay on the phone already in your pocket. No terminal to lease." },
+  { Icon: Globe, label: "Anywhere online", desc: "One link or one embed, working the same on every device." },
 ];
 
 const SHOPPER_PERKS = [
   { Icon: CheckCircle, text: "Saved payment info everywhere — pay once, never re-enter again." },
-  { Icon: Star, text: "Verified reviews from real customers at every Lume business." },
+  { Icon: Receipt, text: "Every receipt and order in one history, not scattered across apps." },
   { Icon: Package, text: "Live order and booking status for everything in one feed." },
   { Icon: CalendarCheck, text: "Book, order, and buy from any Lume seller in seconds." },
 ];
 
+// Sample data for the product mockup. No ratings — Lume has no review system,
+// and invented star counts read as fabricated social proof.
 const SHOP_LISTINGS = [
-  { name: "Rosemary Bistro", tag: "Restaurant · 0.3 mi", rating: "4.9", color: "#3d2a1a" },
-  { name: "Luxe Cuts Studio", tag: "Hair salon · Now open", rating: "4.8", color: "#1a2a3d" },
-  { name: "Mesa Home Goods", tag: "Merchant · Ships today", rating: "4.7", color: "#1a3d2a" },
+  { name: "Rosemary Bistro", tag: "Restaurant · 0.3 mi", color: "#3d2a1a" },
+  { name: "Luxe Cuts Studio", tag: "Hair salon · Open now", color: "#1a2a3d" },
+  { name: "Mesa Home Goods", tag: "Merchant · Ships today", color: "#1a3d2a" },
 ];
 
-const FOOTER_LINKS: Record<string, string[]> = {
-  Product: ["Features", "Pricing", "Changelog", "Roadmap"],
-  Merchants: ["Restaurants", "Services", "Retail", "Case studies"],
-  Resources: ["Docs", "API Reference", "Status", "Blog"],
-  Company: ["About", "Careers", "Privacy", "Terms"],
-};
+// Every entry points somewhere real. Sections that do not exist yet are absent
+// rather than linked to "#".
+const FOOTER_LINKS: { heading: string; links: { label: string; href: string }[] }[] = [
+  {
+    heading: "Product",
+    links: [
+      { label: "How it works", href: "#features" },
+      { label: "Who it's for", href: "#merchants" },
+      { label: "Lume Shop", href: "#lume-shop" },
+    ],
+  },
+  {
+    heading: "Get started",
+    links: [
+      { label: "Create an account", href: "/api/auth/register?post_login_redirect_url=/m/onboarding" },
+      { label: "Log in", href: "/api/auth/login?post_login_redirect_url=/m/dashboard" },
+    ],
+  },
+];
 
 const DELIVERY_PLATFORMS = [
   { name: "Uber Eats", orders: 12, dot: "#06c167" },
@@ -121,12 +136,9 @@ export function Landing() {
 
 function TopBar() {
   return (
-    <div className="flex items-center justify-center gap-8 border-b border-[var(--landing-border)] py-2 text-sm" style={{ color: "var(--landing-muted)" }}>
-      <a href="#" className="font-medium transition-opacity hover:opacity-60" style={{ color: "var(--landing-fg)" }}>
-        For merchants
-      </a>
-      <a href="#" className="transition-opacity hover:opacity-60">For shoppers</a>
-      <a href="#" className="transition-opacity hover:opacity-60">For developers</a>
+    <div className="flex items-center justify-center gap-6 border-b border-[var(--landing-border)] py-2 text-sm" style={{ color: "var(--landing-muted)" }}>
+      <span className="font-medium" style={{ color: "var(--landing-fg)" }}>For merchants</span>
+      <a href="#lume-shop" className="transition-opacity hover:opacity-60">For shoppers</a>
     </div>
   );
 }
@@ -142,14 +154,18 @@ function Nav() {
         </div>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
-          {["Features", "Merchants", "Lume Shop", "Pricing", "Docs"].map((item) => (
+          {[
+            { label: "How it works", href: "#features" },
+            { label: "Who it's for", href: "#merchants" },
+            { label: "Lume Shop", href: "#lume-shop" },
+          ].map((item) => (
             <a
-              key={item}
-              href={`#${item.toLowerCase().replace(" ", "-")}`}
+              key={item.label}
+              href={item.href}
               className="text-sm font-medium transition-opacity hover:opacity-60"
               style={{ color: "var(--landing-fg)" }}
             >
-              {item}
+              {item.label}
             </a>
           ))}
         </nav>
@@ -184,7 +200,7 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden px-6 pt-20 pb-0" style={{ backgroundColor: "#faf8f6" }}>
+    <section className="relative overflow-hidden px-6 pt-20 pb-0" style={{ backgroundColor: "var(--landing-shell)" }}>
       <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-2">
         {/* copy */}
         <div className="flex flex-col gap-8 pb-20">
@@ -305,18 +321,17 @@ function Hero() {
 // ─── Marquee Strip ────────────────────────────────────────────────────────────
 
 const MARQUEE_ITEMS = [
-  "10,000+ merchants",
-  "★ 4.8 average rating",
-  "$500M+ processed",
-  "1.8s avg. checkout",
   "Apple Pay",
   "Google Pay",
   "Visa · Mastercard · Amex",
-  "Rosemary Bistro · $29.16 ✓",
-  "Luxe Cuts Studio · $142.00 ✓",
-  "Mesa Home Goods · $67.50 ✓",
-  "Zero setup fees",
-  "Live in minutes",
+  "Tap to pay on iPhone",
+  "QR table ordering",
+  "Booking deposits",
+  "Invoices",
+  "Payment links",
+  "No setup fees",
+  "No monthly minimum",
+  "Payouts to your bank",
 ];
 
 function StatsStrip() {
@@ -452,7 +467,7 @@ function FeatureMockupSpeed() {
         <button className="flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-bold text-white [touch-action:manipulation]" style={{ backgroundColor: "var(--landing-accent-deep)" }}>
           <Lightning size={14} weight="fill" aria-hidden /> Tap to pay · 1 tap
         </button>
-        <p className="mt-3 text-center text-xs" style={{ color: "var(--landing-muted)" }}>1.8s avg. checkout · no re-entry</p>
+        <p className="mt-3 text-center text-xs" style={{ color: "var(--landing-muted)" }}>Saved card, no re-entry</p>
       </div>
     </div>
   );
@@ -588,7 +603,7 @@ function FeatureScroll() {
   }, []);
 
   return (
-    <section className="px-6 py-24">
+    <section id="features" className="px-6 py-24">
       <div className="mx-auto max-w-7xl">
         <p className="mb-4 text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
           Platform features
@@ -623,12 +638,6 @@ function FeatureScroll() {
                   }}
                 >
                   <div className="flex flex-col gap-6">
-                    <span
-                      className="text-sm font-semibold tabular-nums"
-                      style={{ color: "var(--landing-muted)" }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
                     <h3
                       className="text-3xl font-black lg:text-4xl"
                       style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
@@ -656,11 +665,14 @@ function Offering() {
   const current = OFFERINGS[active]!;
 
   return (
-    <section className="px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
+    <section id="merchants" className="px-6 py-24" style={{ backgroundColor: "var(--landing-shell)" }}>
       <div className="mx-auto max-w-5xl">
-        <p className="mb-16 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
-          Built for your category
-        </p>
+        <h2
+          className="mb-16 max-w-2xl text-4xl font-black lg:text-5xl"
+          style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
+        >
+          Your category is not a configuration screen.
+        </h2>
 
         <div className="flex flex-col items-center gap-2">
           {OFFERINGS.map(({ name }, i) => (
@@ -686,15 +698,16 @@ function Offering() {
                   <p className="mb-4 text-base leading-relaxed" style={{ color: "var(--landing-muted)" }}>
                     {current.desc}
                   </p>
-                  <button
-                    className="btn-spring rounded-full px-6 py-2.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
+                  <a
+                    href="/api/auth/register?post_login_redirect_url=/m/onboarding"
+                    className="btn-spring inline-flex rounded-full px-6 py-2.5 text-sm font-semibold text-white [touch-action:manipulation] focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       backgroundColor: "var(--landing-fg)",
                       outlineColor: "var(--landing-fg)",
                     }}
                   >
-                    Learn more
-                  </button>
+                    Start with {current.name}
+                  </a>
                 </div>
               )}
             </div>
@@ -709,36 +722,28 @@ function Offering() {
 
 function HowYouSell() {
   return (
-    <section className="bg-white px-6 py-24">
-      <div className="mx-auto max-w-7xl">
-        <p className="mb-4 text-center text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
-          Every channel
-        </p>
-        <h2
-          className="mb-4 text-center text-4xl font-black lg:text-5xl"
-          style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
-        >
-          Pick how you sell
-        </h2>
-        <p className="mb-16 text-center text-lg" style={{ color: "var(--landing-muted)" }}>
-          One checkout button. Every commerce type.
-        </p>
+    <section className="bg-white px-6 py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-14 max-w-2xl">
+          <h2
+            className="mb-4 text-4xl font-black lg:text-5xl"
+            style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
+          >
+            The counter moved. The checkout should too.
+          </h2>
+          <p className="text-lg leading-relaxed" style={{ color: "var(--landing-muted)" }}>
+            Same account, same payouts, same reporting — whichever way the sale
+            actually happens.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {SELL_METHODS.map(({ Icon, label, bg, fg, desc }) => (
-            <div
-              key={label}
-              className="flex flex-col gap-5 overflow-hidden rounded-3xl p-7"
-              style={{ backgroundColor: bg }}
-            >
-              <div
-                className="flex size-12 items-center justify-center rounded-2xl"
-                style={{ backgroundColor: `${fg}20` }}
-              >
-                <Icon size={24} weight="fill" style={{ color: fg }} aria-hidden />
-              </div>
+        {/* Hairlines separate peers here, which is what a rule is for */}
+        <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ backgroundColor: "var(--landing-border)" }}>
+          {SELL_METHODS.map(({ Icon, label, desc }) => (
+            <div key={label} className="flex flex-col gap-4 bg-white pt-8 lg:px-7 lg:first:pl-0">
+              <Icon size={22} weight="regular" style={{ color: "var(--landing-accent-deep)" }} aria-hidden />
               <div>
-                <div className="mb-1 text-lg font-black" style={{ color: "var(--landing-fg)" }}>{label}</div>
+                <div className="mb-2 text-base font-bold" style={{ color: "var(--landing-fg)" }}>{label}</div>
                 <div className="text-sm leading-relaxed" style={{ color: "var(--landing-muted)" }}>{desc}</div>
               </div>
             </div>
@@ -752,7 +757,7 @@ function HowYouSell() {
 
 function RestaurantSection() {
   return (
-    <section className="px-6 py-24" style={{ backgroundColor: "#faf8f6" }}>
+    <section className="px-6 py-24" style={{ backgroundColor: "var(--landing-shell)" }}>
       <div className="mx-auto max-w-7xl">
         <p className="mb-4 text-sm font-semibold uppercase tracking-widest" style={{ color: "var(--landing-muted)" }}>
           For restaurants
@@ -877,7 +882,7 @@ function RestaurantSection() {
 
 function LumeShop() {
   return (
-    <section className="overflow-hidden px-6 py-24" style={{ backgroundColor: "var(--landing-fg)" }}>
+    <section id="lume-shop" className="overflow-hidden px-6 py-24" style={{ backgroundColor: "var(--landing-fg)" }}>
       <div className="mx-auto grid max-w-7xl items-center gap-20 lg:grid-cols-2">
         {/* copy */}
         <div className="flex flex-col gap-8">
@@ -979,7 +984,7 @@ function LumeShop() {
               </div>
 
               <div className="space-y-2">
-                {SHOP_LISTINGS.map(({ name, tag, rating, color }) => (
+                {SHOP_LISTINGS.map(({ name, tag, color }) => (
                   <div
                     key={name}
                     className="flex items-center gap-3 rounded-2xl p-3"
@@ -991,10 +996,6 @@ function LumeShop() {
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-xs font-semibold text-white">{name}</div>
                       <div className="truncate text-xs" style={{ color: "#6b5f5a" }}>{tag}</div>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-0.5">
-                      <Star size={10} weight="fill" style={{ color: "#fbbf24" }} aria-hidden />
-                      <span className="text-xs font-semibold tabular-nums" style={{ color: "#9e9693" }}>{rating}</span>
                     </div>
                   </div>
                 ))}
@@ -1109,7 +1110,7 @@ function Footer() {
   return (
     <footer className="bg-white px-6 py-16">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 lg:grid-cols-5">
+        <div className="grid gap-12 lg:grid-cols-4">
           <div className="lg:col-span-1">
             <div className="mb-4 flex items-center gap-2">
               <div
@@ -1125,18 +1126,18 @@ function Footer() {
             </p>
           </div>
 
-          {Object.entries(FOOTER_LINKS).map(([section, links]) => (
-            <div key={section}>
-              <h4 className="mb-4 text-sm font-bold" style={{ color: "var(--landing-fg)" }}>{section}</h4>
+          {FOOTER_LINKS.map(({ heading, links }) => (
+            <div key={heading}>
+              <h4 className="mb-4 text-sm font-bold" style={{ color: "var(--landing-fg)" }}>{heading}</h4>
               <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link}>
+                {links.map(({ label, href }) => (
+                  <li key={label}>
                     <a
-                      href="#"
-                      className="text-sm transition-opacity hover:opacity-100"
+                      href={href}
+                      className="text-sm transition-opacity hover:opacity-60"
                       style={{ color: "var(--landing-muted)" }}
                     >
-                      {link}
+                      {label}
                     </a>
                   </li>
                 ))}

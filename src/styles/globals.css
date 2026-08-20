@@ -65,6 +65,7 @@ h1, h2, h3, h4 {
   --landing-accent-deep: var(--primary);
   --landing-on-accent: oklch(1 0 0);
   --landing-border: oklch(0.93 0.003 0);
+  --landing-shell: oklch(0.98 0.004 60);
   --landing-surface: oklch(1 0 0);
 }
 
