@@ -754,3 +754,137 @@ export const ownershipCheckpointRunsRelations = relations(
   }),
 );
 
+
+// ─── Commerce boundary: humans, apps, and agents ─────────────────────────────
+// See docs/superpowers/specs/agent-commerce-boundary.md
+// PurchaseIntent is the product; the checkout page is one renderer of it.
+
+/** Authority envelope a non-human purchaser acts under. */
+export const delegations = createTable(
+  "delegation",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    /** The human who stays liable for whatever the agent does. */
+    buyerId: d
+      .varchar({ length: 256 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Opaque agent identifier, e.g. "openai:shopping-agent". */
+    agent: d.varchar({ length: 256 }).notNull(),
+    /** Minor units. Null means no ceiling, which we never default to. */
+    maxTransaction: d.integer(),
+    /** Above this amount a human must confirm, no matter what the agent asserts. */
+    requiresConfirmationAbove: d.integer(),
+    /** Null means unrestricted category, set explicitly. */
+    categories: d.jsonb().$type<string[] | null>(),
+    expiresAt: d.timestamp({ withTimezone: true }),
+    revokedAt: d.timestamp({ withTimezone: true }),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [index("delegation_buyer_idx").on(t.buyerId)],
+);
+
+export type PurchaseIntentLineItem = {
+  name: string;
+  quantity: number;
+  /** Minor units. */
+  unitAmount: number;
+};
+
+export type PurchaserKind = "human" | "application" | "agent";
+
+export const purchaseIntents = createTable(
+  "purchase_intent",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    businessId: d
+      .uuid()
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    /** draft | quoted | authorized | confirmed | fulfilled | declined | cancelled | expired */
+    status: d.varchar({ length: 32 }).notNull().default("draft"),
+    purchaserKind: d.varchar({ length: 32 }).notNull().default("human"),
+    purchaserRef: d.varchar({ length: 256 }),
+    /** Set when a non-human purchaser is acting under delegated authority. */
+    delegationId: d.uuid().references(() => delegations.id, {
+      onDelete: "set null",
+    }),
+    items: d.jsonb().$type<PurchaseIntentLineItem[]>(),
+    /** Minor units. Re-pricing invalidates any prior authorization. */
+    amount: d.integer(),
+    currency: d.varchar({ length: 3 }).notNull().default("usd"),
+    /** Why policy allowed or refused this. Never just a boolean. */
+    policyReason: d.varchar({ length: 512 }),
+    requiresHumanConfirmation: d.boolean().notNull().default(false),
+    fulfillment: d.jsonb(),
+    expiresAt: d.timestamp({ withTimezone: true }),
+    authorizedAt: d.timestamp({ withTimezone: true }),
+    confirmedAt: d.timestamp({ withTimezone: true }),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [
+    index("purchase_intent_business_idx").on(t.businessId),
+    index("purchase_intent_status_idx").on(t.status),
+  ],
+);
+
+/**
+ * Append-only. Normal payment platforms record money movement; this records
+ * commercial intent, authorization, and execution — which is the differentiator.
+ */
+export const purchaseIntentEvents = createTable(
+  "purchase_intent_event",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    intentId: d
+      .uuid()
+      .notNull()
+      .references(() => purchaseIntents.id, { onDelete: "cascade" }),
+    /** e.g. quote_returned, policy_evaluated, human_authorized, payment_authorized */
+    kind: d.varchar({ length: 64 }).notNull(),
+    fromStatus: d.varchar({ length: 32 }),
+    toStatus: d.varchar({ length: 32 }),
+    actor: d.varchar({ length: 256 }),
+    detail: d.jsonb(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [index("purchase_intent_event_intent_idx").on(t.intentId)],
+);
+
+export const purchaseIntentRelations = relations(
+  purchaseIntents,
+  ({ one, many }) => ({
+    business: one(businesses, {
+      fields: [purchaseIntents.businessId],
+      references: [businesses.id],
+    }),
+    delegation: one(delegations, {
+      fields: [purchaseIntents.delegationId],
+      references: [delegations.id],
+    }),
+    events: many(purchaseIntentEvents),
+  }),
+);
+
+export const purchaseIntentEventRelations = relations(
+  purchaseIntentEvents,
+  ({ one }) => ({
+    intent: one(purchaseIntents, {
+      fields: [purchaseIntentEvents.intentId],
+      references: [purchaseIntents.id],
+    }),
+  }),
+);

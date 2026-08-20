@@ -24,6 +24,8 @@ const kindeHandler = withAuth({
     "/s(.*)",
     "/w(.*)",
     "/menu(.*)",
+    "/api/commerce(.*)",
+    "/.well-known(.*)",
   ],
 });
 
@@ -35,6 +37,19 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     const url = request.nextUrl.clone();
     url.pathname = `/domains/${host}${request.nextUrl.pathname}`;
     return NextResponse.rewrite(url);
+  }
+
+  // The commerce boundary authenticates with a bearer token in the route
+  // handlers, and discovery is public by design. Kinde's publicPaths matcher
+  // does not reliably match the leading dot in "/.well-known", so bypass here
+  // explicitly rather than depending on its pattern semantics.
+  const { pathname } = request.nextUrl;
+  if (
+    pathname.startsWith("/.well-known/") ||
+    pathname.startsWith("/api/commerce/") ||
+    pathname === "/api/commerce"
+  ) {
+    return NextResponse.next();
   }
 
   if (typeof kindeHandler === "function") {

@@ -9,15 +9,11 @@ import {
   Lightning,
   LockSimple,
   ShoppingCart,
-  CheckCircle,
-  Receipt,
   ForkKnife,
   Briefcase,
   Storefront,
   Globe,
   MagnifyingGlass,
-  Package,
-  CalendarCheck,
 } from "@phosphor-icons/react/dist/ssr";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -32,23 +28,23 @@ const FEATURES = [
     desc: "Apple Pay, Google Pay, card, and link — one integration covers every payment method that matters. Your customers pay how they want. No extra setup. No extra fees.",
   },
   {
-    title: "Fewer taps, more revenue",
-    desc: "Smart autofill, one-tap repeat checkout, and and no forced account creation cut abandonment before it starts. Your checkout doesn't lose sales your business earned.",
+    title: "Recognize the customer. Skip the re-entry.",
+    desc: "Saved payment details turn a repeat order into a single confirmation. No account creation, no re-entering a card.",
   },
   {
     title: "No surprise totals. Ever.",
-    desc: "Subtotals, taxes, and fees in full view before the pay button. No surprise total at confirmation. Customers who trust the process come back more often.",
+    desc: "Subtotals, taxes, and fees are itemized before the pay button, and the number shown is the number charged.",
   },
   {
-    title: "Real support, not just help docs",
-    desc: "Live chat, onboarding help, and a team that knows your business type. When something goes wrong — and it will — you're not alone with a ticket queue.",
+    title: "One place to see what happened",
+    desc: "Every order carries its own record: what was requested, what was authorized, and what was charged.",
   },
 ];
 
 const OFFERINGS = [
   {
     name: "Restaurants",
-    desc: "Table ordering, QR codes, kitchen sync, and tipping — built for the pace of service.",
+    desc: "Table ordering, QR codes, and tipping — built for the pace of service.",
   },
   {
     name: "Services",
@@ -56,11 +52,11 @@ const OFFERINGS = [
   },
   {
     name: "Merchants",
-    desc: "Link-based checkout, in-store POS replacement, and inventory sync in one button.",
+    desc: "Link-based checkout, tap to pay in person, and one product catalog behind both.",
   },
   {
     name: "Developers",
-    desc: "A clean API, webhooks, and embeddable components. Wire Lume anywhere in hours, not days.",
+    desc: "A commerce API built around purchase intent, authorization, and receipts.",
   },
 ];
 
@@ -71,30 +67,15 @@ const SELL_METHODS = [
   { Icon: Globe, label: "Anywhere online", desc: "One link or one embed, working the same on every device." },
 ];
 
-const SHOPPER_PERKS = [
-  { Icon: CheckCircle, text: "Saved payment info everywhere — pay once, never re-enter again." },
-  { Icon: Receipt, text: "Every receipt and order in one history, not scattered across apps." },
-  { Icon: Package, text: "Live order and booking status for everything in one feed." },
-  { Icon: CalendarCheck, text: "Book, order, and buy from any Lume seller in seconds." },
-];
-
-// Sample data for the product mockup. No ratings — Lume has no review system,
-// and invented star counts read as fabricated social proof.
-const SHOP_LISTINGS = [
-  { name: "Rosemary Bistro", tag: "Restaurant · 0.3 mi", color: "#3d2a1a" },
-  { name: "Luxe Cuts Studio", tag: "Hair salon · Open now", color: "#1a2a3d" },
-  { name: "Mesa Home Goods", tag: "Merchant · Ships today", color: "#1a3d2a" },
-];
-
 // Every entry points somewhere real. Sections that do not exist yet are absent
 // rather than linked to "#".
 const FOOTER_LINKS: { heading: string; links: { label: string; href: string }[] }[] = [
   {
     heading: "Product",
     links: [
-      { label: "How it works", href: "#features" },
-      { label: "Who it's for", href: "#merchants" },
-      { label: "Lume Shop", href: "#lume-shop" },
+      { label: "Products", href: "#features" },
+      { label: "Solutions", href: "#merchants" },
+      { label: "Developers", href: "#developers" },
     ],
   },
   {
@@ -125,7 +106,7 @@ export function Landing() {
       <Offering />
       <HowYouSell />
       <RestaurantSection />
-      <LumeShop />
+      <DeveloperSurface />
       <BottomCTA />
       <Footer />
     </div>
@@ -138,7 +119,7 @@ function TopBar() {
   return (
     <div className="flex items-center justify-center gap-6 border-b border-[var(--landing-border)] py-2 text-sm" style={{ color: "var(--landing-muted)" }}>
       <span className="font-medium" style={{ color: "var(--landing-fg)" }}>For merchants</span>
-      <a href="#lume-shop" className="transition-opacity hover:opacity-60">For shoppers</a>
+      <a href="#developers" className="transition-opacity hover:opacity-60">For developers</a>
     </div>
   );
 }
@@ -155,9 +136,9 @@ function Nav() {
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
           {[
-            { label: "How it works", href: "#features" },
-            { label: "Who it's for", href: "#merchants" },
-            { label: "Lume Shop", href: "#lume-shop" },
+            { label: "Products", href: "#features" },
+            { label: "Solutions", href: "#merchants" },
+            { label: "Developers", href: "#developers" },
           ].map((item) => (
             <a
               key={item.label}
@@ -187,7 +168,7 @@ function Nav() {
             asChild
           >
             <a href="/api/auth/register?post_login_redirect_url=/m/onboarding">
-              Get started
+              Start building
             </a>
           </Button>
         </div>
@@ -208,13 +189,13 @@ function Hero() {
             className="text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.03em] lg:text-[4rem]"
             style={{ color: "var(--landing-fg)", textWrap: "balance" } as React.CSSProperties}
           >
-            Your checkout.
+            One checkout.
             <br />
-            <span style={{ color: "var(--landing-accent-deep)" }}>Done right.</span>
+            <span style={{ color: "var(--landing-accent-deep)" }}>However they buy.</span>
           </h1>
           <p className="max-w-md text-lg leading-relaxed" style={{ color: "var(--landing-muted)" }}>
-            One checkout for restaurants, services, and retail.
-            Live in minutes, built to convert.
+            Take payments from people, apps, and AI agents on the same
+            commerce stack. The merchant never has to care which one started it.
           </p>
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-4">
@@ -299,7 +280,7 @@ function Hero() {
                 <ArrowRight size={13} aria-hidden />
               </button>
               <p className="mt-3 text-center text-xs" style={{ color: "var(--landing-muted)" }}>
-                Powered by Lume · 256-bit encryption
+                Powered by Lume · Payments secured by Stripe
               </p>
             </div>
           </div>
@@ -767,7 +748,7 @@ function RestaurantSection() {
           The table is yours. Keep it.
         </h2>
         <p className="mb-16 max-w-2xl text-lg leading-relaxed" style={{ color: "var(--landing-muted)" }}>
-          Stop losing 30% to delivery apps. Lume pulls every order into one dashboard — and gives your guests a direct line to your kitchen.
+          Delivery apps take a commission on every order they bring you. Lume pulls those orders into one dashboard and gives your guests a direct way to order from you.
         </p>
 
         <div className="grid gap-6 lg:grid-cols-3">
@@ -814,9 +795,9 @@ function RestaurantSection() {
             style={{ backgroundColor: "var(--landing-fg)" }}
           >
             <div>
-              <div className="mb-2 text-lg font-semibold text-white">Your QR. $0 commission.</div>
+              <div className="mb-2 text-lg font-semibold text-white">Your QR. No delivery commission.</div>
               <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
-                Guests scan, order, and pay direct. You keep 100% — no 30% Uber fee eating your margins.
+                Guests scan, order, and pay you directly, so the order carries no delivery-app commission.
               </p>
             </div>
             {/* QR visual */}
@@ -835,12 +816,12 @@ function RestaurantSection() {
             {/* Savings comparison */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ backgroundColor: "rgba(255,255,255,0.08)" }}>
-                <span className="text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>Uber Eats fee</span>
+                <span className="text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>Delivery-app commission</span>
                 <span className="text-sm font-semibold" style={{ color: "#ff6b6b" }}>−30%</span>
               </div>
               <div className="flex items-center justify-between rounded-xl px-4 py-3" style={{ backgroundColor: "rgba(255,255,255,0.12)" }}>
                 <span className="text-sm text-white font-medium">Lume direct order</span>
-                <span className="text-sm font-semibold" style={{ color: "var(--landing-accent)" }}>$0 fee</span>
+                <span className="text-sm font-semibold" style={{ color: "var(--landing-accent)" }}>None</span>
               </div>
             </div>
           </div>
@@ -857,8 +838,8 @@ function RestaurantSection() {
             <div className="flex flex-col gap-3">
               {[
                 { dot: "#f59e0b", label: "Issue flagged", sub: "Guest taps \"Something's wrong\"" },
-                { dot: "var(--landing-accent-deep)", label: "You're notified", sub: "Instant alert on your phone" },
-                { dot: "#22c55e", label: "Resolved in 1 tap", sub: "Refund, replacement, or note sent" },
+                { dot: "var(--landing-accent-deep)", label: "You're notified", sub: "Shows up in your dashboard" },
+                { dot: "#22c55e", label: "Resolved in 1 tap", sub: "Refund or note recorded" },
               ].map(({ dot, label, sub }) => (
                 <div key={label} className="flex items-start gap-3">
                   <div className="mt-1 size-2.5 flex-shrink-0 rounded-full" style={{ backgroundColor: dot }} aria-hidden />
@@ -876,166 +857,69 @@ function RestaurantSection() {
   );
 }
 
-// ─── Lume Shop ────────────────────────────────────────────────────────────────
+// ─── Developer surface ───────────────────────────────────────────────────────
+// Everything shown here is a real endpoint. See
+// docs/superpowers/specs/agent-commerce-boundary.md
 
-function LumeShop() {
+const COMMERCE_ENDPOINTS = [
+  { method: "GET", path: "/.well-known/lume-commerce", note: "What this merchant supports" },
+  { method: "POST", path: "/purchase-intents", note: "Create and price an intent" },
+  { method: "POST", path: "/purchase-intents/:id/authorize", note: "Evaluate policy, record the decision" },
+  { method: "POST", path: "/purchase-intents/:id/confirm", note: "Confirm at the authorized amount" },
+  { method: "GET", path: "/purchase-intents/:id", note: "Status plus the full audit timeline" },
+];
+
+function DeveloperSurface() {
   return (
-    <section id="lume-shop" className="overflow-hidden px-6 py-24" style={{ backgroundColor: "var(--landing-fg)" }}>
-      <div className="mx-auto grid max-w-7xl items-center gap-20 lg:grid-cols-2">
-        {/* copy */}
-        <div className="flex flex-col gap-8">
-          <div>
-            <span
-              className="rounded-md px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
-              style={{ backgroundColor: "var(--landing-accent-deep)", color: "white" }}
-            >
-              Lume Shop
-            </span>
-          </div>
-
+    <section id="developers" className="overflow-hidden px-6 py-28" style={{ backgroundColor: "var(--landing-fg)" }}>
+      <div className="mx-auto grid max-w-7xl items-start gap-16 lg:grid-cols-2">
+        <div className="flex flex-col gap-6">
+          <p className="text-sm font-semibold" style={{ color: "var(--landing-accent)" }}>
+            Developers
+          </p>
           <h2
-            className="text-5xl font-semibold leading-[1.05] tracking-tight text-white lg:text-6xl"
+            className="text-[2rem] font-semibold tracking-[-0.025em] text-white lg:text-[2.6rem]"
             style={{ textWrap: "balance" } as React.CSSProperties}
           >
-            One app.<br />Every seller.
+            One order model underneath every channel.
           </h2>
-
-          <p className="max-w-md text-lg leading-relaxed" style={{ color: "#9e9693" }}>
-            Thousands of restaurants, service businesses, and merchants —
-            all on one marketplace. Discover local favorites, book what you need,
-            and check out in seconds with your saved info.
+          <p className="max-w-md text-base leading-relaxed" style={{ color: "#9e9693" }}>
+            A browser renders it. A QR code points at it. An application creates
+            it. The same purchase intent moves from quote to authorization to
+            receipt, and every step is recorded.
           </p>
+          <p className="max-w-md text-base leading-relaxed" style={{ color: "#9e9693" }}>
+            Payment platforms record money movement. Lume records what was
+            requested, what was authorized, and under whose authority.
+          </p>
+        </div>
 
-          <ul className="flex flex-col gap-4">
-            {SHOPPER_PERKS.map(({ Icon, text }) => (
-              <li key={text} className="flex items-start gap-3">
-                <Icon
-                  size={18}
-                  weight="fill"
-                  style={{ color: "var(--landing-accent-deep)" }}
-                  className="mt-0.5 shrink-0"
-                  aria-hidden
-                />
-                <span className="text-sm leading-relaxed" style={{ color: "#c4bfbe" }}>{text}</span>
+        <div className="overflow-hidden rounded-xl border" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+          <div className="border-b px-5 py-3" style={{ borderColor: "rgba(255,255,255,0.12)", backgroundColor: "#2e2520" }}>
+            <span className="font-mono text-xs" style={{ color: "#9e9693" }}>
+              /api/commerce
+            </span>
+          </div>
+          <ul className="divide-y" style={{ borderColor: "rgba(255,255,255,0.12)" }}>
+            {COMMERCE_ENDPOINTS.map(({ method, path, note }) => (
+              <li
+                key={path}
+                className="flex flex-col gap-1 px-5 py-4"
+                style={{ borderColor: "rgba(255,255,255,0.12)" }}
+              >
+                <div className="flex items-baseline gap-3">
+                  <span
+                    className="shrink-0 font-mono text-[0.625rem] font-semibold"
+                    style={{ color: "var(--landing-accent)" }}
+                  >
+                    {method}
+                  </span>
+                  <code className="truncate font-mono text-xs text-white">{path}</code>
+                </div>
+                <span className="text-xs" style={{ color: "#6b5f5a" }}>{note}</span>
               </li>
             ))}
           </ul>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <button
-              className="btn-spring flex items-center gap-2 rounded-lg px-7 py-3.5 text-base font-semibold text-white [touch-action:manipulation] hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ backgroundColor: "var(--landing-accent-deep)" }}
-            >
-              Download the app <ArrowRight size={16} aria-hidden />
-            </button>
-            <button
-              className="btn-spring text-sm font-semibold underline underline-offset-4 [touch-action:manipulation] hover:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ color: "#9e9693" }}
-            >
-              Browse Lume Shop
-            </button>
-          </div>
-        </div>
-
-        {/* phone mockup */}
-        <div className="relative flex justify-center lg:justify-end">
-          <div
-            className="relative w-64 overflow-hidden rounded-[2.5rem] shadow-2xl"
-            style={{ backgroundColor: "#1c1512", border: "1px solid #2e2520" }}
-          >
-            <div className="flex justify-center pb-1 pt-3" aria-hidden>
-              <div className="h-5 w-24 rounded-full" style={{ backgroundColor: "#2e2520" }} />
-            </div>
-
-            <div className="px-4 pb-8">
-              <div className="mb-4 flex items-center justify-between py-2">
-                <span className="text-base font-semibold text-white">Lume Shop</span>
-                <div
-                  className="flex size-7 items-center justify-center rounded-full"
-                  style={{ backgroundColor: "var(--landing-accent-deep)" }}
-                >
-                  <Lightning size={13} weight="fill" className="text-white" aria-hidden />
-                </div>
-              </div>
-
-              <div
-                className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2.5"
-                style={{ backgroundColor: "#2e2520" }}
-              >
-                <MagnifyingGlass size={12} style={{ color: "#6b5f5a" }} aria-hidden />
-                <span className="text-xs" style={{ color: "#6b5f5a" }}>Restaurants, services, shops…</span>
-              </div>
-
-              <div className="mb-4 flex gap-2">
-                {["All", "Food", "Services", "Shop"].map((cat, i) => (
-                  <span
-                    key={cat}
-                    className="shrink-0 rounded-md px-3 py-1 text-[11px] font-semibold"
-                    style={{
-                      backgroundColor: i === 0 ? "var(--landing-accent-deep)" : "#2e2520",
-                      color: i === 0 ? "white" : "#9e9693",
-                    }}
-                  >
-                    {cat}
-                  </span>
-                ))}
-              </div>
-
-              <div className="space-y-2">
-                {SHOP_LISTINGS.map(({ name, tag, color }) => (
-                  <div
-                    key={name}
-                    className="flex items-center gap-3 rounded-lg p-3"
-                    style={{ backgroundColor: "#2e2520" }}
-                  >
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white" style={{ backgroundColor: color }} aria-hidden>
-                      {name[0]}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-semibold text-white">{name}</div>
-                      <div className="truncate text-xs" style={{ color: "#6b5f5a" }}>{tag}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div
-                className="mt-4 flex justify-around border-t pt-3"
-                style={{ borderColor: "#2e2520" }}
-                aria-hidden
-              >
-                {["Home", "Explore", "Orders", "You"].map((tab, i) => (
-                  <div key={tab} className="flex flex-col items-center gap-0.5">
-                    <div
-                      className="size-4 rounded"
-                      style={{ backgroundColor: i === 0 ? "var(--landing-accent-deep)" : "#3d3028" }}
-                    />
-                    <span className="text-[10px]" style={{ color: i === 0 ? "var(--landing-accent-deep)" : "#6b5f5a" }}>
-                      {tab}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div
-            aria-hidden
-            className="absolute -left-6 top-16 hidden rounded-lg px-4 py-3 shadow-xl lg:block"
-            style={{ backgroundColor: "#2e2520", border: "1px solid #3d3028" }}
-          >
-            <div className="text-xs font-semibold text-white">Order placed</div>
-            <div className="mt-0.5 text-xs" style={{ color: "#9e9693" }}>Rosemary Bistro · $29.16</div>
-          </div>
-
-          <div
-            aria-hidden
-            className="absolute -right-6 bottom-20 hidden rounded-lg px-4 py-3 shadow-xl lg:block"
-            style={{ backgroundColor: "var(--landing-accent-deep)" }}
-          >
-            <div className="text-xs font-semibold text-white">Booking confirmed</div>
-            <div className="mt-0.5 text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>Luxe Cuts · 3:00 PM today</div>
-          </div>
         </div>
       </div>
     </section>
@@ -1055,8 +939,8 @@ function BottomCTA() {
           Take your first payment today.
         </h2>
         <p className="max-w-xl text-xl" style={{ color: "rgba(255,255,255,0.75)" }}>
-          No setup fees, no contracts, no code. Most merchants send their first
-          checkout link within ten minutes of signing up.
+          No setup fees, no contracts, no code. Create an account and send a
+          checkout link from the dashboard.
         </p>
 
         <a
@@ -1072,7 +956,7 @@ function BottomCTA() {
           {[
             { n: "1", label: "Create your account", meta: "Email or Google" },
             { n: "2", label: "Add what you sell", meta: "Menu, services, or products" },
-            { n: "3", label: "Share your link", meta: "Get paid the same day" },
+            { n: "3", label: "Share your link", meta: "Paid out to your bank" },
           ].map(({ n, label, meta }) => (
             <li
               key={n}
