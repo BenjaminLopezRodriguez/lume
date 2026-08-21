@@ -138,6 +138,13 @@ export const orders = createTable(
       .notNull()
       .references(() => businesses.id, { onDelete: "cascade" }),
     platform: d.varchar({ length: 32 }).notNull(),
+    /**
+     * Which interface the purchase came through: web | qr | payment_link | api | agent.
+     * Distinct from `platform`, which records the delivery marketplace when there is
+     * one. Nullable because orders predating attribution must read "Unknown" rather
+     * than be guessed at.
+     */
+    source: d.varchar({ length: 32 }),
     externalId: d.varchar({ length: 256 }),
     label: d.varchar({ length: 512 }).notNull(),
     totalCents: d.integer().notNull(),
@@ -887,4 +894,49 @@ export const purchaseIntentEventRelations = relations(
       references: [purchaseIntents.id],
     }),
   }),
+);
+
+/**
+ * Provider webhook receipts. Persisted so replays are no-ops: the provider's own
+ * event id is the uniqueness boundary. Signature verification proves authenticity;
+ * this table proves we have not already acted on it.
+ */
+export const webhookEvents = createTable(
+  "webhook_event",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    provider: d.varchar({ length: 32 }).notNull(),
+    /** The provider's event id, e.g. Stripe evt_… */
+    eventId: d.varchar({ length: 256 }).notNull(),
+    eventType: d.varchar({ length: 128 }),
+    processedAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [uniqueIndex("webhook_event_provider_id_idx").on(t.provider, t.eventId)],
+);
+
+/**
+ * Idempotency for mutating commerce operations. Agents and mobile clients retry;
+ * a duplicate request must never create a second financial operation or order.
+ * The stored response is replayed verbatim on a repeat key.
+ */
+export const idempotencyKeys = createTable(
+  "idempotency_key",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    key: d.varchar({ length: 256 }).notNull(),
+    /** Scope so the same key under a different operation cannot collide. */
+    operation: d.varchar({ length: 64 }).notNull(),
+    /** Hash of the request body — a reused key with different input is a client bug. */
+    requestHash: d.varchar({ length: 128 }).notNull(),
+    responseStatus: d.integer(),
+    responseBody: d.jsonb(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [uniqueIndex("idempotency_key_op_idx").on(t.operation, t.key)],
 );

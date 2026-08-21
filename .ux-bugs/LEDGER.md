@@ -109,3 +109,28 @@ Scope: user-reported — animation jank, nonsensical borders, generic AI feel.
 - /m/* is Kinde-gated. Sidebar active transition, business selector, Channels
   disclosure, Customers empty→populated, dashboard states, dialogs, and responsive
   behaviour were NOT visually confirmed. Static + compiled-CSS verification only.
+
+## 2026-08-20 — Shopify-style merchant IA + commerce core
+
+### Security defect found and fixed
+| Slug | File | Severity | Fix |
+|------|------|----------|-----|
+| unsigned-webhook-accepted | api/webhooks/stripe/route.ts | P0 | With STRIPE_WEBHOOK_SECRET unset the handler JSON.parse'd the body and trusted it — a forged POST could create ownership records. Now fails closed with 500. |
+
+### Logged, not fixed
+| Slug | Severity | Note |
+|------|----------|------|
+| no-merchant-agent-policy | P1 | delegations.buyerId → users.id. Delegations are BUYER-owned; there is no businessId and no merchant-scoped agent policy. Section 11's merchant-set limits need a schema change + evaluatePolicy enforcement. Agents screen is read-only until then. |
+| channelstats-ignores-source | P2 | order.channelStats keys off `platform`, ignoring the new `source` column. Dashboard "Sales by channel" won't reflect real attribution. Moot at 0 orders. |
+| stripe-unwired | P1 | stripe.ts is one paymentLinks.create call. No PaymentIntents/Connect/payouts/refunds/disputes. STRIPE_SECRET_KEY absent from local AND Vercel prod. Payments + revenue Analytics omitted rather than faked. |
+| order-list-no-pagination | P2 | order.list caps at 100, no pagination or filtering. |
+
+### Verified
+- typecheck, lint, production build (31/31), commerce self-check, idempotency self-check
+- All 11 sidebar destinations resolve; /m/orders and /m/agents built
+- No fabricated data in new merchant surfaces; no toggle ships without server-side backing
+- Protocol status reads "Not configured" — ACP/MCP never labelled Active
+
+### Not verified
+- /m/* is Kinde-gated: Orders, Agents, and the new sidebar were NOT seen rendered.
+- Stripe webhook replay safety is correct by construction but UNEXERCISED — no credentials in any environment.

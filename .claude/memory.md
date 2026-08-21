@@ -14,3 +14,8 @@
 | 2026-08-20T00:00:00Z | orchestrator-integration | orchestrator | — | completed | ontology.md, CLAUDE.md register, page titles, sales-bar-graph fabricated DEFAULT_DATA removed |
 | 2026-08-20T00:00:00Z | motion-token-layer | orchestrator | — | completed | globals.css motion tokens + 6 semantic classes; docs/superpowers/specs/motion.md; landing.tsx migrated |
 | 2026-08-20T00:00:00Z | motion-primitives-migrate | general-purpose | 207s | completed | src/components/ui/** ×18 files — ad-hoc timing → tokens |
+| 2026-08-20T00:00:00Z | commerce-schema-source-idem | orchestrator | — | completed | schema.ts orders.source + webhookEvents + idempotencyKeys; db:push verified |
+| 2026-08-20T00:00:00Z | merchant-orders-screen | general-purpose | 68s | completed | m/orders/page.tsx + orders-page-view.tsx — Source column, human statuses, honest empty state |
+| 2026-08-20T00:00:00Z | shopify-sidebar-ia | general-purpose | 65s | completed | app-sidebar.tsx — Store/Sales channels/Automate groups, Integrations to footer |
+| 2026-08-20T00:00:00Z | agents-channel-readonly | general-purpose | 118s | completed | m/agents/* + routers/agent.ts — read-only, honest; found delegations are buyer-owned not merchant-owned |
+| 2026-08-20T00:00:00Z | idempotency-webhook-safety | general-purpose | FAILED (spend limit) | partial | idempotency.ts + 2 routes wired; orchestrator finished webhook replay + self-check |

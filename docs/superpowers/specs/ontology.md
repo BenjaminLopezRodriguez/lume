@@ -79,6 +79,36 @@ Applied renames (user-facing only, no server/table/type renames):
 | Ownership | ambiguous to a merchant | Customers |
 | Connect → In / Out | not inferable | Integrations |
 
+## Merchant vocabulary vs internal vocabulary
+
+The merchant is not the audience for the commerce engine. They think in Shopify
+terms; the engine keeps its own names underneath.
+
+| Merchant sees | Backed by |
+|---------------|-----------|
+| Home | dashboard |
+| Orders | `orders` + `source` attribution |
+| Products | `products`, `storefronts` |
+| Customers | `ownerships` |
+| Sales channels → Online store / Payment links / QR codes | `webPresences`, `qrCodes` |
+| Agents | `delegations` + `evaluatePolicy` |
+| "Approval required", "Order confirmed" | `purchaseIntents.status` |
+
+A merchant must be able to use Lume without knowing what a PurchaseIntent, an API,
+MCP, or ACP is. Infrastructure vocabulary appears only when someone deliberately
+enters a developer or advanced surface.
+
+**A control ships only if flipping it changes server-side behaviour.** A toggle with
+no backing field is a lie about capability, and so is a protocol badge reading
+"Active" for something unimplemented.
+
+## Order source attribution
+
+`orders.source` is the channel the purchase came through — `web`, `qr`,
+`payment_link`, `api`, `agent`. It is deliberately separate from `orders.platform`,
+which records the delivery marketplace when there is one. Source is nullable: orders
+predating attribution render "Unknown" rather than being guessed at.
+
 ## Convergence target
 
 Routes, API resources, permissions, event types and agent tools should

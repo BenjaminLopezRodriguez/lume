@@ -3,6 +3,7 @@
 // Claude: ASK USER before overwriting. Use /prompt-builder + /pm before editing this file.
 
 import { accountGroupRouter } from "@/server/api/routers/accountGroup";
+import { agentRouter } from "@/server/api/routers/agent";
 import { businessRouter } from "@/server/api/routers/business";
 import { capabilitySetRouter } from "@/server/api/routers/capabilitySet";
 import { eventRouter } from "@/server/api/routers/event";
@@ -18,6 +19,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 
 export const appRouter = createTRPCRouter({
   accountGroup: accountGroupRouter,
+  agent: agentRouter,
   business: businessRouter,
   capabilitySet: capabilitySetRouter,
   integration: integrationRouter,

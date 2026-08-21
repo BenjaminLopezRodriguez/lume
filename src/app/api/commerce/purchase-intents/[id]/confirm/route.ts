@@ -9,6 +9,16 @@ import {
   canTransition,
   type PurchaseIntentStatus,
 } from "@/server/commerce/purchase-intent";
+import {
+  claimIdempotencyKey,
+  hashRequest,
+  idempotentResponse,
+  readIdempotencyKey,
+  recordIdempotentResponse,
+  releaseIdempotencyKey,
+} from "@/server/commerce/idempotency";
+
+const OPERATION = "purchase_intent.confirm" as const;
 
 const confirmSchema = z.object({
   /** Identifier of the human confirming. Required when policy demanded one. */
@@ -51,18 +61,45 @@ export async function POST(
     );
   }
 
+  // Retries must never confirm twice. The intent id is part of the hash, so one
+  // key reused against a different intent is a mismatch, not a replay.
+  const idemKey = readIdempotencyKey(req);
+  if (idemKey) {
+    const claim = await claimIdempotencyKey(
+      OPERATION,
+      idemKey,
+      hashRequest({ id, ...parsed.data }),
+    );
+    if (claim.kind !== "proceed") {
+      const replay = idempotentResponse(claim);
+      return NextResponse.json(replay.body, { status: replay.status });
+    }
+  }
+
+  /** Stores the response under the key, then returns it. */
+  const respond = async (payload: unknown, status: number) => {
+    if (idemKey) {
+      if (status >= 200 && status < 300) {
+        await recordIdempotentResponse(OPERATION, idemKey, status, payload);
+      } else {
+        await releaseIdempotencyKey(OPERATION, idemKey);
+      }
+    }
+    return NextResponse.json(payload, { status });
+  };
+
   const intent = await db.query.purchaseIntents.findFirst({
     where: eq(purchaseIntents.id, id),
   });
   if (!intent) {
-    return NextResponse.json({ error: "Not found." }, { status: 404 });
+    return respond({ error: "Not found." }, 404);
   }
 
   const status = intent.status as PurchaseIntentStatus;
   if (!canTransition(status, "confirmed")) {
-    return NextResponse.json(
+    return respond(
       { error: `Cannot confirm an intent in status "${status}".` },
-      { status: 409 },
+      409,
     );
   }
 
@@ -79,23 +116,23 @@ export async function POST(
       actor: parsed.data.confirmedBy ?? "unknown",
       detail: { expected: parsed.data.expectedAmount, actual: intent.amount },
     });
-    return NextResponse.json(
+    return respond(
       {
         error: "Amount has changed since authorization. Re-authorize required.",
         expected: parsed.data.expectedAmount,
         actual: intent.amount,
       },
-      { status: 409 },
+      409,
     );
   }
 
   if (intent.requiresHumanConfirmation && !parsed.data.confirmedBy) {
-    return NextResponse.json(
+    return respond(
       {
         error:
           "This intent requires human confirmation. Supply confirmedBy identifying the person who approved.",
       },
-      { status: 403 },
+      403,
     );
   }
 
@@ -115,11 +152,14 @@ export async function POST(
     detail: { amount: intent.amount, currency: intent.currency },
   });
 
-  return NextResponse.json({
-    id,
-    status: "confirmed",
-    amount: intent.amount,
-    currency: intent.currency,
-    confirmed_at: now.toISOString(),
-  });
+  return respond(
+    {
+      id,
+      status: "confirmed",
+      amount: intent.amount,
+      currency: intent.currency,
+      confirmed_at: now.toISOString(),
+    },
+    200,
+  );
 }

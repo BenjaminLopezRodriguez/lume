@@ -9,18 +9,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { CreateBusinessDialog } from "@/app/m/_components/create-business-dialog";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import {
-  ArrowSquareIn,
-  ArrowSquareOut,
   CaretDown,
-  ChartBar,
   Gear,
   Globe,
   Headset,
+  House,
   LinkSimple,
-  Plus,
   Plugs,
   QrCode,
-  ShareNetwork,
+  Receipt,
+  Robot,
+  Tag,
   UsersThree,
 } from "@phosphor-icons/react";
 import {
@@ -37,12 +36,8 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
@@ -50,28 +45,32 @@ import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
   {
-    label: "Overview",
+    label: "Store",
     items: [
-      { id: "dashboard", label: "Dashboard", Icon: ChartBar, href: "/m/dashboard" },
-      { id: "ownership", label: "Customers", Icon: UsersThree, href: "/m/ownership" },
+      { label: "Home", Icon: House, href: "/m/dashboard" },
+      { label: "Orders", Icon: Receipt, href: "/m/orders" },
+      { label: "Products", Icon: Tag, href: "/m/store" },
+      { label: "Customers", Icon: UsersThree, href: "/m/ownership" },
     ],
   },
   {
-    label: "Sell",
+    label: "Sales channels",
     items: [
-      { id: "share", label: "Checkout", Icon: ShareNetwork, href: "/m/share" },
-      { id: "presence", label: "Channels", Icon: Globe },
+      { label: "Online store", Icon: Globe, href: "/m/presence/web" },
+      { label: "Payment links", Icon: LinkSimple, href: "/m/presence/link" },
+      { label: "QR codes", Icon: QrCode, href: "/m/presence/qr" },
     ],
   },
   {
     label: "Automate",
-    items: [{ id: "connect", label: "Integrations", Icon: Plugs }],
+    items: [{ label: "Agents", Icon: Robot, href: "/m/agents" }],
   },
 ] as const;
 
 const FOOTER_NAV = [
-  { href: "/m/support", label: "Support", Icon: Headset },
+  { href: "/m/connect", label: "Integrations", Icon: Plugs },
   { href: "/m/settings", label: "Settings", Icon: Gear },
+  { href: "/m/support", label: "Support", Icon: Headset },
 ] as const;
 
 const ITEM_CLASS = cn(
@@ -181,108 +180,18 @@ export function AppSidebar() {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu className="gap-1">
-                {group.items.map((item) => {
-                  if (item.id === "presence") {
-                    const presenceActive = pathname.startsWith("/m/presence/");
-                    const PRESENCE_OPTIONS = [
-                      { label: "Web", Icon: Globe, href: "/m/presence/web" },
-                      { label: "QR Code", Icon: QrCode, href: "/m/presence/qr" },
-                      { label: "Link", Icon: LinkSimple, href: "/m/presence/link" },
-                    ] as const;
-                    return (
-                      <SidebarMenuItem key="presence">
-                        <SidebarMenuButton
-                          asChild
-                          isActive={presenceActive}
-                          className={ITEM_CLASS}
-                        >
-                          <Link
-                            href="/m/presence/web"
-                            onClick={closeOnNavigate}
-                            aria-current={presenceActive ? "page" : undefined}
-                          >
-                            <Globe size={18} weight={presenceActive ? "fill" : "regular"} />
-                            <span>{item.label}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <SidebarMenuAction
-                              className="motion-control motion-control-icon flex size-6 items-center justify-center rounded-md text-muted-foreground/70 hover:bg-sidebar-accent/50 hover:text-foreground"
-                              aria-label="Add channel"
-                            >
-                              <Plus size={12} weight="bold" aria-hidden />
-                            </SidebarMenuAction>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent side="right" align="start" className="w-40">
-                            {PRESENCE_OPTIONS.map(({ label, Icon, href }) => (
-                              <DropdownMenuItem key={label} asChild>
-                                <Link href={href} onClick={closeOnNavigate} className="flex items-center gap-2">
-                                  <Icon size={14} />
-                                  {label}
-                                </Link>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </SidebarMenuItem>
-                    );
-                  }
-
-                  if (item.id === "connect") {
-                    const connectActive = pathname.startsWith("/m/connect");
-                    const inActive =
-                      pathname === "/m/connect/in" || pathname.startsWith("/m/connect/in/");
-                    const outActive =
-                      pathname === "/m/connect/out" || pathname.startsWith("/m/connect/out/");
-                    return (
-                      <SidebarMenuItem key="connect">
-                        <SidebarMenuButton isActive={connectActive} className={ITEM_CLASS}>
-                          <Plugs size={18} weight={connectActive ? "fill" : "regular"} />
-                          <span>{item.label}</span>
-                        </SidebarMenuButton>
-                        <SidebarMenuSub>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton asChild isActive={inActive} className="motion-control">
-                              <Link
-                                href="/m/connect/in"
-                                onClick={closeOnNavigate}
-                                aria-current={inActive ? "page" : undefined}
-                              >
-                                <ArrowSquareIn size={14} />
-                                Incoming orders
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                          <SidebarMenuSubItem>
-                            <SidebarMenuSubButton asChild isActive={outActive} className="motion-control">
-                              <Link
-                                href="/m/connect/out"
-                                onClick={closeOnNavigate}
-                                aria-current={outActive ? "page" : undefined}
-                              >
-                                <ArrowSquareOut size={14} />
-                                Outgoing events
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        </SidebarMenuSub>
-                      </SidebarMenuItem>
-                    );
-                  }
-
-                  const href = "href" in item ? item.href : "/m/dashboard";
-                  return (
-                    <NavLink
-                      key={item.id}
-                      href={href}
-                      label={item.label}
-                      Icon={item.Icon}
-                      active={pathname === href || pathname.startsWith(`${href}/`)}
-                      onNavigate={closeOnNavigate}
-                    />
-                  );
-                })}
+                {group.items.map((item) => (
+                  <NavLink
+                    key={item.href}
+                    href={item.href}
+                    label={item.label}
+                    Icon={item.Icon}
+                    active={
+                      pathname === item.href || pathname.startsWith(`${item.href}/`)
+                    }
+                    onNavigate={closeOnNavigate}
+                  />
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

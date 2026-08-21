@@ -19,7 +19,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "check:commerce": "node --experimental-strip-types src/server/commerce/purchase-intent.check.ts"
+    "check:commerce": "node --experimental-strip-types src/server/commerce/purchase-intent.check.ts",
+    "check:idempotency": "node --experimental-strip-types src/server/commerce/idempotency.check.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

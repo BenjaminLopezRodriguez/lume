@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/server/db";
 import { env } from "@/env";
+import { webhookEvents } from "@/server/db/schema";
 import { createOwnership } from "@/server/ownership";
 import type { AssetType } from "@/server/ownership";
 
@@ -70,13 +71,39 @@ export async function POST(request: Request) {
   const sig = request.headers.get("stripe-signature");
   const s = stripe();
 
+  // Fail closed. Without a configured secret we cannot prove Stripe sent this,
+  // and an unsigned body would let anyone forge a completed checkout.
+  if (!env.STRIPE_WEBHOOK_SECRET) {
+    return NextResponse.json(
+      { error: "Webhook secret not configured" },
+      { status: 500 },
+    );
+  }
+
   let event: Stripe.Event;
   try {
-    event = env.STRIPE_WEBHOOK_SECRET
-      ? s.webhooks.constructEvent(body, sig ?? "", env.STRIPE_WEBHOOK_SECRET)
-      : (JSON.parse(body) as Stripe.Event);
+    event = s.webhooks.constructEvent(body, sig ?? "", env.STRIPE_WEBHOOK_SECRET);
   } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+  }
+
+  // Replay safety: the unique index on (provider, eventId) is the boundary, so a
+  // redelivered event changes state exactly once. 200 so Stripe stops retrying.
+  try {
+    await db.insert(webhookEvents).values({
+      provider: "stripe",
+      eventId: event.id,
+      eventType: event.type,
+    });
+  } catch (err) {
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      (err as { code?: unknown }).code === "23505"
+    ) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    throw err;
   }
 
   if (event.type !== "checkout.session.completed") {

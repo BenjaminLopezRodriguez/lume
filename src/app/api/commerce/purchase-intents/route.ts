@@ -10,6 +10,16 @@ import {
 } from "@/server/db/schema";
 import { authorizeCommerceRequest } from "@/server/commerce/auth";
 import { totalAmount } from "@/server/commerce/purchase-intent";
+import {
+  claimIdempotencyKey,
+  hashRequest,
+  idempotentResponse,
+  readIdempotencyKey,
+  recordIdempotentResponse,
+  releaseIdempotencyKey,
+} from "@/server/commerce/idempotency";
+
+const OPERATION = "purchase_intent.create" as const;
 
 const lineItem = z.object({
   name: z.string().min(1).max(256),
@@ -53,19 +63,44 @@ export async function POST(req: Request) {
   }
   const input = parsed.data;
 
+  // Retries must never create a second intent. Absent key behaves as before.
+  const idemKey = readIdempotencyKey(req);
+  if (idemKey) {
+    const claim = await claimIdempotencyKey(
+      OPERATION,
+      idemKey,
+      hashRequest(parsed.data),
+    );
+    if (claim.kind !== "proceed") {
+      const replay = idempotentResponse(claim);
+      return NextResponse.json(replay.body, { status: replay.status });
+    }
+  }
+
+  /** Stores the response under the key, then returns it. */
+  const respond = async (payload: unknown, status: number) => {
+    if (idemKey) {
+      // A client error leaves nothing durable behind, so free the key for a
+      // corrected retry; a success is stored and replayed verbatim.
+      if (status >= 200 && status < 300) {
+        await recordIdempotentResponse(OPERATION, idemKey, status, payload);
+      } else {
+        await releaseIdempotencyKey(OPERATION, idemKey);
+      }
+    }
+    return NextResponse.json(payload, { status });
+  };
+
   const business = await db.query.businesses.findFirst({
     where: eq(businesses.id, input.businessId),
   });
   if (!business) {
-    return NextResponse.json({ error: "Unknown merchant." }, { status: 404 });
+    return respond({ error: "Unknown merchant." }, 404);
   }
 
   const amount = totalAmount(input.items);
   if (amount <= 0) {
-    return NextResponse.json(
-      { error: "Intent total must be greater than zero." },
-      { status: 400 },
-    );
+    return respond({ error: "Intent total must be greater than zero." }, 400);
   }
 
   const expiresAt = new Date(Date.now() + input.expiresInMinutes * 60_000);
@@ -88,10 +123,7 @@ export async function POST(req: Request) {
     .returning();
 
   if (!intent) {
-    return NextResponse.json(
-      { error: "Could not create intent." },
-      { status: 500 },
-    );
+    return respond({ error: "Could not create intent." }, 500);
   }
 
   await db.insert(purchaseIntentEvents).values({
@@ -103,7 +135,7 @@ export async function POST(req: Request) {
     detail: { amount, currency: input.currency },
   });
 
-  return NextResponse.json(
+  return respond(
     {
       id: intent.id,
       status: intent.status,
@@ -113,6 +145,6 @@ export async function POST(req: Request) {
       items: input.items,
       expires_at: expiresAt.toISOString(),
     },
-    { status: 201 },
+    201,
   );
 }
