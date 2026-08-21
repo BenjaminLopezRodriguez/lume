@@ -27,3 +27,7 @@
 | 2026-08-20T00:00:00Z | ask-lume-command-surface | general-purpose | 172s | completed | ask-lume-composer.tsx (4 files→1, 847→406 lines); Sheet panel/FAB/provider deleted |
 | 2026-08-20T00:00:00Z | idempotency-reconcile | orchestrator | — | completed | idempotency.ts storeSingleUse/consumeSingleUse; executor no longer touches table |
 | 2026-08-20T00:00:00Z | handoff-spec | orchestrator | — | completed | docs/superpowers/specs/ask-lume-multiturn-research.md — multi-turn + Tavily research, cold-start ready |
+| 2026-08-20T00:00:00Z | feature | agent | src/ai/conversation.ts, src/ai/executor.ts, src/app/api/agent/route.ts, src/server/db/schema.ts | completed | Ask Lume Feature A multi-turn: scoped conversations, five loop states, confirmation resumes the loop; check:conversation added. Feature B not built. |
+| 2026-08-20T00:00:00Z | multiturn-ui-markdown | general-purpose | 249s | completed | markdown.tsx + composer — conversation turns, sanitised Markdown |
+| 2026-08-20T00:00:00Z | multiturn-backend | general-purpose | 534s | completed | conversation.ts + executor runTurn/confirmAndResume + route contract |
+| 2026-08-20T00:00:00Z | multiturn-integration | orchestrator | — | completed | safe-url extraction + check:markdown, remark-gfm, 3 multi-turn evals, lint |

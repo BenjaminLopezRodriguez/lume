@@ -23,8 +23,10 @@
     "check:idempotency": "node --experimental-strip-types src/server/commerce/idempotency.check.ts",
     "check:agent": "node --experimental-strip-types src/ai/policy.check.ts",
     "check:injection": "node --experimental-strip-types src/ai/untrusted.check.ts",
+    "check:conversation": "node --experimental-strip-types --experimental-loader=./scripts/alias-loader.mjs src/ai/conversation.check.ts",
     "eval:agent": "node --experimental-strip-types --experimental-loader=./scripts/alias-loader.mjs --env-file=.env.local src/ai/evals.ts",
-    "check:blocks": "node --experimental-strip-types src/lib/agent-blocks.check.ts"
+    "check:blocks": "node --experimental-strip-types src/lib/agent-blocks.check.ts",
+    "check:markdown": "node --experimental-strip-types src/lib/safe-url.check.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -54,8 +56,10 @@
     "react": "^19.0.0",
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^4.12.0",
     "recharts": "3.8.0",
+    "remark-gfm": "^4.0.1",
     "resend": "^6.16.0",
     "server-only": "^0.0.1",
     "shadcn": "^4.12.0",

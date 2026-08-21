@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 type Block = { kind?: string; tool?: string; data?: unknown };
 
 import { blockRows } from "@/lib/agent-blocks";
+import { Markdown } from "@/lib/markdown";
 
 type Confirmation = {
   id?: string;
@@ -30,12 +31,42 @@ type Confirmation = {
   cancelLabel?: string;
 };
 
-type Result = {
+/**
+ * Response status. Anything unrecognised is treated as "completed" — the
+ * client never crashes on a status it has not been taught.
+ */
+type Status =
+  | "waiting_for_user"
+  | "completed"
+  | "confirmation_required"
+  | "failed";
+
+/** One visible exchange line. Not a chat message: no author, no timestamp. */
+type Turn = {
+  key: string;
+  from: "merchant" | "lume";
   text: string;
   blocks?: Block[];
-  confirmation?: Confirmation | null;
   isError?: boolean;
 };
+
+/* ── Defensive response probing ──────────────────────────────────────────── */
+
+function str(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function readConfirmation(value: unknown): Confirmation | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  return {
+    id: str(record.id),
+    title: str(record.title),
+    summary: str(record.summary),
+    confirmLabel: str(record.confirmLabel),
+    cancelLabel: str(record.cancelLabel),
+  };
+}
 
 /* ── Static suggestions. Only capabilities this repo actually has. ───────── */
 
@@ -100,22 +131,67 @@ function Blocks({ blocks }: { blocks: Block[] }) {
   );
 }
 
+/**
+ * Merchant turns are indented behind a rule and muted; Lume turns sit flush at
+ * full contrast and render Markdown. The distinction is structural (indent +
+ * rule) as well as tonal, so colour is never the only signal, and a screen
+ * reader gets an explicit attribution.
+ */
+function TurnView({ turn }: { turn: Turn }) {
+  if (turn.from === "merchant") {
+    return (
+      <div className="border-l-2 border-border pl-2">
+        <span className="sr-only">You asked: </span>
+        <p className="text-xs/relaxed whitespace-pre-wrap text-muted-foreground">
+          {turn.text}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <span className="sr-only">Lume replied: </span>
+      {turn.isError ? (
+        <p className="text-xs/relaxed text-destructive">
+          <span className="font-medium">Failed · </span>
+          {turn.text}
+        </p>
+      ) : (
+        turn.text && <Markdown>{turn.text}</Markdown>
+      )}
+      {turn.blocks && <Blocks blocks={turn.blocks} />}
+    </div>
+  );
+}
+
 /* ── The one floating command surface ────────────────────────────────────── */
 
 export function AskLumeSurface() {
   const pathname = usePathname() ?? "";
   const { activeBusiness } = useBusinesses();
   const isHome = pathname === HOME_ROUTE;
+  const businessId = activeBusiness?.id;
 
   const [configured, setConfigured] = useState<boolean | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
-  const [result, setResult] = useState<Result | null>(null);
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
-  const confirmation = result?.confirmation ?? null;
+  const scrollRef = useRef<HTMLDivElement>(null);
+  /** Server-issued thread id. Ref, not state: it is sent, never rendered. */
+  const conversationId = useRef<string | null>(null);
+  /** Monotonic key source — no Date.now() during render (hydration safety). */
+  const turnSeq = useRef(0);
+
+  const nextKey = useCallback(() => {
+    turnSeq.current += 1;
+    return `t${turnSeq.current}`;
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -143,6 +219,17 @@ export function AskLumeSurface() {
     window.setTimeout(() => inputRef.current?.focus(), 0);
   }, []);
 
+  const reset = useCallback(() => {
+    conversationId.current = null;
+    setTurns([]);
+    setConfirmation(null);
+  }, []);
+
+  // Task state is never carried across businesses. Switching starts fresh.
+  useEffect(() => {
+    reset();
+  }, [businessId, reset]);
+
   // Cmd/Ctrl+J. Cmd+B belongs to the sidebar; J is unused elsewhere.
   useEffect(() => {
     if (!configured) return;
@@ -160,16 +247,26 @@ export function AskLumeSurface() {
     if (confirmation) confirmRef.current?.focus();
   }, [confirmation]);
 
+  // The newest turn is at the bottom; the surface grows upward from the input.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [turns, pending, confirmation]);
+
   const post = useCallback(
     async (body: Record<string, unknown>) => {
       setPending(true);
+      setConfirmation(null);
       try {
         const res = await fetch("/api/agent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            businessId: activeBusiness?.id,
+            businessId,
             route: pathname,
+            ...(conversationId.current
+              ? { conversationId: conversationId.current }
+              : {}),
             ...body,
           }),
         });
@@ -178,23 +275,59 @@ export function AskLumeSurface() {
           return;
         }
         if (!res.ok) throw new Error("failed");
-        const data = (await res.json()) as {
-          message?: string;
-          blocks?: Block[];
-          pendingConfirmation?: Confirmation | null;
-        };
-        setResult({
-          text: data.message ?? "",
-          blocks: data.blocks,
-          confirmation: data.pendingConfirmation ?? null,
-        });
+
+        const data: unknown = await res.json();
+        const record =
+          data && typeof data === "object" ? (data as Record<string, unknown>) : {};
+
+        const threadId = str(record.conversationId);
+        if (threadId) conversationId.current = threadId;
+
+        const status = (str(record.status) ?? "completed") as Status;
+        const nextConfirmation =
+          status === "confirmation_required"
+            ? readConfirmation(record.pendingConfirmation)
+            : null;
+
+        const text = str(record.message) ?? "";
+        const blocks = Array.isArray(record.blocks)
+          ? (record.blocks as Block[])
+          : undefined;
+
+        if (text || blocks) {
+          setTurns((prev) => [
+            ...prev,
+            {
+              key: nextKey(),
+              from: "lume",
+              text,
+              blocks,
+              isError: status === "failed",
+            },
+          ]);
+        }
+
+        setConfirmation(nextConfirmation);
+
+        // "waiting_for_user" means Lume asked something — stay ready to answer.
+        if (!nextConfirmation) {
+          window.setTimeout(() => inputRef.current?.focus(), 0);
+        }
       } catch {
-        setResult({ text: "Couldn't complete that.", isError: true });
+        setTurns((prev) => [
+          ...prev,
+          {
+            key: nextKey(),
+            from: "lume",
+            text: "Couldn't complete that.",
+            isError: true,
+          },
+        ]);
       } finally {
         setPending(false);
       }
     },
-    [activeBusiness?.id, pathname],
+    [businessId, nextKey, pathname],
   );
 
   function submit() {
@@ -202,13 +335,16 @@ export function AskLumeSurface() {
     // A pending confirmation can only be resolved by its own controls.
     if (!message || pending || confirmation) return;
     setInput("");
-    setResult(null);
+    setTurns((prev) => [
+      ...prev,
+      { key: nextKey(), from: "merchant", text: message },
+    ]);
     void post({ message });
   }
 
   function collapse() {
+    // The conversation survives collapse on the same business.
     setExpanded(false);
-    setResult(null);
     inputRef.current?.blur();
   }
 
@@ -258,71 +394,94 @@ export function AskLumeSurface() {
   }
 
   const suggestions = suggestionsFor(pathname);
-  const showSuggestions = expanded && !result && !pending;
+  const hasConversation = turns.length > 0;
+  const showSuggestions = expanded && !hasConversation && !pending;
 
   return wrapper(
-    <div className="pointer-events-auto w-full max-w-[680px] rounded-lg border border-border bg-card shadow-md focus-within:ring-2 focus-within:ring-ring sm:w-[600px]">
-      {(pending || result) && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="max-h-[60vh] space-y-2 overflow-y-auto border-b border-border p-3"
-        >
-          {pending && (
-            <p className="text-xs text-muted-foreground">Checking…</p>
-          )}
-          {!pending && confirmation && (
-            <div className="space-y-2">
-              <p className="text-xs/relaxed font-medium text-foreground">
-                {confirmation.title ?? "Confirm this action"}
-              </p>
-              {confirmation.summary && (
-                <p className="text-xs/relaxed text-muted-foreground">
-                  {confirmation.summary}
-                </p>
-              )}
-              <div className="flex gap-2">
-                <Button
-                  ref={confirmRef}
-                  type="button"
-                  size="sm"
-                  onClick={() =>
-                    void post({
-                      confirm: true,
-                      confirmationId: confirmation.id,
-                      message: confirmation.confirmLabel ?? "Confirm",
-                    })
-                  }
-                >
-                  {confirmation.confirmLabel ?? "Confirm"}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    setResult({ text: "Cancelled. Nothing changed." })
-                  }
-                >
-                  {confirmation.cancelLabel ?? "Cancel"}
-                </Button>
-              </div>
+    <div
+      onKeyDown={(event) => {
+        if (event.key === "Escape") collapse();
+      }}
+      className="pointer-events-auto w-full max-w-[680px] rounded-lg border border-border bg-card shadow-md focus-within:ring-2 focus-within:ring-ring sm:w-[600px]"
+    >
+      {(pending || hasConversation) && (
+        <div className="border-b border-border">
+          {hasConversation && (
+            <div className="flex items-center justify-end px-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  reset();
+                  inputRef.current?.focus();
+                }}
+                className="motion-control rounded-md px-1.5 py-0.5 text-[0.6875rem] text-muted-foreground transition-colors duration-(--duration-instant) ease-snap hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                New conversation
+              </button>
             </div>
           )}
-          {!pending && !confirmation && result && (
-            <>
-              {result.text && (
-                <p
-                  className={`text-xs/relaxed whitespace-pre-wrap ${
-                    result.isError ? "text-destructive" : "text-foreground"
-                  }`}
-                >
-                  {result.text}
+
+          <div
+            ref={scrollRef}
+            role="log"
+            aria-live="polite"
+            aria-label="Ask Lume conversation"
+            className="max-h-[60vh] space-y-2.5 overflow-y-auto p-3"
+          >
+            {turns.map((turn) => (
+              <TurnView key={turn.key} turn={turn} />
+            ))}
+
+            {pending && <p className="text-xs text-muted-foreground">Working…</p>}
+
+            {!pending && confirmation && (
+              <div className="space-y-2 rounded-md border border-border p-2">
+                <p className="text-xs/relaxed font-medium text-foreground">
+                  {confirmation.title ?? "Confirm this action"}
                 </p>
-              )}
-              {result.blocks && <Blocks blocks={result.blocks} />}
-            </>
-          )}
+                {confirmation.summary && (
+                  <p className="text-xs/relaxed text-muted-foreground">
+                    {confirmation.summary}
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    ref={confirmRef}
+                    type="button"
+                    size="sm"
+                    onClick={() =>
+                      void post({
+                        confirm: true,
+                        confirmationId: confirmation.id,
+                      })
+                    }
+                  >
+                    {confirmation.confirmLabel ?? "Confirm"}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      // No cancel endpoint exists: an abandoned proposal expires.
+                      setConfirmation(null);
+                      setTurns((prev) => [
+                        ...prev,
+                        {
+                          key: nextKey(),
+                          from: "lume",
+                          text: "Cancelled. Nothing changed.",
+                        },
+                      ]);
+                      inputRef.current?.focus();
+                    }}
+                  >
+                    {confirmation.cancelLabel ?? "Cancel"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -338,7 +497,9 @@ export function AskLumeSurface() {
           value={input}
           rows={1}
           aria-label="Ask Lume"
-          placeholder="Ask Lume anything…"
+          placeholder={
+            hasConversation ? "Reply to Lume…" : "Ask Lume anything…"
+          }
           disabled={confirmation !== null}
           onFocus={() => {
             setExpanded(true);

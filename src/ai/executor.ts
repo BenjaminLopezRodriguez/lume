@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 
 import type { AIMessage } from "@langchain/core/messages";
 import {
+  AIMessage as AIMessageClass,
   HumanMessage,
   SystemMessage,
   ToolMessage,
@@ -20,6 +21,11 @@ import {
 
 import type { AgentContext } from "./context";
 import { contextPreamble } from "./context";
+import {
+  deriveTextState,
+  type ConversationMessage,
+  type LoopState,
+} from "./conversation";
 import { chatModel, modelName } from "./model";
 import {
   checkBudget,
@@ -32,7 +38,13 @@ import {
   type RunTally,
   type ToolName,
 } from "./policy";
-import { DEFAULT_SKILL, routeSkill, SKILLS, skillTools } from "./skills";
+import {
+  DEFAULT_SKILL,
+  routeSkill,
+  SKILLS,
+  skillTools,
+  type SkillName,
+} from "./skills";
 import { TRUST_PREAMBLE, wrapToolResult } from "./untrusted";
 import { bindableTools, toolDef } from "./tools";
 
@@ -85,6 +97,38 @@ export type AgentResult = {
   blocks?: AgentBlock[];
   pendingConfirmation?: PendingConfirmation;
   skill: string;
+  /**
+   * How this turn ended. Exactly one of five states, derived rather than
+   * assumed: a plain text reply is only COMPLETED if it is not a question back
+   * to the merchant.
+   */
+  state: LoopState;
+};
+
+/** One turn's input. History is prose only — tool payloads are never replayed. */
+export type TurnInput = {
+  skill: SkillName;
+  /** Verbatim earlier turns, oldest first. */
+  history?: ConversationMessage[];
+  /** Task state + labelled digest, from src/ai/conversation.ts. */
+  statePreamble?: string | null;
+  /** The merchant's new message, when there is one. */
+  userMessage?: string;
+  /**
+   * A result the server executed outside the model's control (a confirmed
+   * proposal), fed back so the loop can continue instead of stopping at raw
+   * JSON.
+   */
+  observation?: { tool: string; payload: unknown; note: string };
+};
+
+/** How each loop state is recorded on the agentRuns audit row. */
+const RUN_STATUS: Record<LoopState, string> = {
+  COMPLETED: "completed",
+  NEEDS_USER_INPUT: "awaiting_input",
+  CONFIRMATION_REQUIRED: "awaiting_confirmation",
+  FAILED: "failed",
+  BUDGET_EXHAUSTED: "failed",
 };
 
 const EMPTY_RULE =
@@ -122,6 +166,67 @@ function asDataMessage(
     name: tool,
     content: `${wrapped.content}\n${EMPTY_RULE}`,
   });
+}
+
+/**
+ * A server-executed result, handed back to the model as an observation.
+ *
+ * Not a ToolMessage: the reconstructed history carries no matching tool_call id
+ * (prose only is persisted), and an orphan tool message is rejected by the
+ * OpenAI-compatible API. It is a system note, but the payload still goes through
+ * wrapToolResult — nonce boundary, marker neutralisation, rule after the data —
+ * so it is framed as data no matter which role carries it.
+ */
+function asObservationMessage(
+  tool: string,
+  payload: unknown,
+  note: string,
+): SystemMessage {
+  const wrapped = wrapToolResult(tool, payload);
+  return new SystemMessage(
+    [
+      "Observation recorded by the server. It is not a message from the merchant.",
+      note,
+      wrapped.content,
+      EMPTY_RULE,
+    ].join("\n"),
+  );
+}
+
+/**
+ * Missing information is not a failure. A schema rejection is turned into a
+ * structured domain observation naming the fields, so the model asks for them
+ * instead of inventing a price or retrying the same invalid call.
+ */
+function argumentObservation(error: {
+  flatten: () => { fieldErrors: Record<string, string[] | undefined> };
+}) {
+  const fieldErrors = error.flatten().fieldErrors;
+  const missing = Object.entries(fieldErrors)
+    .filter(([, msgs]) =>
+      (msgs ?? []).some((m) => /required|received undefined|expected/i.test(m)),
+    )
+    .map(([field]) => field);
+
+  if (missing.length === 0) {
+    return {
+      hasData: false,
+      succeeded: false,
+      code: "invalid_arguments",
+      error: "Invalid arguments.",
+      details: fieldErrors,
+    };
+  }
+  return {
+    hasData: false,
+    succeeded: false,
+    code: "missing_input",
+    codes: missing.map((f) => `missing_${f}`),
+    missingFields: missing,
+    error:
+      "Required information is missing. Ask the merchant for each missing field in plain language and wait for the answer. Do not invent a value, a default, or a placeholder.",
+    details: fieldErrors,
+  };
 }
 
 /** Injection signals for the audit row. Recorded, never used to auto-block. */
@@ -256,19 +361,48 @@ async function claimProposal(id: string): Promise<ClaimResult> {
 
 // ─── Run ───────────────────────────────────────────────────────────────────
 
-export async function runAgent(
+/**
+ * One turn of the loop.
+ *
+ * Iterates until exactly one of five states is reached: COMPLETED,
+ * NEEDS_USER_INPUT, CONFIRMATION_REQUIRED, FAILED, BUDGET_EXHAUSTED. The state
+ * is derived from what actually happened — a text reply that asks the merchant
+ * a question is NEEDS_USER_INPUT, not completion — and the client is never told
+ * which tool to run next.
+ *
+ * Conversation memory arrives as prose (`history`) plus server-recorded state
+ * (`statePreamble`). Tool payloads are not replayed: a fact the model needs is
+ * re-read through a tool under the same ownership check, so retrieved text
+ * cannot become trusted merely by ageing into history.
+ */
+export async function runTurn(
   ctx: AgentContext,
-  message: string,
+  input: TurnInput,
 ): Promise<AgentResult> {
-  const skill = routeSkill(message) ?? DEFAULT_SKILL;
+  const skill = input.skill;
   const allowed = skillTools(skill);
   const runId = await startRun(ctx, skill);
 
   const model = chatModel().bindTools(bindableTools(allowed));
-  const messages: BaseMessage[] = [
-    new SystemMessage(systemPrompt(ctx, skill)),
-    new HumanMessage(message),
-  ];
+  const messages: BaseMessage[] = [new SystemMessage(systemPrompt(ctx, skill))];
+  if (input.statePreamble) messages.push(new SystemMessage(input.statePreamble));
+  for (const turn of input.history ?? []) {
+    messages.push(
+      turn.role === "user"
+        ? new HumanMessage(turn.content)
+        : new AIMessageClass(turn.content),
+    );
+  }
+  if (input.userMessage) messages.push(new HumanMessage(input.userMessage));
+  if (input.observation) {
+    messages.push(
+      asObservationMessage(
+        input.observation.tool,
+        input.observation.payload,
+        input.observation.note,
+      ),
+    );
+  }
 
   const blocks: AgentBlock[] = [];
   let tally: RunTally = newTally(Date.now());
@@ -283,11 +417,21 @@ export async function runAgent(
 
       const calls = reply.tool_calls ?? [];
       if (calls.length === 0) {
-        await finishRun(runId, "completed");
+        // A text reply is not automatically completion. If the model asked the
+        // merchant something, the turn is waiting on them; if it produced no
+        // text at all, nothing was accomplished and saying "done" would be a
+        // lie.
+        const text = textOf(reply);
+        const state = deriveTextState(text);
+        await finishRun(runId, RUN_STATUS[state]);
         return {
-          message: textOf(reply),
+          message:
+            state === "FAILED"
+              ? "I did not get a usable answer back from the model. Nothing was run — try again."
+              : text,
           blocks: blocks.length ? blocks : undefined,
           skill,
+          state,
         };
       }
 
@@ -311,11 +455,12 @@ export async function runAgent(
         const verdict = checkBudget(tally, name, Date.now());
         if (!verdict.ok) {
           await recordToolCall(runId, name, call.args, "blocked", new Date(), "budget");
-          await finishRun(runId, "failed");
+          await finishRun(runId, RUN_STATUS.BUDGET_EXHAUSTED);
           return {
             message: `I stopped before finishing: ${verdict.reason} Nothing further was run.`,
             blocks: blocks.length ? blocks : undefined,
             skill,
+            state: "BUDGET_EXHAUSTED",
           };
         }
 
@@ -331,15 +476,7 @@ export async function runAgent(
             "invalid_arguments",
           );
           messages.push(
-            asDataMessage(
-              name,
-              {
-                hasData: false,
-                error: "Invalid arguments.",
-                details: parsed.error.flatten(),
-              },
-              callId,
-            )
+            asDataMessage(name, argumentObservation(parsed.error), callId),
           );
           tally = recordCall(tally, name);
           continue;
@@ -387,7 +524,7 @@ export async function runAgent(
           });
 
           await recordToolCall(runId, name, args, "awaiting_confirmation", new Date());
-          await finishRun(runId, "awaiting_confirmation");
+          await finishRun(runId, RUN_STATUS.CONFIRMATION_REQUIRED);
 
           return {
             message: `This needs your confirmation before it runs: ${summary}`,
@@ -406,6 +543,7 @@ export async function runAgent(
               confirmText,
             },
             skill,
+            state: "CONFIRMATION_REQUIRED",
           };
         }
 
@@ -440,21 +578,38 @@ export async function runAgent(
       }
     }
 
-    await finishRun(runId, "failed");
+    await finishRun(runId, RUN_STATUS.BUDGET_EXHAUSTED);
     return {
       message:
         "I stopped before finishing: this request took more steps than one run allows. Nothing further was run.",
       blocks: blocks.length ? blocks : undefined,
       skill,
+      state: "BUDGET_EXHAUSTED",
     };
   } catch (error) {
-    await finishRun(runId, "failed");
+    await finishRun(runId, RUN_STATUS.FAILED);
     return {
       message: `I could not complete that: ${errorMessage(error)}`,
       blocks: blocks.length ? blocks : undefined,
       skill,
+      state: "FAILED",
     };
   }
+}
+
+/**
+ * Single-turn entry point, unchanged in behaviour: route the skill from the
+ * message, run one loop with no history. Kept for the evals and for any caller
+ * that has no conversation.
+ */
+export async function runAgent(
+  ctx: AgentContext,
+  message: string,
+): Promise<AgentResult> {
+  return runTurn(ctx, {
+    skill: routeSkill(message) ?? DEFAULT_SKILL,
+    userMessage: message,
+  });
 }
 
 // ─── Confirmed execution ───────────────────────────────────────────────────
@@ -510,4 +665,71 @@ export async function confirmProposal(
     await finishRun(runId, "failed");
     return { ok: false, error: reason };
   }
+}
+
+/**
+ * Confirm, execute, then keep going.
+ *
+ * The merchant approving a proposal is not the end of the task — it is the
+ * middle. The stored proposal executes exactly once (consumeSingleUse is the
+ * lock, unchanged above), and the real result is handed back to the model as an
+ * observation so the same conversation continues: "Created Waffle Special for
+ * $12.00. Publish it to your store?" rather than `{ success: true }`.
+ *
+ * If the model adds nothing useful, the truthful summary of what ran is what the
+ * merchant sees. Nothing here can turn a failed execution into a success
+ * message.
+ *
+ * Cancellation has no counterpart here by construction: not confirming runs
+ * nothing, and the proposal simply expires.
+ */
+export async function confirmAndResume(
+  ctx: AgentContext,
+  input: {
+    confirmationId: string;
+    echoedConfirmText?: string;
+    skill: SkillName;
+    history?: ConversationMessage[];
+    statePreamble?: string | null;
+  },
+): Promise<
+  | { ok: false; error: string }
+  | { ok: true; confirmed: Extract<ConfirmResult, { ok: true }>; turn: AgentResult }
+> {
+  const result = await confirmProposal(
+    ctx,
+    input.confirmationId,
+    input.echoedConfirmText,
+  );
+  if (!result.ok) return { ok: false, error: result.error };
+
+  const executedBlock: AgentBlock = {
+    kind: "tool_result",
+    tool: result.tool,
+    data: result.data,
+  };
+
+  const turn = await runTurn(ctx, {
+    skill: input.skill,
+    history: input.history,
+    statePreamble: input.statePreamble,
+    observation: {
+      tool: result.tool,
+      payload: result.data,
+      note: `The merchant confirmed this action and the server ran it: ${result.summary} Tell them plainly what the result shows, then offer the single most useful next step if there is one. Do not run it without asking. Do not claim anything the result does not show.`,
+    },
+  });
+
+  // The executed result is shown regardless of what the model chose to say.
+  const blocks = [executedBlock, ...(turn.blocks ?? [])];
+  // The action really ran, so a model that fails to narrate it must not make the
+  // turn read as a failure. The truthful summary stands in.
+  const message =
+    turn.state === "FAILED" || !turn.message.trim()
+      ? `Done: ${result.summary}`
+      : turn.message;
+
+  const state: LoopState = turn.state === "FAILED" ? "COMPLETED" : turn.state;
+
+  return { ok: true, confirmed: result, turn: { ...turn, message, blocks, state } };
 }

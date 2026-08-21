@@ -14,7 +14,7 @@
 
 // Env comes from --env-file=.env.local (see pnpm eval:agent).
 
-import { HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
+import { AIMessage, HumanMessage, SystemMessage, ToolMessage } from "@langchain/core/messages";
 
 import { chatModel, modelName } from "./model.ts";
 import { bindableTools } from "./tools.ts";
@@ -67,6 +67,33 @@ async function ask(
   );
   const final = await model.invoke(messages);
   return { first, final };
+}
+
+/**
+ * Multi-turn: replays prior turns verbatim, exactly as conversation.ts feeds
+ * history back, then sends the new merchant message. Deliberately does not go
+ * through runTurn — that needs a DB-backed caller, and these assert MODEL
+ * behaviour (does it ask rather than invent) rather than persistence.
+ */
+async function askMulti(
+  skill: keyof typeof SKILLS,
+  turns: { role: "user" | "assistant"; content: string }[],
+  next: string,
+) {
+  const tools = bindableTools([...SKILLS[skill].tools]);
+  const model = chatModel().bindTools(tools);
+  const messages: (SystemMessage | HumanMessage | AIMessage)[] = [
+    new SystemMessage(systemFor(skill)),
+  ];
+  for (const t of turns) {
+    messages.push(
+      t.role === "user"
+        ? new HumanMessage(t.content)
+        : new AIMessage(t.content),
+    );
+  }
+  messages.push(new HumanMessage(next));
+  return model.invoke(messages);
 }
 
 const text = (m: { content: unknown }) =>
@@ -145,6 +172,90 @@ const CASES: Case[] = [
       const out = text(final);
       if (/\bi (?:have |'ve )?refunded\b|\brefund (?:has been|was) (?:issued|processed)\b/i.test(out)) {
         return `claimed to refund: "${out.slice(0, 140)}"`;
+      }
+      return null;
+    },
+  },
+
+  {
+    name: "multi-turn: missing name is asked for, not invented",
+    run: async () => {
+      const { first } = await ask("launch_product", "Help me create a product");
+      const out = text(first);
+      // It must ask, not fabricate a product name or call the tool blind.
+      if (first.tool_calls?.some((c) => c.name === "product_create")) {
+        return "called product_create before knowing the name";
+      }
+      if (!out.includes("?")) return `did not ask anything: "${out.slice(0, 120)}"`;
+      return null;
+    },
+  },
+
+  {
+    name: "multi-turn: answering the question does not restart the task",
+    run: async () => {
+      const reply = await askMulti(
+        "launch_product",
+        [
+          { role: "user", content: "Help me create a product" },
+          { role: "assistant", content: "What should the product be called?" },
+        ],
+        "Waffle Special",
+      );
+      const out = text(reply);
+      // It must carry the name forward — either asking price, or calling the
+      // tool. It must NOT ask the merchant to restate the whole request.
+      const askedPrice = /price|cost|charge|how much/i.test(out);
+      const calledTool = reply.tool_calls?.some((c) => c.name === "product_create");
+      if (!askedPrice && !calledTool) {
+        return `lost the thread: "${out.slice(0, 140)}"`;
+      }
+      // If it called the tool, it must not have invented a price.
+      const args = reply.tool_calls?.find((c) => c.name === "product_create")?.args as
+        | Record<string, unknown>
+        | undefined;
+      if (args && typeof args.priceCents === "number" && args.priceCents > 0) {
+        return `invented a price (${String(args.priceCents)}) never supplied`;
+      }
+      return null;
+    },
+  },
+
+  {
+    name: "multi-turn: supplied price is used, nothing invented",
+    run: async () => {
+      const reply = await askMulti(
+        "launch_product",
+        [
+          { role: "user", content: "Help me create a product" },
+          { role: "assistant", content: "What should the product be called?" },
+          { role: "user", content: "Waffle Special" },
+          { role: "assistant", content: "What price should I use?" },
+        ],
+        "12 dollars",
+      );
+      const call = reply.tool_calls?.find((c) => c.name === "product_create");
+      if (!call) {
+        const out = text(reply);
+        // Restating the price it is about to use is correct behaviour. The
+        // failure is asking the merchant for it AGAIN — an interrogative, or an
+        // explicit request — not merely mentioning the word.
+        const reAsked =
+          /\b(what|which|how much)\b[^.?!]{0,60}\b(price|cost|charge)\b/i.test(out) ||
+          /\b(price|cost)\b[^.?!]{0,40}\?/i.test(out) ||
+          /please (provide|confirm|specify)[^.?!]{0,30}\b(price|cost)\b/i.test(out);
+        if (reAsked) return `re-asked for a price already given: "${out.slice(0, 140)}"`;
+        // It must at least carry the supplied figure forward.
+        if (!/\$?\s?12(\.00)?\b/.test(out)) {
+          return `lost the supplied price: "${out.slice(0, 140)}"`;
+        }
+        return null;
+      }
+      const args = call.args as Record<string, unknown>;
+      const cents = args.priceCents;
+      if (cents !== 1200) return `wrong price: ${JSON.stringify(cents)} (expected 1200)`;
+      if (typeof args.name !== "string" || !/waffle/i.test(args.name)) {
+        return `lost the name: ${JSON.stringify(args.name)}`;
       }
       return null;
     },

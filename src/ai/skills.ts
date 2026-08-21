@@ -147,7 +147,7 @@ export function routeSkill(message: string): SkillName {
   for (const skill of Object.values(SKILLS)) {
     for (const intent of skill.intents) {
       if (text.includes(intent) && intent.length > bestLength) {
-        best = skill.name as SkillName;
+        best = skill.name;
         bestLength = intent.length;
       }
     }

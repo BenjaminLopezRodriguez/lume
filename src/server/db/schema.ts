@@ -1024,3 +1024,95 @@ export const agentToolCallsRelations = relations(agentToolCalls, ({ one }) => ({
     references: [agentRuns.id],
   }),
 }));
+
+// ─── Merchant agent: multi-turn conversations ──────────────────────────────
+
+/**
+ * One multi-turn exchange between a merchant and the agent.
+ *
+ * Scoped to exactly one (businessId, userId) pair. That pair is a security
+ * boundary, not a convenience: src/ai/conversation.ts verifies BOTH on every
+ * load, and a conversation naming another business is refused rather than
+ * re-scoped to whoever asked for it.
+ *
+ * `task` is lightweight resumable state — the skill in play, what the merchant
+ * has already supplied, and what actually ran. It is not a form engine, and
+ * nothing is written into it that the server did not observe.
+ */
+export const agentConversations = createTable(
+  "agent_conversation",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    businessId: d
+      .uuid()
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    userId: d
+      .varchar({ length: 256 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** ConversationStatus in src/ai/conversation.ts. */
+    status: d.varchar({ length: 32 }).notNull().default("understanding"),
+    /** ConversationTask. Typed loosely here so the schema stays dependency-free. */
+    task: d.jsonb().$type<Record<string, unknown>>(),
+    /**
+     * Deterministic, labelled digest of turns that fell out of the replay
+     * window. Merchant lines and assistant lines stay distinguishable, and tool
+     * output never appears — retrieved data must not become trusted context by
+     * passing through a summary.
+     */
+    summary: d.text(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [
+    index("agent_conversation_business_user_idx").on(t.businessId, t.userId),
+  ],
+);
+
+/**
+ * One turn of prose. Merchant messages and assistant messages only.
+ *
+ * Raw tool payloads are deliberately NOT stored here: execution metadata belongs
+ * in agentToolCalls, which already records injection signals and neutralised
+ * markers. Persisting a payload would quietly promote untrusted retrieved text
+ * into replayed conversation context.
+ */
+export const agentMessages = createTable(
+  "agent_message",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    conversationId: d
+      .uuid()
+      .notNull()
+      .references(() => agentConversations.id, { onDelete: "cascade" }),
+    /** 'user' | 'assistant' */
+    role: d.varchar({ length: 16 }).notNull(),
+    content: d.text().notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+  }),
+  (t) => [index("agent_message_conversation_idx").on(t.conversationId)],
+);
+
+export const agentConversationsRelations = relations(
+  agentConversations,
+  ({ many }) => ({
+    messages: many(agentMessages),
+  }),
+);
+
+export const agentMessagesRelations = relations(agentMessages, ({ one }) => ({
+  conversation: one(agentConversations, {
+    fields: [agentMessages.conversationId],
+    references: [agentConversations.id],
+  }),
+}));
