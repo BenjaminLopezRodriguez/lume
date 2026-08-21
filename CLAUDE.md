@@ -11,6 +11,8 @@ Before product, schema, or merchant-flow changes:
 
 For implementation phases, see **[docs/superpowers/plans/ownership-roadmap.md](./docs/superpowers/plans/ownership-roadmap.md)**.
 
+**Next up:** [docs/superpowers/specs/ask-lume-multiturn-research.md](./docs/superpowers/specs/ask-lume-multiturn-research.md) — multi-turn Ask Lume + Tavily research tools. Cold-start ready; needs `TAVILY_API_KEY`.
+
 Session workflow: **[docs/CLAUDE_WORKFLOW.md](./docs/CLAUDE_WORKFLOW.md)**.
 
 ## Register

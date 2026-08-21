@@ -26,3 +26,4 @@
 | 2026-08-20T00:00:00Z | agent-evals-live | orchestrator | — | completed | 5/5 vs deepseek-v4-flash: routing, no-fabrication, injection containment, capability honesty |
 | 2026-08-20T00:00:00Z | ask-lume-command-surface | general-purpose | 172s | completed | ask-lume-composer.tsx (4 files→1, 847→406 lines); Sheet panel/FAB/provider deleted |
 | 2026-08-20T00:00:00Z | idempotency-reconcile | orchestrator | — | completed | idempotency.ts storeSingleUse/consumeSingleUse; executor no longer touches table |
+| 2026-08-20T00:00:00Z | handoff-spec | orchestrator | — | completed | docs/superpowers/specs/ask-lume-multiturn-research.md — multi-turn + Tavily research, cold-start ready |
