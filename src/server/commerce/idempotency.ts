@@ -16,7 +16,14 @@ import { createHash } from "node:crypto";
 /** Operations are scoped so the same key under two operations cannot collide. */
 export type IdempotentOperation =
   | "purchase_intent.create"
-  | "purchase_intent.confirm";
+  | "purchase_intent.confirm"
+  /**
+   * A merchant-agent action proposed by the model and awaiting human
+   * confirmation. Shares this table for its unique (operation, key) index, but
+   * uses the single-use helpers below rather than the claim/record cycle: a
+   * proposal is written once and consumed once, not retried.
+   */
+  | "agent.proposal";
 
 const MAX_KEY_LENGTH = 256;
 
@@ -197,4 +204,63 @@ export function idempotentResponse(decision: IdempotencyDecision): {
         "A request with this Idempotency-Key is still in progress. Retry shortly.",
     },
   };
+}
+
+
+/* ─── Single-use records ──────────────────────────────────────────────────────
+ * A different shape from the claim/replay cycle above. A retried request wants
+ * the SAME answer twice; a confirmation must execute exactly ONCE and fail the
+ * second time. Both live here so there is one implementation over this table.
+ */
+
+/** Writes a payload that may be consumed exactly once. Returns its opaque id. */
+export async function storeSingleUse(
+  operation: IdempotentOperation,
+  payload: unknown,
+  requestHash: string,
+): Promise<string> {
+  const { db, idempotencyKeys } = await store();
+  const { randomUUID } = await import("node:crypto");
+  const key = randomUUID();
+
+  await db.insert(idempotencyKeys).values({
+    key,
+    operation,
+    requestHash,
+    // Null marks it unconsumed — the conditional update below is the lock.
+    responseStatus: null,
+    responseBody: payload,
+  });
+  return key;
+}
+
+export type ConsumeResult<T> =
+  | { ok: true; payload: T }
+  | { ok: false; reason: "unknown" | "already_used" };
+
+/**
+ * Consumes a single-use record. The conditional UPDATE is the lock: two
+ * concurrent confirms race on `responseStatus IS NULL` and exactly one wins,
+ * so this is never a read-then-write check that both could pass.
+ */
+export async function consumeSingleUse<T>(
+  operation: IdempotentOperation,
+  key: string,
+): Promise<ConsumeResult<T>> {
+  const { db, idempotencyKeys, scope } = await store();
+  const { and, isNull } = await import("drizzle-orm");
+
+  const existing = await db.query.idempotencyKeys.findFirst({
+    where: scope(operation, key),
+  });
+  if (!existing) return { ok: false, reason: "unknown" };
+
+  const [claimed] = await db
+    .update(idempotencyKeys)
+    .set({ responseStatus: 200 })
+    .where(and(scope(operation, key), isNull(idempotencyKeys.responseStatus)))
+    .returning({ id: idempotencyKeys.id });
+
+  if (!claimed) return { ok: false, reason: "already_used" };
+  return { ok: true, payload: existing.responseBody as T };
 }

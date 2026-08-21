@@ -1,18 +1,22 @@
 import "server-only";
 
-import { createHash, randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 
+import type { AIMessage } from "@langchain/core/messages";
 import {
-  AIMessage,
   HumanMessage,
   SystemMessage,
   ToolMessage,
   type BaseMessage,
 } from "@langchain/core/messages";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/server/db";
-import { agentRuns, agentToolCalls, idempotencyKeys } from "@/server/db/schema";
+import { agentRuns, agentToolCalls } from "@/server/db/schema";
+import {
+  consumeSingleUse,
+  storeSingleUse,
+} from "@/server/commerce/idempotency";
 
 import type { AgentContext } from "./context";
 import { contextPreamble } from "./context";
@@ -55,7 +59,7 @@ const STALE_AFTER_CALLS = 3;
 /** Proposals are short-lived: a confirmation minutes later is a different decision. */
 const PROPOSAL_TTL_MS = 10 * 60 * 1000;
 
-const PROPOSAL_OPERATION = "agent.proposal";
+const PROPOSAL_OPERATION = "agent.proposal" as const;
 
 export type AgentBlock = {
   kind: "tool_result";
@@ -101,12 +105,6 @@ function systemPrompt(ctx: AgentContext, skill: keyof typeof SKILLS): string {
     `Skill: ${SKILLS[skill].name}. ${SKILLS[skill].instructions}`,
   ].join("\n\n");
 }
-
-type ToolMessageResult = {
-  message: ToolMessage;
-  signals: string[];
-  hadMarkers: boolean;
-};
 
 /**
  * The only path by which tool output reaches the model. Delimiting, nonce,
@@ -221,15 +219,11 @@ type StoredProposal = {
  * that makes single-use a write race rather than a read-then-check.
  */
 async function storeProposal(proposal: StoredProposal): Promise<string> {
-  const id = randomUUID();
-  await db.insert(idempotencyKeys).values({
-    key: id,
-    operation: PROPOSAL_OPERATION,
-    requestHash: hashArgs({ tool: proposal.tool, args: proposal.args }),
-    responseStatus: null,
-    responseBody: proposal,
-  });
-  return id;
+  return storeSingleUse(
+    PROPOSAL_OPERATION,
+    proposal,
+    hashArgs({ tool: proposal.tool, args: proposal.args }),
+  );
 }
 
 type ClaimResult =
@@ -241,30 +235,23 @@ type ClaimResult =
  * NULL) is the lock: a replayed confirm loses it and gets nothing.
  */
 async function claimProposal(id: string): Promise<ClaimResult> {
-  const scope = and(
-    eq(idempotencyKeys.operation, PROPOSAL_OPERATION),
-    eq(idempotencyKeys.key, id),
-  );
-
-  const existing = await db.query.idempotencyKeys.findFirst({ where: scope });
-  if (!existing) return { ok: false, error: "That confirmation is unknown." };
-  if (existing.responseStatus !== null) {
-    return { ok: false, error: "That confirmation was already used." };
+  const consumed = await consumeSingleUse<StoredProposal>(PROPOSAL_OPERATION, id);
+  if (!consumed.ok) {
+    return {
+      ok: false,
+      error:
+        consumed.reason === "unknown"
+          ? "That confirmation is unknown."
+          : "That confirmation was already used.",
+    };
   }
 
-  const proposal = existing.responseBody as StoredProposal | null;
-  if (!proposal || Date.now() > proposal.expiresAt) {
+  // Expiry is checked after the claim, so a stale confirm still burns its
+  // single use rather than remaining replayable.
+  if (Date.now() > consumed.payload.expiresAt) {
     return { ok: false, error: "That confirmation has expired. Ask again." };
   }
-
-  const [claimed] = await db
-    .update(idempotencyKeys)
-    .set({ responseStatus: 200 })
-    .where(and(scope, isNull(idempotencyKeys.responseStatus)))
-    .returning({ id: idempotencyKeys.id });
-
-  if (!claimed) return { ok: false, error: "That confirmation was already used." };
-  return { ok: true, proposal };
+  return { ok: true, proposal: consumed.payload };
 }
 
 // ─── Run ───────────────────────────────────────────────────────────────────

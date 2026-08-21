@@ -1,9 +1,6 @@
 import { Toaster } from "sonner";
 import { MobileShell } from "@/app/m/_components/mobile-shell";
-import {
-  AskLumeProvider,
-  AskLumeSurface,
-} from "@/app/m/_components/ask-lume-provider";
+import { AskLumeSurface } from "@/app/m/_components/ask-lume-composer";
 
 export default function MobileLayout({
   children,
@@ -11,10 +8,8 @@ export default function MobileLayout({
   return (
     <>
       <MobileShell>
-        <AskLumeProvider>
-          {children}
-          <AskLumeSurface />
-        </AskLumeProvider>
+        {children}
+        <AskLumeSurface />
       </MobileShell>
       <Toaster position="bottom-center" />
     </>
