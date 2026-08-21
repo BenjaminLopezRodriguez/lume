@@ -19,3 +19,8 @@
 | 2026-08-20T00:00:00Z | shopify-sidebar-ia | general-purpose | 65s | completed | app-sidebar.tsx — Store/Sales channels/Automate groups, Integrations to footer |
 | 2026-08-20T00:00:00Z | agents-channel-readonly | general-purpose | 118s | completed | m/agents/* + routers/agent.ts — read-only, honest; found delegations are buyer-owned not merchant-owned |
 | 2026-08-20T00:00:00Z | idempotency-webhook-safety | general-purpose | FAILED (spend limit) | partial | idempotency.ts + 2 routes wired; orchestrator finished webhook replay + self-check |
+| 2026-08-20T00:00:00Z | ask-lume-ui | general-purpose | 181s | completed | ask-lume-{provider,composer,fab,panel}.tsx + m/layout.tsx — capability-gated |
+| 2026-08-20T00:00:00Z | agent-pure-layers | orchestrator | — | completed | src/ai/{policy,skills,model}.ts + policy.check.ts; DeepSeek key + thinking-disable verified live |
+| 2026-08-20T00:00:00Z | agent-tools-executor-api | general-purpose | 589s | completed | src/ai/{tools,executor,context}.ts + api/agent/* + agentRuns/agentToolCalls |
+| 2026-08-20T00:00:00Z | injection-hardening | orchestrator | — | completed | src/ai/untrusted.ts + check; nonce boundary, per-field cap; consolidated executor onto it |
+| 2026-08-20T00:00:00Z | agent-evals-live | orchestrator | — | completed | 5/5 vs deepseek-v4-flash: routing, no-fabrication, injection containment, capability honesty |

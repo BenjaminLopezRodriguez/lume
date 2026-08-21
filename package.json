@@ -20,11 +20,16 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "check:commerce": "node --experimental-strip-types src/server/commerce/purchase-intent.check.ts",
-    "check:idempotency": "node --experimental-strip-types src/server/commerce/idempotency.check.ts"
+    "check:idempotency": "node --experimental-strip-types src/server/commerce/idempotency.check.ts",
+    "check:agent": "node --experimental-strip-types src/ai/policy.check.ts",
+    "check:injection": "node --experimental-strip-types src/ai/untrusted.check.ts",
+    "eval:agent": "node --experimental-strip-types --experimental-loader=./scripts/alias-loader.mjs --env-file=.env.local src/ai/evals.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@kinde-oss/kinde-auth-nextjs": "^2.13.0",
+    "@langchain/core": "^1.2.8",
+    "@langchain/openai": "^1.5.8",
     "@phosphor-icons/react": "^2.1.10",
     "@shadcn/react": "^0.2.0",
     "@t3-oss/env-nextjs": "^0.12.0",
@@ -39,6 +44,7 @@
     "drizzle-orm": "^0.41.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
+    "langchain": "^1.5.9",
     "next": "^15.2.3",
     "next-themes": "^0.4.6",
     "postgres": "^3.4.4",

@@ -940,3 +940,87 @@ export const idempotencyKeys = createTable(
   }),
   (t) => [uniqueIndex("idempotency_key_op_idx").on(t.operation, t.key)],
 );
+
+// ─── Merchant agent: run + tool-call audit ─────────────────────────────────
+
+/**
+ * One agent request. Records what was asked of the system, never the prompt
+ * itself — merchant messages and customer data stay out of the audit trail.
+ */
+export const agentRuns = createTable(
+  "agent_run",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    businessId: d
+      .uuid()
+      .notNull()
+      .references(() => businesses.id, { onDelete: "cascade" }),
+    userId: d
+      .varchar({ length: 256 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** Model identifier only. Never the credential. */
+    model: d.varchar({ length: 64 }).notNull(),
+    skill: d.varchar({ length: 64 }).notNull(),
+    /** 'running' | 'completed' | 'awaiting_confirmation' | 'failed' */
+    status: d.varchar({ length: 32 }).notNull().default("running"),
+    startedAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    completedAt: d.timestamp({ withTimezone: true }),
+  }),
+  (t) => [
+    index("agent_run_business_idx").on(t.businessId),
+    index("agent_run_user_idx").on(t.userId),
+  ],
+);
+
+/**
+ * One tool invocation inside a run. Arguments are stored as a hash, not in the
+ * clear: enough to prove two calls were identical, not enough to leak a
+ * customer name or a price the merchant considers private.
+ */
+export const agentToolCalls = createTable(
+  "agent_tool_call",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    runId: d
+      .uuid()
+      .notNull()
+      .references(() => agentRuns.id, { onDelete: "cascade" }),
+    tool: d.varchar({ length: 64 }).notNull(),
+    /** ToolClass from src/ai/policy.ts. */
+    classification: d.varchar({ length: 16 }).notNull(),
+    /** sha256 of the canonical arguments. */
+    inputHash: d.varchar({ length: 64 }).notNull(),
+    /** 'ok' | 'failed' | 'blocked' | 'awaiting_confirmation' */
+    status: d.varchar({ length: 16 }).notNull(),
+    /**
+     * Injection phrases detected in this result by src/ai/untrusted.ts. Recorded,
+     * never used to block: a real customer note may legitimately say "cancel this",
+     * and withholding a merchant's own data would be the worse trade.
+     */
+    injectionSignals: d.jsonb().$type<string[]>(),
+    /** True when boundary or role markers were neutralised in the payload. */
+    hadMarkers: d.boolean().notNull().default(false),
+    startedAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    completedAt: d.timestamp({ withTimezone: true }),
+    errorCode: d.varchar({ length: 64 }),
+  }),
+  (t) => [index("agent_tool_call_run_idx").on(t.runId)],
+);
+
+export const agentRunsRelations = relations(agentRuns, ({ many }) => ({
+  toolCalls: many(agentToolCalls),
+}));
+
+export const agentToolCallsRelations = relations(agentToolCalls, ({ one }) => ({
+  run: one(agentRuns, {
+    fields: [agentToolCalls.runId],
+    references: [agentRuns.id],
+  }),
+}));
