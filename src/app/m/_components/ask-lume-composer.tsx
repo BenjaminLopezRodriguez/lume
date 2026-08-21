@@ -10,11 +10,17 @@ import { Textarea } from "@/components/ui/textarea";
 
 /* ── Server contract (POST /api/agent) ───────────────────────────────────── */
 
-type Entity = { id: string; label: string; detail?: string; href?: string };
+/**
+ * What the server actually sends (see AgentBlock in src/ai/executor.ts):
+ *   { kind: "tool_result", tool, data }
+ * `data` is a tool envelope, normally { hasData, count, items }, but it is
+ * typed `unknown` server-side — so nothing here may assume a shape. Every
+ * field is probed before use; a block this component cannot read renders
+ * nothing rather than throwing.
+ */
+type Block = { kind?: string; tool?: string; data?: unknown };
 
-type Block =
-  | { type: "text"; text: string }
-  | { type: "list" | "entities"; title?: string; items: Entity[] };
+import { blockRows } from "@/lib/agent-blocks";
 
 type Confirmation = {
   id?: string;
@@ -66,47 +72,30 @@ function suggestionsFor(pathname: string): string[] {
 function Blocks({ blocks }: { blocks: Block[] }) {
   return (
     <>
-      {blocks.map((block, index) =>
-        block.type === "text" ? (
-          <p
-            key={index}
-            className="text-xs/relaxed whitespace-pre-wrap text-foreground"
-          >
-            {block.text}
-          </p>
-        ) : (
+      {blocks.map((block, index) => {
+        const rows = blockRows(block);
+
+        if (rows.length === 0) return null;
+
+        return (
           <div key={index} className="rounded-md border border-border">
-            {block.title && (
-              <p className="border-b border-border px-2 py-1 text-[0.625rem] font-medium tracking-wide text-muted-foreground uppercase">
-                {block.title}
-              </p>
-            )}
             <ul className="divide-y divide-border">
-              {block.items.map((item) => (
-                <li key={item.id} className="px-2 py-1.5">
-                  {item.href ? (
-                    <a
-                      href={item.href}
-                      className="text-xs/relaxed font-medium text-foreground underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <span className="text-xs/relaxed font-medium text-foreground">
-                      {item.label}
-                    </span>
-                  )}
-                  {item.detail && (
+              {rows.map((row) => (
+                <li key={row.key} className="px-2 py-1.5">
+                  <span className="text-xs/relaxed font-medium text-foreground">
+                    {row.label}
+                  </span>
+                  {row.detail && (
                     <p className="text-[0.6875rem] text-muted-foreground">
-                      {item.detail}
+                      {row.detail}
                     </p>
                   )}
                 </li>
               ))}
             </ul>
           </div>
-        ),
-      )}
+        );
+      })}
     </>
   );
 }

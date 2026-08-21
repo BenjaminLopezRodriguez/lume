@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import Link from "next/link";
 import { useBusinesses } from "@/app/m/_components/business-provider";
 import { PageContent } from "@/app/m/_components/page-content";
@@ -53,7 +55,22 @@ function greeting(hour: number) {
   return "Good evening";
 }
 
+/**
+ * The greeting depends on the viewer's local clock, which the server does not
+ * share. Rendering it during SSR produced a hydration mismatch (React #418)
+ * whenever the two sides straddled a boundary — the server in UTC saying
+ * "Good evening" while the browser said "Good afternoon".
+ *
+ * Resolved after mount instead, so the first paint matches the server exactly.
+ */
+function useGreeting(): string | null {
+  const [value, setValue] = useState<string | null>(null);
+  useEffect(() => setValue(greeting(new Date().getHours())), []);
+  return value;
+}
+
 export function DashboardPageView() {
+  const hello = useGreeting();
   const { activeBusiness } = useBusinesses();
   const businessId = activeBusiness?.id;
 
@@ -105,9 +122,11 @@ export function DashboardPageView() {
   return (
     <PageContent width="full">
       <PageHeader
-        title={`${greeting(new Date().getHours())}${
-          activeBusiness ? `, ${activeBusiness.name}` : ""
-        }`}
+        title={
+          hello
+            ? `${hello}${activeBusiness ? `, ${activeBusiness.name}` : ""}`
+            : (activeBusiness?.name ?? "Home")
+        }
         meta={
           activeBusiness ? (
             <dl className="mt-1 flex flex-wrap items-end gap-x-10 gap-y-4">

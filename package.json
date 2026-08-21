@@ -23,7 +23,8 @@
     "check:idempotency": "node --experimental-strip-types src/server/commerce/idempotency.check.ts",
     "check:agent": "node --experimental-strip-types src/ai/policy.check.ts",
     "check:injection": "node --experimental-strip-types src/ai/untrusted.check.ts",
-    "eval:agent": "node --experimental-strip-types --experimental-loader=./scripts/alias-loader.mjs --env-file=.env.local src/ai/evals.ts"
+    "eval:agent": "node --experimental-strip-types --experimental-loader=./scripts/alias-loader.mjs --env-file=.env.local src/ai/evals.ts",
+    "check:blocks": "node --experimental-strip-types src/lib/agent-blocks.check.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
